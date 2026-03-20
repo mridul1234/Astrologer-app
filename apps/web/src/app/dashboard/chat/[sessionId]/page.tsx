@@ -51,17 +51,18 @@ export default function UserChatPage() {
   }, [messages, scrollToBottom]);
 
   // Load session data + connect socket
-  useEffect(() => {
-    if (!authSession?.user) return;
+  const authStatus = authSession?.user ? "authenticated" : "loading";
 
-    // Get socket token from localStorage (set when starting chat)
+  useEffect(() => {
+    if (authStatus !== "authenticated") return;
+    if (socketRef.current) return; // Prevent double connection
+
     const socketToken = localStorage.getItem(`socket_token_${sessionId}`);
     if (!socketToken) {
       router.push("/dashboard");
       return;
     }
 
-    // Fetch session history
     fetch(`/api/chat/session/${sessionId}`)
       .then((r) => r.json())
       .then((data: SessionData) => {
@@ -70,9 +71,9 @@ export default function UserChatPage() {
         setBalance(data.user.walletBalance ?? 0);
       });
 
-    // Connect to socket server
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001", {
       auth: { token: socketToken },
+      transports: ["websocket", "polling"]
     });
 
     socket.on("connect", () => {
@@ -100,11 +101,17 @@ export default function UserChatPage() {
       setEnded(true);
     });
 
-    socket.on("disconnect", () => setConnected(false));
+    socket.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
+      setConnected(false);
+    });
 
     socketRef.current = socket;
-    return () => { socket.disconnect(); };
-  }, [authSession, sessionId, router]);
+    return () => { 
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [authStatus, sessionId, router]);
 
   function sendMessage() {
     if (!input.trim() || !socketRef.current) return;

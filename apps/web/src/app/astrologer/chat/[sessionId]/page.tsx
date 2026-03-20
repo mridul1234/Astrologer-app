@@ -43,8 +43,11 @@ export default function AstrologerChatPage() {
 
   useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
 
+  const authStatus = authSession?.user ? "authenticated" : "loading";
+
   useEffect(() => {
-    if (!authSession?.user) return;
+    if (authStatus !== "authenticated") return;
+    if (socketRef.current) return;
 
     const socketToken = localStorage.getItem(`socket_token_${sessionId}`);
     if (!socketToken) { router.push("/astrologer"); return; }
@@ -58,6 +61,7 @@ export default function AstrologerChatPage() {
 
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001", {
       auth: { token: socketToken },
+      transports: ["websocket", "polling"]
     });
 
     socket.on("connect", () => {
@@ -74,11 +78,17 @@ export default function AstrologerChatPage() {
     });
 
     socket.on("session_ended", () => setEnded(true));
-    socket.on("disconnect", () => setConnected(false));
+    socket.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
+      setConnected(false);
+    });
 
     socketRef.current = socket;
-    return () => { socket.disconnect(); };
-  }, [authSession, sessionId, router]);
+    return () => { 
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [authStatus, sessionId, router]);
 
   function sendMessage() {
     if (!input.trim() || !socketRef.current) return;
