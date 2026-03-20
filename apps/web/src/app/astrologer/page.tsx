@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface ChatSession {
@@ -145,16 +146,27 @@ export default function AstrologerDashboard() {
             {togglingOnline ? "Updating…" : isOnline ? "Online" : "Go Online"}
           </button>
 
-          {/* Avatar */}
-          <div
-            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm"
+          {/* Avatar → Settings */}
+          <Link
+            href="/astrologer/settings"
+            id="astro-settings-nav-btn"
+            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm hover:scale-110 transition-transform"
             style={{
               background: "linear-gradient(135deg, #d97706, #7c3aed)",
               color: "white",
             }}
+            title="Account Settings"
           >
             {astrologerName[0]}
-          </div>
+          </Link>
+
+          <Link
+            href="/astrologer/settings"
+            id="astro-settings-link"
+            className="text-sm text-purple-300/60 hover:text-white transition-colors"
+          >
+            Settings
+          </Link>
 
           <button
             onClick={() => router.push("/login")}
@@ -385,6 +397,13 @@ export default function AstrologerDashboard() {
           )}
         </div>
       </main>
+
+      {/* Admin Panel Link Footer */}
+      <footer className="py-6 text-center border-t border-white/5 mt-auto">
+        <Link href="/admin" className="text-xs font-semibold px-4 py-2 rounded-full border border-white/10 text-purple-300/60 hover:text-white hover:bg-white/5 transition">
+          👑 View Admin Panel Prototype
+        </Link>
+      </footer>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Astrologer {
   id: string;
@@ -192,16 +192,27 @@ export default function UserDashboard() {
             </div>
           </button>
 
-          {/* Avatar */}
-          <div
-            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm"
+          {/* Avatar → Profile */}
+          <Link
+            href="/profile"
+            id="profile-nav-btn"
+            className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm hover:scale-110 transition-transform"
             style={{
               background: "linear-gradient(135deg, #7c3aed, #d97706)",
               color: "white",
             }}
+            title="View Profile"
           >
             {userName[0]}
-          </div>
+          </Link>
+
+          <Link
+            href="/profile"
+            id="profile-link"
+            className="text-sm text-purple-300/60 hover:text-white transition-colors"
+          >
+            Profile
+          </Link>
 
           <button
             onClick={() => router.push("/login")}
