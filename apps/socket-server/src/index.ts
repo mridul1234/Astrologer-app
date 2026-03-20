@@ -9,13 +9,13 @@ import cors from "cors";
 dotenv.config();
 
 const app = express();
-app.use(cors({ origin: process.env.NEXT_APP_URL || "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.NEXT_APP_URL || "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
     credentials: true,
   },

@@ -23,13 +23,19 @@ export default function AstrologerDashboard() {
   const [togglingOnline, setTogglingOnline] = useState(false);
 
   useEffect(() => {
-    fetch("/api/astrologer/stats")
-      .then((r) => r.json())
-      .then((d) => {
-        setSessions(d.sessions || []);
-        setEarnings(d.totalEarnings || 0);
-        setIsOnline(d.isOnline || false);
-      });
+    const fetchStats = () => {
+      fetch("/api/astrologer/stats")
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.sessions) setSessions(d.sessions);
+          if (d.totalEarnings !== undefined) setEarnings(d.totalEarnings);
+          if (d.isOnline !== undefined) setIsOnline(d.isOnline);
+        });
+    };
+
+    fetchStats();
+    const interval = setInterval(fetchStats, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   async function toggleOnline() {
