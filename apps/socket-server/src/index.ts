@@ -1,7 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@astrology/db";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -21,7 +21,7 @@ const io = new Server(httpServer, {
   },
 });
 
-const prisma = new PrismaClient();
+// @ts-ignore - Prisma is already initialized in @astrology/db
 
 // ─── Async Message Write Queue ───────────────────────────────────────────────
 // Messages are buffered here and flushed to DB every 2s — never blocks WS path
