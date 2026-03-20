@@ -1,0 +1,19 @@
+{
+  "name": "astrology-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=apps/web\" \"npm run dev --workspace=apps/socket-server\"",
+    "build": "npm run build --workspace=apps/web",
+    "db:generate": "npm run db:generate --workspace=packages/db",
+    "db:push": "npm run db:push --workspace=packages/db",
+    "db:studio": "npm run db:studio --workspace=packages/db"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
