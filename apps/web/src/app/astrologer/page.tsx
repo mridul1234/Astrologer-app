@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -29,18 +29,47 @@ export default function AstrologerDashboard() {
     .reduce((acc, s) => acc + (s.totalCost || 0), 0);
   const totalSessions = sessions.length;
 
+  const previousActiveCount = useRef(-1);
+
+  // ─── Play Audio Chime ────────────────────────────────────────────────────
+  const playChime = useCallback(() => {
+    try {
+      const audioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!audioCtx) return;
+      const ctx = new audioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {}
+  }, []);
+
   // ─── Fetch sessions + online status from the API ───────────────────────────
   const fetchStats = useCallback(async () => {
     try {
       const res = await fetch("/api/astrologer/stats");
       if (!res.ok) return;
       const data = await res.json();
-      setSessions(
-        (data.sessions || []).map((s: ChatSession & { duration?: number }) => ({
-          ...s,
-          duration: s.duration ?? 0,
-        }))
-      );
+      
+      const list = (data.sessions || []).map((s: ChatSession & { duration?: number }) => ({
+        ...s,
+        duration: s.duration ?? 0,
+      }));
+      setSessions(list);
+      
+      const activeNow = list.filter((s: ChatSession) => s.status === "ACTIVE").length;
+      if (previousActiveCount.current !== -1 && activeNow > previousActiveCount.current) {
+        playChime();
+      }
+      previousActiveCount.current = activeNow;
+
       setIsOnline(!!data.isOnline);
     } catch {
       // network error — keep stale state

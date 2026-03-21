@@ -401,9 +401,22 @@ export default function UserChatPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-[#110e20] border border-[#f5c842]/20 p-8 rounded-3xl w-full max-w-md flex flex-col items-center">
             <h2 className="text-2xl font-cinzel font-bold text-[#f5c842] mb-2">Rate Your Session</h2>
-            <p className="text-white/70 text-sm mb-6 text-center">
+            <p className="text-white/70 text-sm mb-4 text-center">
               How was your consultation with {astrologerName}?
             </p>
+
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 w-full text-sm">
+              <div className="flex justify-between mb-2">
+                <span className="text-white/60">Duration:</span>
+                <span className="text-white font-semibold">{Math.floor(duration / 60)}m {duration % 60}s</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">Total Cost:</span>
+                <span className="text-[#34d399] font-bold">
+                  ₹{(Math.max(1, Math.ceil(duration / 60)) * rate).toFixed(0)}
+                </span>
+              </div>
+            </div>
             
             <div className="flex gap-2 mb-6">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -548,6 +561,13 @@ export default function UserChatPage() {
           ₹{rate}/min · Wallet is being deducted in real-time
         </span>
       </div>
+
+      {/* ─── WALLET WARNING BANNER ─── */}
+      {astrologerJoined && !ended && rate > 0 && balance > 0 && balance < rate * 2 && (
+        <div className="mx-4 mt-4 bg-red-500/10 border border-red-500/50 text-red-200 px-4 py-2 rounded-xl text-center text-sm font-semibold animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+          ⚠️ Low Balance: 1 Minute Remaining. Top up to continue chatting!
+        </div>
+      )}
 
       {/* ─── MESSAGES ─── */}
       <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4">
