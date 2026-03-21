@@ -3,140 +3,40 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 interface Astrologer {
   id: string;
-  speciality: string;
+  speciality: string | null;
   ratePerMin: number;
   isOnline: boolean;
-  bio: string;
-  rating: number;
-  totalSessions: number;
+  bio: string | null;
   user: { name: string };
-  badge: string;
-  zodiacIcon: string;
 }
 
-// Dummy astrologers data — replace with API call when ready
-const DUMMY_ASTROLOGERS: Astrologer[] = [
-  {
-    id: "a1",
-    user: { name: "Pandit Ravi Sharma" },
-    speciality: "Vedic Astrology · Kundali",
-    ratePerMin: 30,
-    isOnline: true,
-    bio: "25+ years of experience in Vedic Jyotish. Specialized in marriage, career & spiritual guidance.",
-    rating: 4.9,
-    totalSessions: 3200,
-    badge: "Top Rated",
-    zodiacIcon: "☀️",
-  },
-  {
-    id: "a2",
-    user: { name: "Dr. Meera Joshi" },
-    speciality: "Numerology · Tarot",
-    ratePerMin: 20,
-    isOnline: true,
-    bio: "Tarot & numerology expert with a PhD in parapsychology. Known for eerily accurate love readings.",
-    rating: 4.8,
-    totalSessions: 1850,
-    badge: "Trending",
-    zodiacIcon: "🌙",
-  },
-  {
-    id: "a3",
-    user: { name: "Acharya Dev Prasad" },
-    speciality: "Palmistry · Vastu",
-    ratePerMin: 25,
-    isOnline: false,
-    bio: "Master of Hasta Rekha (palmistry) and Vastu Shastra. Provides holistic life alignment.",
-    rating: 4.7,
-    totalSessions: 2100,
-    badge: "Expert",
-    zodiacIcon: "⭐",
-  },
-  {
-    id: "a4",
-    user: { name: "Deepika Rao" },
-    speciality: "Western Astrology · Natal Chart",
-    ratePerMin: 18,
-    isOnline: true,
-    bio: "Certified Western astrologer specializing in natal charts, transits, and compatibility readings.",
-    rating: 4.6,
-    totalSessions: 980,
-    badge: "Rising Star",
-    zodiacIcon: "🌟",
-  },
-  {
-    id: "a5",
-    user: { name: "Guru Arjun Nair" },
-    speciality: "KP Astrology · Prashna",
-    ratePerMin: 35,
-    isOnline: true,
-    bio: "KP astrology specialist with 30 years of practice. Answers specific questions with surgical precision.",
-    rating: 5.0,
-    totalSessions: 5400,
-    badge: "Grand Master",
-    zodiacIcon: "🔮",
-  },
-  {
-    id: "a6",
-    user: { name: "Sanya Kapoor" },
-    speciality: "Angel Cards · Crystal Healing",
-    ratePerMin: 15,
-    isOnline: false,
-    bio: "Angel card reader and crystal healer combining spiritual tools for deep energy healing sessions.",
-    rating: 4.5,
-    totalSessions: 620,
-    badge: "New",
-    zodiacIcon: "💫",
-  },
-];
-
-const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
-  "Top Rated": {
-    bg: "rgba(245,200,66,0.15)",
-    color: "#f5c842",
-    border: "rgba(245,200,66,0.3)",
-  },
-  "Trending": {
-    bg: "rgba(239,68,68,0.12)",
-    color: "#f87171",
-    border: "rgba(239,68,68,0.3)",
-  },
-  "Grand Master": {
-    bg: "rgba(124,58,237,0.2)",
-    color: "#c4b5fd",
-    border: "rgba(124,58,237,0.4)",
-  },
-  "Expert": {
-    bg: "rgba(59,130,246,0.12)",
-    color: "#93c5fd",
-    border: "rgba(59,130,246,0.3)",
-  },
-  "Rising Star": {
-    bg: "rgba(16,185,129,0.12)",
-    color: "#6ee7b7",
-    border: "rgba(16,185,129,0.3)",
-  },
-  "New": {
-    bg: "rgba(255,255,255,0.06)",
-    color: "rgba(255,255,255,0.5)",
-    border: "rgba(255,255,255,0.15)",
-  },
-};
 
 export default function UserDashboard() {
   const router = useRouter();
-  const [balance, setBalance] = useState(500); // Dummy balance
+  const { data: session } = useSession();
+  const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
+  const [loadingAstrologers, setLoadingAstrologers] = useState(true);
+  const [balance, setBalance] = useState(500);
   const [starting, setStarting] = useState<string | null>(null);
   const [showWallet, setShowWallet] = useState(false);
   const [filter, setFilter] = useState<"all" | "online">("all");
-  const [userName] = useState("Rahul"); // Dummy user name
 
-  const astrologers = filter === "online"
-    ? DUMMY_ASTROLOGERS.filter((a) => a.isOnline)
-    : DUMMY_ASTROLOGERS;
+  const userName = session?.user?.name ?? "Seeker";
+
+  useEffect(() => {
+    fetch("/api/astrologers")
+      .then((r) => r.json())
+      .then((data) => { setAstrologers(data); setLoadingAstrologers(false); })
+      .catch(() => setLoadingAstrologers(false));
+  }, []);
+
+  const displayedAstrologers = filter === "online"
+    ? astrologers.filter((a) => a.isOnline)
+    : astrologers;
 
   async function startChat(astrologerId: string, rate: number) {
     if (balance < rate * 2) {
@@ -295,9 +195,16 @@ export default function UserDashboard() {
 
         {/* Astrologer Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {astrologers.map((a) => {
-            const badge = BADGE_STYLES[a.badge] || BADGE_STYLES["New"];
-            return (
+          {loadingAstrologers ? (
+            <div className="col-span-3 text-center py-16 text-purple-400/50">Loading astrologers…</div>
+          ) : displayedAstrologers.length === 0 ? (
+            <div className="col-span-3 text-center py-16">
+              <div className="text-4xl mb-3">🔮</div>
+              <p className="text-purple-300/50">No astrologers available yet.</p>
+              <p className="text-purple-400/30 text-sm mt-1">Sign up an astrologer account to get started!</p>
+            </div>
+          ) : (
+            displayedAstrologers.map((a) => (
               <div
                 key={a.id}
                 className="glass-card rounded-2xl p-6 flex flex-col gap-4 transition-all duration-300 hover:-translate-y-1 group"
@@ -313,36 +220,19 @@ export default function UserDashboard() {
                       border: "1px solid rgba(245,200,66,0.15)",
                     }}
                   >
-                    {a.zodiacIcon}
+                    🔮
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <div className="text-white font-semibold truncate">{a.user.name}</div>
-                      <span
-                        className="px-2 py-0.5 rounded-full text-xs font-semibold shrink-0"
-                        style={{
-                          background: badge.bg,
-                          color: badge.color,
-                          border: `1px solid ${badge.border}`,
-                        }}
-                      >
-                        {a.badge}
-                      </span>
-                    </div>
-                    <div className="text-purple-400/70 text-xs mt-0.5 truncate">{a.speciality}</div>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-yellow-400 text-xs">{"★".repeat(Math.floor(a.rating))} {a.rating}</span>
-                      <span className="text-purple-500/40 text-xs">{a.totalSessions.toLocaleString()} sessions</span>
-                    </div>
+                    <div className="text-white font-semibold truncate">{a.user.name}</div>
+                    <div className="text-purple-400/70 text-xs mt-0.5 truncate">{a.speciality ?? "Astrology"}</div>
                   </div>
                   {/* Online status */}
                   <div
-                    className={`text-xs px-2 py-1 rounded-lg font-medium shrink-0 ${
-                      a.isOnline ? "status-online" : "status-offline"
-                    }`}
+                    className="text-xs px-2 py-1 rounded-lg font-medium shrink-0"
                     style={{
                       background: a.isOnline ? "rgba(52,211,153,0.1)" : "rgba(107,114,128,0.1)",
                       border: `1px solid ${a.isOnline ? "rgba(52,211,153,0.2)" : "rgba(107,114,128,0.2)"}`,
+                      color: a.isOnline ? "#6ee7b7" : "#6b7280",
                     }}
                   >
                     {a.isOnline ? "● Online" : "○ Away"}
@@ -350,7 +240,7 @@ export default function UserDashboard() {
                 </div>
 
                 {/* Bio */}
-                <p className="text-purple-300/60 text-xs leading-relaxed line-clamp-2">{a.bio}</p>
+                <p className="text-purple-300/60 text-xs leading-relaxed line-clamp-2">{a.bio ?? "Available for cosmic guidance."}</p>
 
                 {/* Footer */}
                 <div className="flex items-center justify-between mt-auto pt-2 border-t border-white/5">
@@ -381,8 +271,8 @@ export default function UserDashboard() {
                   </button>
                 </div>
               </div>
-            );
-          })}
+            ))
+          )}
         </div>
       </main>
 
