@@ -46,15 +46,18 @@ model User {
 }
 
 model Astrologer {
-  id         String   @id @default(cuid())
-  userId     String   @unique
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bio        String?
-  speciality String?
-  ratePerMin Float    @default(10)
-  isOnline   Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio             String?
+  speciality      String?
+  experienceYears Int      @default(0)
+  languages       String   @default("Hindi, English")
+  profileImage    String?
+  ratePerMin      Float    @default(10)
+  isOnline        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   chatSessions ChatSession[] @relation("AstrologerSessions")
   reviews      Review[]      @relation("AstrologerReviews")

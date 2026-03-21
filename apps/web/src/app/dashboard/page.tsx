@@ -103,10 +103,12 @@ export default function UserDashboard() {
   return (
     <div className="min-h-screen bg-[#fdfaf5] text-slate-800 font-sans flex flex-col">
       {/* ─── NAVBAR ─── */}
-      <nav className="bg-white border-b border-stone-200">
+      <nav 
+        className="sticky top-0 z-50 bg-white/95 backdrop-blur-lg border-b border-[#f5c842]/20 shadow-sm transition-all"
+      >
         <div className="max-w-[1400px] mx-auto">
           {/* Top Row */}
-          <div className="flex items-center justify-between px-6 py-3 border-b border-stone-100">
+          <div className="flex items-center justify-between px-6 py-3">
             
             {/* Logo */}
             <div className="flex items-center gap-3">
@@ -129,33 +131,37 @@ export default function UserDashboard() {
             </div>
 
             {/* Desktop Center Links */}
-            <div className="hidden lg:flex items-center gap-6 font-semibold text-slate-600 text-[15px]">
-              <Link href="#" className="hover:text-[#FF9933] transition-colors flex items-center gap-2">
-                 <span>✨</span> Free Kundli
+            <div className="hidden lg:flex items-center gap-8 font-bold text-slate-700 text-[15px]">
+              <Link href="#" className="hover:text-[#FF9933] transition-colors flex items-center gap-2 group">
+                 <span className="group-hover:rotate-12 transition-transform text-xl">✨</span> 
+                 <span>Free Kundli</span>
+              </Link>
+              <Link href="#" className="hover:text-[#FF9933] transition-colors flex items-center gap-2 group">
+                 <span className="group-hover:scale-110 transition-transform text-xl">🕉️</span> 
+                 <span>Chat with Astrologer</span>
               </Link>
             </div>
 
-            {/* Right Side: Language, Wallet, Profile */}
-            <div className="flex items-center gap-4">
-              <button className="hidden sm:flex items-center gap-1 bg-[#fff8ed] text-stone-700 px-3 py-1.5 rounded-full text-sm font-semibold border border-orange-100 hover:bg-orange-50">
-                English
-                <svg className="w-3 h-3 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/></svg>
-              </button>
+            {/* Right Side: Wallet, Profile */}
+            <div className="flex items-center gap-5">
               
               <button
                 onClick={() => router.push("/wallet")}
-                className="flex items-center gap-2 bg-[#fef8f0] px-4 py-1.5 rounded-full border border-orange-100 shadow-sm hover:shadow-md transition-all"
+                className="flex items-center gap-3 px-4 py-2 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-[#FF9933]/40 hover:shadow-md transition-all group"
               >
-                <span className="text-xl">👛</span>
-                <span className="font-bold text-stone-800 text-sm">Wallet <span className="text-black">₹ {balance.toFixed(0)}</span></span>
+                <div className="flex items-center gap-1.5 bg-[#10b981]/10 text-[#10b981] px-2.5 py-1 rounded-lg">
+                  <span className="text-xs">₹</span>
+                  <span className="font-extrabold text-sm font-cinzel">{balance.toFixed(0)}</span>
+                </div>
+                <span className="font-extrabold text-[#FF9933] text-[10px] uppercase tracking-widest group-hover:text-[#e67e22] transition-colors">Recharge ✦</span>
               </button>
 
               <div className="relative" ref={profileRef}>
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="w-10 h-10 rounded-full bg-slate-200 border-2 border-[#e2e8f0] overflow-hidden flex items-center justify-center hover:border-slate-300 transition-colors"
+                  className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#f5c842] to-[#FF9933] border-[3px] border-white shadow-md flex items-center justify-center font-extrabold text-white text-lg hover:scale-105 transition-transform"
                 >
-                  <svg className="w-6 h-6 text-slate-400 mt-2" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                  {userName[0].toUpperCase()}
                 </button>
                 
                 {/* Profile Dropdown */}
@@ -178,13 +184,6 @@ export default function UserDashboard() {
                 )}
               </div>
             </div>
-          </div>
-
-          {/* Bottom Row */}
-          <div className="hidden lg:flex items-center justify-center gap-8 py-3 text-[#4b5563] font-bold text-[15px]">
-            <Link href="#" className="hover:text-[#FF9933] flex items-center gap-2">
-               <span className="text-xl">🕉️</span> Chat with Astrologer
-            </Link>
           </div>
         </div>
       </nav>
