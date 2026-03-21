@@ -12,6 +12,8 @@ interface Astrologer {
   isOnline: boolean;
   bio: string | null;
   user: { name: string };
+  averageRating: number;
+  reviewCount: number;
 }
 
 
@@ -246,8 +248,18 @@ export default function UserDashboard() {
                     🔮
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-white font-semibold truncate">{a.user.name}</div>
-                    <div className="text-purple-400/70 text-xs mt-0.5 truncate">{a.speciality ?? "Astrology"}</div>
+                    <div className="text-white font-semibold truncate flex items-center gap-2">
+                      {a.user.name}
+                      {a.reviewCount > 0 && (
+                        <span className="text-xs bg-[#f5c842]/10 text-[#f5c842] px-1.5 py-0.5 rounded-md flex items-center gap-1 border border-[#f5c842]/20">
+                          <span className="text-[10px]">★</span> {a.averageRating.toFixed(1)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-purple-400/70 text-xs mt-0.5 truncate flex items-center gap-1">
+                      {a.speciality ?? "Astrology"}
+                      {a.reviewCount > 0 && <span className="text-purple-400/40 text-[10px]">({a.reviewCount} reviews)</span>}
+                    </div>
                   </div>
                   {/* Online status */}
                   <div

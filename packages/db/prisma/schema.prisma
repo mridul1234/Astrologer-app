@@ -41,6 +41,7 @@ model User {
   chatSessions      ChatSession[] @relation("UserSessions")
   sentMessages      Message[]     @relation("SentMessages")
   transactions      Transaction[]
+  reviews           Review[]      @relation("UserReviews")
 }
 
 model Astrologer {
@@ -55,6 +56,7 @@ model Astrologer {
   updatedAt  DateTime @updatedAt
 
   chatSessions ChatSession[] @relation("AstrologerSessions")
+  reviews      Review[]      @relation("AstrologerReviews")
 }
 
 model ChatSession {
@@ -69,6 +71,7 @@ model ChatSession {
   status        SessionStatus @default(ACTIVE)
 
   messages Message[]
+  review   Review?
 }
 
 model Message {
@@ -90,3 +93,17 @@ model Transaction {
   reason    String?
   createdAt DateTime        @default(now())
 }
+
+model Review {
+  id           String      @id @default(cuid())
+  rating       Int         // 1 to 5
+  comment      String?
+  userId       String
+  user         User        @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
+  astrologerId String
+  astrologer   Astrologer  @relation("AstrologerReviews", fields: [astrologerId], references: [id], onDelete: Cascade)
+  sessionId    String      @unique
+  session      ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+}
+

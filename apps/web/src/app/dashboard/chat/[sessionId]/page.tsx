@@ -27,9 +27,17 @@ export default function UserChatPage() {
   const [waitingTimeLeft, setWaitingTimeLeft] = useState(600); // 10 minutes max
   const [waitTimeOver, setWaitTimeOver] = useState(false);
   const [astrologerName, setAstrologerName] = useState("Astrologer");
+  const [astrologerId, setAstrologerId] = useState("");
   const [rate, setRate] = useState(0);
   const [myUserId, setMyUserId] = useState<string | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+
+  // Review states
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -91,7 +99,13 @@ export default function UserChatPage() {
         const sessionData = await sessionRes.json();
 
         setAstrologerName(sessionData.astrologer?.user?.name || "Astrologer");
+        setAstrologerId(sessionData.astrologer?.id || "");
         setRate(sessionData.astrologer?.ratePerMin || 0);
+
+        // Check if a review already exists
+        if (sessionData.review) {
+          setReviewSubmitted(true);
+        }
         setBalance(sessionData.user?.walletBalance || 0);
         if (sessionData.status === "ENDED") { setEnded(true); }
 
@@ -249,9 +263,35 @@ export default function UserChatPage() {
     if (text.length > 0) {
       typingTimeoutRef.current = setTimeout(() => {
         socketRef.current?.emit("typing", { sessionId, isTyping: false });
-      }, 2000);
+      }, 1000);
     }
   }
+
+  const submitReview = async () => {
+    if (rating === 0) return;
+    setIsSubmittingReview(true);
+    try {
+      const res = await fetch("/api/chat/review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId,
+          astrologerId,
+          rating,
+          comment,
+        }),
+      });
+      if (res.ok) {
+        setReviewSubmitted(true);
+        // Optionally auto-redirect back to dashboard after a delay:
+        setTimeout(() => router.push("/dashboard"), 1500);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   function handleEndSession() {
     if (!socketRef.current) return;
@@ -350,8 +390,63 @@ export default function UserChatPage() {
   return (
     <div
       className="flex flex-col h-screen"
-      style={{ position: "relative", zIndex: 1 }}
+      style={{
+        background: "linear-gradient(to bottom, #0a0815, #05030a)",
+        fontFamily: "'Inter', sans-serif"
+      }}
     >
+      {/* ─── REVIEW OVERLAY ─── */}
+      {ended && astrologerJoined && !reviewSubmitted && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#110e20] border border-[#f5c842]/20 p-8 rounded-3xl w-full max-w-md flex flex-col items-center">
+            <h2 className="text-2xl font-cinzel font-bold text-[#f5c842] mb-2">Rate Your Session</h2>
+            <p className="text-white/70 text-sm mb-6 text-center">
+              How was your consultation with {astrologerName}?
+            </p>
+            
+            <div className="flex gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => setRating(star)}
+                  className="text-4xl transition-transform hover:scale-110 focus:outline-none"
+                >
+                  <span className={star <= (hoverRating || rating) ? "text-[#f5c842]" : "text-white/20"}>
+                    ★
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Leave a comment (optional)..."
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 resize-none focus:outline-none focus:border-[#f5c842]/50 mb-6"
+              rows={3}
+            />
+
+            <div className="flex w-full gap-3">
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="flex-1 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors text-sm font-semibold"
+              >
+                Skip
+              </button>
+              <button
+                disabled={rating === 0 || isSubmittingReview}
+                onClick={submitReview}
+                className="flex-1 py-3 px-4 rounded-xl bg-[#f5c842] hover:bg-[#ffe175] text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-semibold"
+              >
+                {isSubmittingReview ? "Submitting..." : "Submit Review"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── HEADER ─── */}
       <header
         className="flex items-center justify-between px-5 py-3.5 shrink-0"
