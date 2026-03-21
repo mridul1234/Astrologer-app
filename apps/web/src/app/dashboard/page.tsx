@@ -98,7 +98,7 @@ export default function UserDashboard() {
           {/* Wallet */}
           <button
             id="wallet-nav-btn"
-            onClick={() => setShowWallet(true)}
+            onClick={() => router.push("/wallet")}
             className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-105"
             style={{
               background: "rgba(245,200,66,0.1)",

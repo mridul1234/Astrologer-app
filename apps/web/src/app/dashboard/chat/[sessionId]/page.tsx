@@ -240,16 +240,6 @@ export default function UserChatPage() {
     const content = input.trim();
     setInput("");
 
-    // Optimistically add our own message
-    const tempMsg: Message = {
-      id: `tmp_${Date.now()}`,
-      senderId: myUserId || "me",
-      content,
-      createdAt: new Date(),
-      isMe: true,
-    };
-    setMessages((prev) => [...prev, tempMsg]);
-
     socketRef.current.emit("send_message", { sessionId, content });
 
     // Send typing=false
