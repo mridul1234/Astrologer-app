@@ -21,33 +21,13 @@ async function clearData() {
   console.log(`Deleted ${transactions.count} transactions.`);
 
   // 4. Delete non-test Astrologers
-  const astrologers = await prisma.astrologer.deleteMany({
-    where: {
-      user: {
-        email: {
-          notIn: ["testuser@example.com", "astro@example.com"]
-        }
-      }
-    }
-  });
-  console.log(`Deleted ${astrologers.count} redundant astrologer profiles.`);
+  // 4. Delete Astrologers
+  const astrologers = await prisma.astrologer.deleteMany({});
+  console.log(`Deleted ${astrologers.count} astrologer profiles.`);
 
-  // 5. Delete non-test Users
-  const users = await prisma.user.deleteMany({
-    where: {
-      email: {
-        notIn: ["testuser@example.com", "astro@example.com"]
-      }
-    }
-  });
-  console.log(`Deleted ${users.count} redundant user accounts.`);
-
-  // 6. Reset Test User Balances
-  await prisma.user.update({
-    where: { email: "testuser@example.com" },
-    data: { walletBalance: 1000 }
-  });
-  console.log("Reset testuser wallet balance to 1000.");
+  // 5. Delete Users
+  const users = await prisma.user.deleteMany({});
+  console.log(`Deleted ${users.count} user accounts.`);
 
   console.log("Database cleanup complete!");
 }
