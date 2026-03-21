@@ -23,6 +23,9 @@ export default function UserChatPage() {
   const [ended, setEnded] = useState(false);
   const [duration, setDuration] = useState(0);
   const [connected, setConnected] = useState(false);
+  const [astrologerJoined, setAstrologerJoined] = useState(false);
+  const [waitingTimeLeft, setWaitingTimeLeft] = useState(600); // 10 minutes max
+  const [waitTimeOver, setWaitTimeOver] = useState(false);
   const [astrologerName, setAstrologerName] = useState("Astrologer");
   const [rate, setRate] = useState(0);
   const [myUserId, setMyUserId] = useState<string | null>(null);
@@ -37,16 +40,44 @@ export default function UserChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  const endSessionEarly = useCallback(() => {
+    if (socketRef.current) {
+      socketRef.current.emit("end_session", { sessionId });
+    }
+    setEnded(true);
+    router.push("/dashboard");
+  }, [sessionId, router]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
   // Duration timer (local, UI only)
   useEffect(() => {
-    if (ended || !connected) return;
+    if (ended || !connected || !astrologerJoined) return;
     timerRef.current = setInterval(() => setDuration((d) => d + 1), 1000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [ended, connected]);
+  }, [ended, connected, astrologerJoined]);
+
+  // Wait timer countdown (10 mins limit)
+  useEffect(() => {
+    if (ended || astrologerJoined) return;
+    const interval = setInterval(() => {
+      setWaitingTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setWaitTimeOver(true);
+          // Auto-end if possible
+          if (socketRef.current) {
+            socketRef.current.emit("end_session", { sessionId });
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [ended, astrologerJoined, sessionId]);
 
   // ─── Load session info + connect socket ───────────────────────────────────
   useEffect(() => {
@@ -64,6 +95,15 @@ export default function UserChatPage() {
         setBalance(sessionData.user?.walletBalance || 0);
         if (sessionData.status === "ENDED") { setEnded(true); }
 
+        // Calc initial waiting time left
+        const createdMs = new Date(sessionData.createdAt).getTime();
+        const elapsedSecs = Math.floor((Date.now() - createdMs) / 1000);
+        const rem = Math.max(0, 600 - elapsedSecs);
+        setWaitingTimeLeft(rem);
+        if (rem === 0 && sessionData.status !== "ENDED") {
+          setWaitTimeOver(true);
+        }
+
         // Load existing messages - always fetch our userId for attribution
         const profileRes = await fetch("/api/user/profile");
         const profile = await profileRes.json();
@@ -71,6 +111,8 @@ export default function UserChatPage() {
         if (uid) setMyUserId(uid);
 
         if (sessionData.messages?.length > 0) {
+          // If there are messages, we assume the astrologer had joined at some point
+          setAstrologerJoined(true);
           setMessages(
             sessionData.messages.map((m: { id: string; senderId: string; content: string; createdAt: string }) => ({
               id: m.id,
@@ -142,6 +184,10 @@ export default function UserChatPage() {
         socket.on("session_ended", () => {
           setEnded(true);
           if (timerRef.current) clearInterval(timerRef.current);
+        });
+
+        socket.on("astrologer_joined", () => {
+          setAstrologerJoined(true);
         });
 
         socket.on("error", ({ message }: { message: string }) => {
@@ -242,16 +288,65 @@ export default function UserChatPage() {
 
   if (status === "error") {
     return (
-      <div className="flex flex-col h-screen items-center justify-center gap-4" style={{ position: "relative", zIndex: 1 }}>
-        <div className="text-4xl">⚠️</div>
-        <div className="text-red-400 text-sm">Could not connect. Please try again.</div>
-        <button onClick={() => router.push("/dashboard")} className="btn-gold px-6 py-2 rounded-xl text-sm font-bold">
-          ← Back to Dashboard
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-4 text-center">
+        <h2 className="text-xl font-bold text-red-400 mb-2">Connection Error</h2>
+        <p className="opacity-80 mb-6">Failed to connect to chat server</p>
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="px-6 py-2 rounded-xl bg-[rgba(245,200,66,0.2)] text-[#f5c842] hover:bg-[#f5c842] hover:text-black transition-colors"
+        >
+          Return to Dashboard
         </button>
       </div>
     );
   }
 
+  // ─── WAITING SCREEN ───
+  if (!astrologerJoined && !ended && !waitTimeOver) {
+    const mins = Math.floor(waitingTimeLeft / 60);
+    const secs = waitingTimeLeft % 60;
+    
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen relative p-4" style={{ background: "#050311" }}>
+        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 50% 30%, rgba(245,200,66,0.15) 0%, transparent 40%)" }} />
+        <div className="z-10 bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl flex flex-col items-center text-center max-w-sm w-full">
+          <div className="w-20 h-20 mb-6 rounded-full border-t-2 border-[#f5c842] border-r-2 border-r-[#f5c842]/30 animate-spin" />
+          <h2 className="text-2xl font-cinzel font-bold text-[#f5c842] mb-2">Waiting for Astrologer</h2>
+          <p className="text-sm opacity-80 text-white/70 mb-6">
+            Connecting you to {astrologerName}...
+          </p>
+          <div className="text-3xl font-mono text-white/90 mb-8 bg-white/5 px-6 py-3 rounded-2xl shadow-inner border border-white/5">
+            {mins.toString().padStart(2, "0")}:{secs.toString().padStart(2, "0")}
+          </div>
+          <button
+            onClick={endSessionEarly}
+            className="text-red-400/80 hover:text-red-400 text-sm underline underline-offset-4"
+          >
+            Cancel Session
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── TIMEOUT SCREEN ───
+  if (!astrologerJoined && waitTimeOver) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-4 text-center">
+        <div className="text-4xl mb-4">⏳</div>
+        <h2 className="text-xl font-bold text-red-400 mb-2">Astrologer Unavailable</h2>
+        <p className="opacity-80 mb-6 max-w-sm">The astrologer did not join within 10 minutes. The session has been auto-cancelled and you have not been charged.</p>
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+        >
+          Return to Dashboard
+        </button>
+      </div>
+    );
+  }
+
+  // ─── ACTIVE CHAT INTERFACE ───
   return (
     <div
       className="flex flex-col h-screen"

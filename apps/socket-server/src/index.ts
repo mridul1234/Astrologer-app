@@ -89,8 +89,23 @@ io.on("connection", (socket) => {
       socket.join(sessionId);
       socket.emit("session_joined", { sessionId });
 
-      // Start billing timer only once per session, when the user (not astrologer) joins
-      if (session.userId === userId && !billingTimers.has(sessionId)) {
+      const isAstrologer = session.astrologer.userId === userId;
+      
+      const socketsInRoom = await io.in(sessionId).fetchSockets();
+      const astrologerInRoom = socketsInRoom.some(s => s.data.userId === session.astrologer.userId);
+      const userInRoom = socketsInRoom.some(s => s.data.userId === session.userId);
+
+      if (isAstrologer) {
+        io.to(sessionId).emit("astrologer_joined");
+      }
+      
+      // If user is joining and astrologer is already there, tell the user immediately
+      if (session.userId === userId && astrologerInRoom) {
+        socket.emit("astrologer_joined");
+      }
+
+      // Start billing timer only when BOTH are in the room
+      if (astrologerInRoom && userInRoom && !billingTimers.has(sessionId)) {
         activeSessions.set(sessionId, {
           userId: session.userId,
           astrologerId: session.astrologerId,
