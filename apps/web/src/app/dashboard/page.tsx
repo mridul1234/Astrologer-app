@@ -36,8 +36,8 @@ export default function UserDashboard() {
     fetch("/api/astrologers")
       .then((r) => r.json())
       .then((data) => {
-        // Sort online first
-        const sorted = data.sort((a: Astrologer, b: Astrologer) => (a.isOnline === b.isOnline) ? 0 : a.isOnline ? -1 : 1);
+        // Sort by review count
+        const sorted = data.sort((a: Astrologer, b: Astrologer) => b.reviewCount - a.reviewCount);
         setAstrologers(sorted);
         setLoadingAstrologers(false);
       })
@@ -130,11 +130,9 @@ export default function UserDashboard() {
 
             {/* Desktop Center Links */}
             <div className="hidden lg:flex items-center gap-6 font-semibold text-slate-600 text-[15px]">
-              <Link href="#" className="hover:text-[#FF9933] transition-colors">Free Kundli</Link>
-              <Link href="#" className="hover:text-[#FF9933] transition-colors">Kundli Matching</Link>
-              <Link href="#" className="hover:text-[#FF9933] transition-colors">Academy</Link>
-              <Link href="#" className="hover:text-[#FF9933] transition-colors">Horoscopes</Link>
-              <Link href="#" className="hover:text-[#FF9933] transition-colors">Blogs</Link>
+              <Link href="#" className="hover:text-[#FF9933] transition-colors flex items-center gap-2">
+                 <span>✨</span> Free Kundli
+              </Link>
             </div>
 
             {/* Right Side: Language, Wallet, Profile */}
@@ -184,9 +182,9 @@ export default function UserDashboard() {
 
           {/* Bottom Row */}
           <div className="hidden lg:flex items-center justify-center gap-8 py-3 text-[#4b5563] font-bold text-[15px]">
-            <Link href="#" className="hover:text-[#FF9933]">Chat with Astrologer</Link>
-            <Link href="#" className="hover:text-[#FF9933]">Talk to Astrologer</Link>
-            <Link href="#" className="hover:text-[#FF9933]">AstroGuruji Store</Link>
+            <Link href="#" className="hover:text-[#FF9933] flex items-center gap-2">
+               <span className="text-xl">🕉️</span> Chat with Astrologer
+            </Link>
           </div>
         </div>
       </nav>
@@ -329,14 +327,10 @@ export default function UserDashboard() {
                       </div>
                       <button
                         onClick={() => startChat(a.id, a.ratePerMin)}
-                        disabled={!a.isOnline || !!starting}
-                        className={`px-5 py-2 rounded-xl text-sm font-bold border ${
-                          a.isOnline 
-                          ? "border-[#16a34a] text-[#16a34a] hover:bg-[#16a34a]/5 bg-transparent"
-                          : "border-stone-200 text-stone-400 bg-stone-50 cursor-not-allowed"
-                        }`}
+                        disabled={!!starting}
+                        className="px-5 py-2 rounded-xl text-sm font-bold border border-[#16a34a] text-[#16a34a] hover:bg-[#16a34a]/5 bg-transparent"
                       >
-                         {starting === a.id ? "..." : a.isOnline ? (a.ratePerMin === 0 ? "Free Chat" : "Chat") : "Offline"}
+                         {starting === a.id ? "..." : (a.ratePerMin === 0 ? "Free Chat" : "Chat")}
                       </button>
                     </div>
                   </div>
