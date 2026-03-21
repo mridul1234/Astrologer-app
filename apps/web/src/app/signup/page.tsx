@@ -59,7 +59,7 @@ export default function SignupPage() {
     setStep("loading");
     await new Promise((r) => setTimeout(r, 1000));
     
-    const res = await signIn("OTP", {
+    const res = await signIn("credentials", {
       phone: form.phone,
       role: form.role,
       name: form.name,

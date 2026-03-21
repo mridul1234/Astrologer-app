@@ -92,7 +92,7 @@ export default function LoginPage() {
     await new Promise((r) => setTimeout(r, 800));
 
     // NextAuth Sign In with phone OTP mock flow
-    await signIn("OTP", {
+    await signIn("credentials", {
       phone,
       callbackUrl: "/dashboard",
     });
