@@ -63,19 +63,8 @@ export default function SignupPage() {
       phone: form.phone,
       role: form.role,
       name: form.name,
-      redirect: false,
+      callbackUrl: "/dashboard",
     });
-
-    if (res?.error) {
-      setError("Signup failed.");
-      setStep("form");
-      setLoading(false);
-      return;
-    }
-
-    // Refresh instantly so middleware handles routing to either /dashboard or /astrologer seamlessly
-    window.location.href = "/dashboard";
-  }
 
   if (step === "loading") {
     return (

@@ -92,20 +92,10 @@ export default function LoginPage() {
     await new Promise((r) => setTimeout(r, 800));
 
     // NextAuth Sign In with phone OTP mock flow
-    const res = await signIn("OTP", {
+    await signIn("OTP", {
       phone,
-      redirect: false,
+      callbackUrl: "/dashboard",
     });
-
-    if (res?.error) {
-      setError("Login failed.");
-      setStep("phone");
-      setLoading(false);
-      return;
-    }
-
-    // Refresh instantly so middleware handles routing to either /dashboard or /astrologer seamlessly
-    window.location.href = "/dashboard";
   }
 
   async function handleResend() {
