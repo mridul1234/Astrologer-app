@@ -105,7 +105,7 @@ export default function LoginPage() {
     }
 
     // Refresh instantly so middleware handles routing to either /dashboard or /astrologer seamlessly
-    window.location.href = "/";
+    window.location.href = "/dashboard";
   }
 
   async function handleResend() {
