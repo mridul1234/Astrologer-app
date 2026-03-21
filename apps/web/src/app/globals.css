@@ -3,14 +3,15 @@
 
 :root {
   --gold: #f5c842;
-  --gold-light: #fde68a;
+  --gold-light: #fef3c7;
   --gold-dark: #d97706;
-  --cosmic-deep: #050311;
-  --cosmic-purple: #1a0533;
-  --cosmic-indigo: #0d0b2b;
-  --mystic-purple: #7c3aed;
-  --mystic-glow: rgba(124, 58, 237, 0.3);
+  --saffron: #FF9933;
+  --saffron-light: #ffedd5;
+  --bg-main: #faf8f5;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
   --gold-glow: rgba(245, 200, 66, 0.3);
+  --saffron-glow: rgba(255, 153, 51, 0.2);
 }
 
 * {
@@ -23,43 +24,36 @@ body {
 }
 
 body {
-  background: var(--cosmic-deep);
-  color: #e9d5ff;
+  background: var(--bg-main);
+  color: var(--text-main);
   font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Star field background */
+/* Subtle Saffron/Gold Background Pattern */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   background-image:
-    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 40% 25%, rgba(255,255,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 55% 75%, rgba(255,255,255,0.3) 0%, transparent 100%),
-    radial-gradient(1px 1px at 70% 40%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 80% 10%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 90% 85%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 15% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
-    radial-gradient(1px 1px at 60% 5%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 35% 45%, rgba(245, 200, 66, 0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 75% 65%, rgba(245, 200, 66, 0.3) 0%, transparent 100%),
-    radial-gradient(2px 2px at 5% 50%, rgba(245, 200, 66, 0.2) 0%, transparent 100%);
+    radial-gradient(1.5px 1.5px at 10% 15%, rgba(255,153,51,0.15) 0%, transparent 100%),
+    radial-gradient(2px 2px at 25% 60%, rgba(245,200,66,0.1) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 25%, rgba(255,153,51,0.15) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 70% 40%, rgba(245,200,66,0.12) 0%, transparent 100%),
+    radial-gradient(2px 2px at 80% 10%, rgba(255,153,51,0.1) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 85%, rgba(245,200,66,0.15) 0%, transparent 100%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* Cosmic gradient orbs */
+/* Warm Orbs */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(88, 28, 135, 0.35) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(109, 40, 217, 0.25) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 35% at 50% 100%, rgba(245, 200, 66, 0.08) 0%, transparent 50%);
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(255, 153, 51, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(245, 200, 66, 0.04) 0%, transparent 60%);
   pointer-events: none;
   z-index: 0;
 }
@@ -70,14 +64,14 @@ body::after {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.02);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(124, 58, 237, 0.4);
+  background: rgba(255, 153, 51, 0.3);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(124, 58, 237, 0.7);
+  background: rgba(255, 153, 51, 0.6);
 }
 
 /* Font utilities */
@@ -85,7 +79,7 @@ body::after {
   font-family: "Cinzel", serif;
 }
 
-/* Gold shimmer animation */
+/* Animation Defs */
 @keyframes shimmer {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
@@ -97,8 +91,8 @@ body::after {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px var(--gold-glow), 0 0 40px rgba(124,58,237,0.2); }
-  50% { box-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(124,58,237,0.3); }
+  0%, 100% { box-shadow: 0 0 20px var(--gold-glow), 0 0 40px var(--saffron-glow); }
+  50% { box-shadow: 0 0 40px var(--gold-glow), 0 0 80px rgba(255, 153, 51, 0.3); }
 }
 
 @keyframes spin-slow {
@@ -107,8 +101,8 @@ body::after {
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.3); }
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
 }
 
 @keyframes slide-up {
@@ -122,9 +116,9 @@ body::after {
 .animate-slide-up { animation: slide-up 0.4s ease forwards; }
 .animate-twinkle { animation: twinkle 2s ease-in-out infinite; }
 
-/* Gold text shimmer */
+/* Text Shimmer for Light Backgrounds */
 .text-gold-shimmer {
-  background: linear-gradient(90deg, #f5c842, #fde68a, #d97706, #fde68a, #f5c842);
+  background: linear-gradient(90deg, #d97706, #FF9933, #d97706);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -132,54 +126,59 @@ body::after {
   animation: shimmer 3s linear infinite;
 }
 
-/* Glass card */
+/* Glass cards optimized for LIGHT mode */
 .glass-card {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(245, 200, 66, 0.4);
+  box-shadow: 0 10px 40px rgba(245,200,66,0.08);
+  color: var(--text-main);
 }
 
 .glass-card-gold {
-  background: rgba(245, 200, 66, 0.04);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 253, 240, 0.95));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(245, 200, 66, 0.15);
+  border: 1px solid rgba(245, 200, 66, 0.6);
+  box-shadow: 0 10px 40px rgba(245,200,66,0.12);
+  color: var(--text-main);
 }
 
-/* Input styles */
+/* Input styles for light mode */
 .cosmic-input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: white;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
   transition: all 0.2s ease;
 }
 
 .cosmic-input:focus {
   outline: none;
-  border-color: rgba(245, 200, 66, 0.5);
-  box-shadow: 0 0 0 3px rgba(245, 200, 66, 0.1), 0 0 20px rgba(245, 200, 66, 0.08);
-  background: rgba(255, 255, 255, 0.07);
+  border-color: #FF9933;
+  box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.15), 0 0 15px rgba(245, 200, 66, 0.1);
+  background: #fffdf5;
 }
 
 .cosmic-input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: #94a3b8;
 }
 
-/* Gold button */
+/* Buttons */
 .btn-gold {
-  background: linear-gradient(135deg, #d97706, #f5c842, #d97706);
+  background: linear-gradient(135deg, #FF9933, #f5c842, #FF9933);
   background-size: 200% 100%;
   background-position: left;
-  color: #1a0533;
+  color: #ffffff;
   font-weight: 700;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(245, 200, 66, 0.25);
+  box-shadow: 0 4px 15px rgba(255, 153, 51, 0.3);
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
 .btn-gold:hover:not(:disabled) {
   background-position: right;
-  box-shadow: 0 4px 30px rgba(245, 200, 66, 0.45);
+  box-shadow: 0 6px 25px rgba(255, 153, 51, 0.5);
   transform: translateY(-1px);
 }
 
@@ -188,26 +187,27 @@ body::after {
   cursor: not-allowed;
 }
 
-/* Purple button */
 .btn-mystic {
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  background: linear-gradient(135deg, #f5c842, #FF9933);
+  color: white;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 15px rgba(245, 200, 66, 0.3);
+  font-weight: 700;
 }
 
 .btn-mystic:hover:not(:disabled) {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  box-shadow: 0 4px 30px rgba(124, 58, 237, 0.5);
+  background: linear-gradient(135deg, #FF9933, #f5c842);
+  box-shadow: 0 6px 20px rgba(245, 200, 66, 0.4);
   transform: translateY(-1px);
 }
 
 /* Status dot */
 .status-online {
-  color: #34d399;
+  color: #10b981;
 }
 
 .status-offline {
-  color: #6b7280;
+  color: #94a3b8;
 }
 
 /* OTP input */
@@ -217,25 +217,25 @@ body::after {
   text-align: center;
   font-size: 1.5rem;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(245, 200, 66, 0.2);
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
   border-radius: 12px;
-  color: white;
+  color: #1e293b;
   transition: all 0.2s ease;
-  caret-color: #f5c842;
+  caret-color: #FF9933;
 }
 
 .otp-input:focus {
   outline: none;
-  border-color: rgba(245, 200, 66, 0.7);
-  box-shadow: 0 0 0 3px rgba(245, 200, 66, 0.15), 0 0 20px rgba(245, 200, 66, 0.1);
-  background: rgba(245, 200, 66, 0.05);
+  border-color: #FF9933;
+  box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.15);
+  background: #fffdf5;
 }
 
-/* Zodiac ring decoration */
+/* Zodiac decoration */
 .zodiac-ring {
   position: absolute;
   border-radius: 50%;
-  border: 1px solid rgba(245, 200, 66, 0.12);
+  border: 1px solid rgba(245, 200, 66, 0.2);
   pointer-events: none;
 }
