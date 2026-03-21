@@ -78,7 +78,7 @@ export default function Home() {
               Sign In
             </Link>
             <Link
-              href="/signup"
+              href="/login"
               className="btn-gold text-sm px-5 py-2.5 rounded-xl font-semibold"
             >
               Get Started
@@ -116,7 +116,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
-              href="/signup"
+              href="/login"
               id="hero-cta-primary"
               className="btn-gold px-8 py-4 rounded-2xl font-bold text-lg w-full sm:w-auto"
             >
@@ -268,7 +268,7 @@ export default function Home() {
             The universe has been waiting to speak to you. Start your first session today.
           </p>
           <Link
-            href="/signup"
+            href="/login"
             id="bottom-cta"
             className="btn-gold inline-block px-10 py-4 rounded-2xl font-bold text-xl"
           >

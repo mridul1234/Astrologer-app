@@ -205,10 +205,10 @@ export default function LoginPage() {
               </form>
 
               <p className="text-center text-purple-300/60 text-sm mt-6">
-                New here?{" "}
-                <Link href="/signup" className="font-medium hover:text-white transition-colors" style={{ color: "#f5c842" }}>
-                  Create an account
-                </Link>
+                <span className="text-purple-300/60">New to the cosmos? </span>
+                <button onClick={() => window.location.reload()} className="font-medium hover:text-white transition-colors" style={{ color: "#f5c842" }}>
+                  Join Us
+                </button>
               </p>
             </>
           )}

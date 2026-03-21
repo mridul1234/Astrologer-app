@@ -7,7 +7,7 @@ export default auth((req) => {
   const role = req.auth?.user?.role;
 
   // Public paths — always accessible
-  const publicPaths = ["/", "/login", "/signup"];
+const publicPaths = ["/", "/login", "/admin/login", "/astrologer/login", "/api/dev/seed-admin"];
   if (publicPaths.some((p) => pathname === p)) return NextResponse.next();
 
   // Not logged in — redirect to login
