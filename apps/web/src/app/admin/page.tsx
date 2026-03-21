@@ -119,24 +119,8 @@ export default function AdminDashboardPage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <SectionCard title="Recent Live Sessions" subtitle="Currently active chats taking place on the platform.">
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="flex flex-wrap items-center justify-between px-4 py-3 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="flex items-center gap-3">
-                          <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: "#34d399" }}></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3" style={{ background: "#10b981" }}></span>
-                          </span>
-                          <div>
-                            <div className="text-sm font-medium text-white flex gap-2">
-                              {DUMMY_USERS[i % 2].name} <span className="text-purple-400/50">↔</span> {DUMMY_ASTROLOGERS[i % 2].name}
-                            </div>
-                            <div className="text-xs text-purple-300/50 mr-2">Session running for {i * 4 + 2}m</div>
-                          </div>
-                        </div>
-                        <button className="text-xs font-semibold px-3 py-1.5 rounded-lg text-red-400 hover:bg-red-400/10 transition mt-2 sm:mt-0">Force Terminate</button>
-                      </div>
-                    ))}
+                  <div className="py-10 text-center text-purple-400/40 text-sm">
+                    💬 No active sessions right now
                   </div>
                 </SectionCard>
 
