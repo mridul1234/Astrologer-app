@@ -106,31 +106,33 @@ io.on("connection", (socket) => {
 
       // Start billing timer only when BOTH are in the room
       if (astrologerInRoom && userInRoom && !billingTimers.has(sessionId)) {
-        activeSessions.set(sessionId, {
+        const meta = {
           userId: session.userId,
           astrologerId: session.astrologerId,
           ratePerMin: session.astrologer.ratePerMin,
-        });
+        };
+        activeSessions.set(sessionId, meta);
 
-        const timer = setInterval(async () => {
-          const meta = activeSessions.get(sessionId);
-          if (!meta) return;
-
+        // Function to charge 1 minute
+        const chargeMinute = async () => {
           try {
+            const currentMeta = activeSessions.get(sessionId);
+            if (!currentMeta) return;
+
             const updated = await prisma.user.update({
-              where: { id: meta.userId },
-              data: { walletBalance: { decrement: meta.ratePerMin } },
+              where: { id: currentMeta.userId },
+              data: { walletBalance: { decrement: currentMeta.ratePerMin } },
             });
 
             await prisma.$transaction([
               prisma.chatSession.update({
                 where: { id: sessionId },
-                data: { totalCost: { increment: meta.ratePerMin } },
+                data: { totalCost: { increment: currentMeta.ratePerMin } },
               }),
               prisma.transaction.create({
                 data: {
-                  userId: meta.userId,
-                  amount: meta.ratePerMin,
+                  userId: currentMeta.userId,
+                  amount: currentMeta.ratePerMin,
                   type: "DEBIT",
                   reason: `Chat - session ${sessionId}`,
                 },
@@ -147,8 +149,13 @@ io.on("connection", (socket) => {
           } catch (err) {
             console.error("[Billing] Error:", err);
           }
-        }, 60_000);
+        };
 
+        // Charge the FIRST minute immediately (minimum charge)
+        await chargeMinute();
+
+        // Then continue charging every 60 seconds
+        const timer = setInterval(chargeMinute, 60_000);
         billingTimers.set(sessionId, timer);
       }
     } catch (err) {
