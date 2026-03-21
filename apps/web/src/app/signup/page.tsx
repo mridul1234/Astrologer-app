@@ -65,6 +65,7 @@ export default function SignupPage() {
       name: form.name,
       callbackUrl: "/dashboard",
     });
+  }
 
   if (step === "loading") {
     return (
