@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -11,29 +11,75 @@ interface ChatSession {
   endedAt: string | null;
   totalCost: number;
   status: "ACTIVE" | "ENDED";
-  user: { name: string; phone: string };
+  user: { name: string; phone?: string };
   duration: number; // minutes
 }
-
-// No dummy data — sessions will be loaded from the real API
-const EMPTY_SESSIONS: ChatSession[] = [];
 
 export default function AstrologerDashboard() {
   const router = useRouter();
   const [isOnline, setIsOnline] = useState(false);
   const [togglingOnline, setTogglingOnline] = useState(false);
-  const [sessions] = useState<ChatSession[]>(EMPTY_SESSIONS);
-  const [astrologerName] = useState("Astrologer");
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [astrologerName, setAstrologerName] = useState("Astrologer");
+  const [loading, setLoading] = useState(true);
 
-  const totalEarnings = sessions.reduce((acc, s) => acc + s.totalCost, 0);
-  const totalSessions = sessions.length;
   const activeSessions = sessions.filter((s) => s.status === "ACTIVE");
+  const totalEarnings = sessions
+    .filter((s) => s.status === "ENDED")
+    .reduce((acc, s) => acc + (s.totalCost || 0), 0);
+  const totalSessions = sessions.length;
 
+  // ─── Fetch sessions + online status from the API ───────────────────────────
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await fetch("/api/astrologer/stats");
+      if (!res.ok) return;
+      const data = await res.json();
+      setSessions(
+        (data.sessions || []).map((s: ChatSession & { duration?: number }) => ({
+          ...s,
+          duration: s.duration ?? 0,
+        }))
+      );
+      setIsOnline(!!data.isOnline);
+    } catch {
+      // network error — keep stale state
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch astrologer profile name
+  useEffect(() => {
+    fetch("/api/astrologer/profile")
+      .then((r) => r.json())
+      .then((d) => { if (d?.name) setAstrologerName(d.name); })
+      .catch(() => {});
+  }, []);
+
+  // Initial fetch + poll every 10 seconds for new incoming sessions
+  useEffect(() => {
+    fetchStats();
+    const interval = setInterval(fetchStats, 10_000);
+    return () => clearInterval(interval);
+  }, [fetchStats]);
+
+  // ─── Toggle online status ────────────────────────────────────────────────
   async function toggleOnline() {
     setTogglingOnline(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setIsOnline((v) => !v);
-    setTogglingOnline(false);
+    try {
+      const next = !isOnline;
+      const res = await fetch("/api/astrologer/online", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isOnline: next }),
+      });
+      if (res.ok) setIsOnline(next);
+    } catch {
+      // ignore
+    } finally {
+      setTogglingOnline(false);
+    }
   }
 
   async function joinChat(sessionId: string) {
@@ -205,6 +251,9 @@ export default function AstrologerDashboard() {
                 style={{ boxShadow: "0 0 8px #34d399" }}
               />
               Active Sessions
+              <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold bg-green-400/10 text-green-400 border border-green-400/20">
+                {activeSessions.length} live
+              </span>
             </h2>
             <div className="space-y-3">
               {activeSessions.map((s) => (
@@ -225,12 +274,12 @@ export default function AstrologerDashboard() {
                         color: "#6ee7b7",
                       }}
                     >
-                      {s.user.name[0]}
+                      {(s.user?.name || "U")[0]}
                     </div>
                     <div>
-                      <div className="text-white font-semibold">{s.user.name}</div>
+                      <div className="text-white font-semibold">{s.user?.name || "User"}</div>
                       <div className="text-green-400/70 text-xs">
-                        Started {formatTime(s.startedAt)} · {s.duration} min · ₹{s.totalCost}
+                        Started {formatTime(s.startedAt)} · ₹{s.totalCost?.toFixed(0) || 0}
                       </div>
                     </div>
                   </div>
@@ -282,76 +331,64 @@ export default function AstrologerDashboard() {
             </span>
           </h2>
 
-          {sessions.length === 0 ? (
-            <div
-              className="glass-card rounded-2xl py-16 text-center"
-            >
+          {loading ? (
+            <div className="glass-card rounded-2xl py-16 text-center">
+              <div className="text-3xl mb-4 animate-spin">🔮</div>
+              <div className="text-purple-300/60 text-sm">Loading sessions…</div>
+            </div>
+          ) : sessions.length === 0 ? (
+            <div className="glass-card rounded-2xl py-16 text-center">
               <div className="text-5xl mb-4">🌙</div>
               <div className="text-purple-300/60 font-cinzel">No sessions yet</div>
               <div className="text-purple-400/40 text-sm mt-1">Go online to start receiving chats</div>
             </div>
           ) : (
             <div className="space-y-3">
-              {sessions.map((s) => (
-                <div
-                  key={s.id}
-                  className="glass-card flex items-center justify-between px-5 py-4 rounded-2xl hover:bg-white/5 transition-all group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
-                      style={{
-                        background: "linear-gradient(135deg, rgba(124,58,237,0.3), rgba(217,119,6,0.2))",
-                        color: "#c4b5fd",
-                      }}
-                    >
-                      {s.user.name[0]}
-                    </div>
-                    <div>
-                      <div className="text-white font-medium text-sm">{s.user.name}</div>
-                      <div className="text-purple-400/60 text-xs">
-                        {formatDate(s.startedAt)} · {s.duration} min
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <div className="font-cinzel font-bold text-sm" style={{ color: "#f5c842" }}>
-                        ₹{s.totalCost}
-                      </div>
-                      <div className="text-purple-400/50 text-xs">earned</div>
-                    </div>
-                    <span
-                      className="px-3 py-1 rounded-full text-xs font-semibold"
-                      style={
-                        s.status === "ACTIVE"
-                          ? {
-                              background: "rgba(52,211,153,0.12)",
-                              border: "1px solid rgba(52,211,153,0.25)",
-                              color: "#34d399",
-                            }
-                          : {
-                              background: "rgba(107,114,128,0.1)",
-                              border: "1px solid rgba(107,114,128,0.15)",
-                              color: "rgba(156,163,175,0.7)",
-                            }
-                      }
-                    >
-                      {s.status === "ACTIVE" ? "● Active" : "Ended"}
-                    </span>
-
-                    {s.status === "ACTIVE" && (
-                      <button
-                        onClick={() => joinChat(s.id)}
-                        className="btn-gold px-4 py-2 rounded-xl text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity"
+              {sessions
+                .filter((s) => s.status === "ENDED")
+                .map((s) => (
+                  <div
+                    key={s.id}
+                    className="glass-card flex items-center justify-between px-5 py-4 rounded-2xl hover:bg-white/5 transition-all group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
+                        style={{
+                          background: "linear-gradient(135deg, rgba(124,58,237,0.3), rgba(217,119,6,0.2))",
+                          color: "#c4b5fd",
+                        }}
                       >
-                        Join
-                      </button>
-                    )}
+                        {(s.user?.name || "U")[0]}
+                      </div>
+                      <div>
+                        <div className="text-white font-medium text-sm">{s.user?.name || "User"}</div>
+                        <div className="text-purple-400/60 text-xs">
+                          {formatDate(s.startedAt)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className="font-cinzel font-bold text-sm" style={{ color: "#f5c842" }}>
+                          ₹{s.totalCost?.toFixed(0) || 0}
+                        </div>
+                        <div className="text-purple-400/50 text-xs">earned</div>
+                      </div>
+                      <span
+                        className="px-3 py-1 rounded-full text-xs font-semibold"
+                        style={{
+                          background: "rgba(107,114,128,0.1)",
+                          border: "1px solid rgba(107,114,128,0.15)",
+                          color: "rgba(156,163,175,0.7)",
+                        }}
+                      >
+                        Ended
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </div>

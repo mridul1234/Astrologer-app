@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { io, Socket } from "socket.io-client";
 
 interface Message {
   id: string;
@@ -11,44 +12,26 @@ interface Message {
   isMe: boolean;
 }
 
-const DUMMY_ME_ID = "user-123";
-const DUMMY_ASTROLOGER_NAME = "Pandit Ravi Sharma";
-const DUMMY_RATE = 30;
-
-// Dummy bot replies to simulate astrologer
-const BOT_REPLIES = [
-  "The stars suggest a period of transformation ahead. Be open to new opportunities. 🌟",
-  "I see Jupiter in your 10th house — this is a very favorable time for career matters.",
-  "Your moon sign indicates deep emotional sensitivity. Trust your intuition.",
-  "The planetary alignment this week favors decisive action. Take that bold step!",
-  "I sense some turbulence in relationships, but Venus moving into your 7th house soon will bring harmony.",
-  "This is an auspicious time for new beginnings. The universe is aligned with your intentions.",
-  "Your birth chart shows you are entering a powerful Mahadasha period. Great things are coming.",
-];
-
 export default function UserChatPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const router = useRouter();
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      senderId: "astrologer",
-      content: "Namaste! 🙏 I am Pandit Ravi Sharma. I can see your aura clearly. Tell me, what guidance are you seeking from the stars today?",
-      createdAt: new Date(),
-      isMe: false,
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [balance, setBalance] = useState(500);
+  const [balance, setBalance] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [ended, setEnded] = useState(false);
-  const [duration, setDuration] = useState(0); // seconds in session
-  const [connected] = useState(true);
+  const [duration, setDuration] = useState(0);
+  const [connected, setConnected] = useState(false);
+  const [astrologerName, setAstrologerName] = useState("Astrologer");
+  const [rate, setRate] = useState(0);
+  const [myUserId, setMyUserId] = useState<string | null>(null);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
+  const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const billingRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -58,63 +41,175 @@ export default function UserChatPage() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  // Billing timer
+  // Duration timer (local, UI only)
   useEffect(() => {
-    if (ended) return;
-    billingRef.current = setInterval(() => {
-      setDuration((d) => d + 1);
-      // Deduct per second (rate/60 per second)
-      setBalance((b) => {
-        const deduction = DUMMY_RATE / 60;
-        const newBalance = b - deduction;
-        if (newBalance <= 0) {
-          setEnded(true);
-          return 0;
+    if (ended || !connected) return;
+    timerRef.current = setInterval(() => setDuration((d) => d + 1), 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [ended, connected]);
+
+  // ─── Load session info + connect socket ───────────────────────────────────
+  useEffect(() => {
+    let socket: Socket;
+
+    async function init() {
+      try {
+        // 1. Get session details (astrologer name, rate, user balance)
+        const sessionRes = await fetch(`/api/chat/session/${sessionId}`);
+        if (!sessionRes.ok) { setStatus("error"); return; }
+        const sessionData = await sessionRes.json();
+
+        setAstrologerName(sessionData.astrologer?.user?.name || "Astrologer");
+        setRate(sessionData.astrologer?.ratePerMin || 0);
+        setBalance(sessionData.user?.walletBalance || 0);
+        if (sessionData.status === "ENDED") { setEnded(true); }
+
+        // Load existing messages
+        if (sessionData.messages?.length > 0) {
+          // We need our own userId to know which messages are "isMe"
+          const profileRes = await fetch("/api/user/profile");
+          const profile = await profileRes.json();
+          const uid = profile?.id;
+          setMyUserId(uid);
+
+          setMessages(
+            sessionData.messages.map((m: { id: string; senderId: string; content: string; createdAt: string }) => ({
+              id: m.id,
+              senderId: m.senderId,
+              content: m.content,
+              createdAt: new Date(m.createdAt),
+              isMe: m.senderId === uid,
+            }))
+          );
         }
-        return newBalance;
-      });
-    }, 1000);
-    return () => { if (billingRef.current) clearInterval(billingRef.current); };
-  }, [ended]);
+
+        // 2. Get socket token (returned by /api/chat/start as socketToken, or fetch fresh)
+        const tokenRes = await fetch("/api/chat/socket-token");
+        if (!tokenRes.ok) { setStatus("error"); return; }
+        const { token } = await tokenRes.json();
+
+        // 3. Connect to socket server
+        const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+        socket = io(SOCKET_URL, { auth: { token }, transports: ["websocket"] });
+        socketRef.current = socket;
+
+        socket.on("connect", () => {
+          setConnected(true);
+          setStatus("ready");
+          socket.emit("join_session", { sessionId });
+        });
+
+        socket.on("connect_error", () => {
+          setConnected(false);
+          setStatus("error");
+        });
+
+        socket.on("disconnect", () => setConnected(false));
+
+        socket.on("receive_message", (msg: { id: string; senderId: string; content: string; createdAt: string }) => {
+          // Get our userId from state (closure won't have it yet for first render)
+          setMyUserId((uid) => {
+            const isMe = msg.senderId === uid;
+            setMessages((prev) => {
+              // dedup by id
+              if (prev.some((m) => m.id === msg.id)) return prev;
+              return [...prev, { ...msg, createdAt: new Date(msg.createdAt), isMe }];
+            });
+            return uid;
+          });
+        });
+
+        socket.on("user_typing", ({ isTyping: t }: { isTyping: boolean }) => {
+          setIsTyping(t);
+          if (t) {
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
+          }
+        });
+
+        socket.on("balance_update", ({ balance: b }: { balance: number }) => {
+          setBalance(b);
+        });
+
+        socket.on("session_ended", () => {
+          setEnded(true);
+          if (timerRef.current) clearInterval(timerRef.current);
+        });
+
+        socket.on("error", ({ message }: { message: string }) => {
+          console.error("[Socket] Error:", message);
+        });
+
+      } catch (err) {
+        console.error("[Chat] Init error:", err);
+        setStatus("error");
+      }
+    }
+
+    init();
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    };
+  }, [sessionId]);
+
+  // ─── Also fetch own userId separately (for message attribution) ──────────
+  useEffect(() => {
+    fetch("/api/user/profile")
+      .then((r) => r.json())
+      .then((d) => { if (d?.id) setMyUserId(d.id); })
+      .catch(() => {});
+  }, []);
 
   function sendMessage() {
-    if (!input.trim() || ended) return;
-    const msg: Message = {
-      id: Date.now().toString(),
-      senderId: DUMMY_ME_ID,
-      content: input.trim(),
+    if (!input.trim() || ended || !socketRef.current) return;
+    const content = input.trim();
+    setInput("");
+
+    // Optimistically add our own message
+    const tempMsg: Message = {
+      id: `tmp_${Date.now()}`,
+      senderId: myUserId || "me",
+      content,
       createdAt: new Date(),
       isMe: true,
     };
-    setMessages((prev) => [...prev, msg]);
-    setInput("");
+    setMessages((prev) => [...prev, tempMsg]);
 
-    // Simulate astrologer typing and replying
-    setIsTyping(true);
-    const delay = 1500 + Math.random() * 1500;
+    socketRef.current.emit("send_message", { sessionId, content });
+
+    // Send typing=false
+    socketRef.current.emit("typing", { sessionId, isTyping: false });
+  }
+
+  function handleTyping(text: string) {
+    setInput(text);
+    if (!socketRef.current) return;
+    socketRef.current.emit("typing", { sessionId, isTyping: text.length > 0 });
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    typingTimeoutRef.current = setTimeout(() => {
-      setIsTyping(false);
-      const reply: Message = {
-        id: (Date.now() + 1).toString(),
-        senderId: "astrologer",
-        content: BOT_REPLIES[Math.floor(Math.random() * BOT_REPLIES.length)],
-        createdAt: new Date(),
-        isMe: false,
-      };
-      setMessages((prev) => [...prev, reply]);
-    }, delay);
+    if (text.length > 0) {
+      typingTimeoutRef.current = setTimeout(() => {
+        socketRef.current?.emit("typing", { sessionId, isTyping: false });
+      }, 2000);
+    }
   }
 
   function handleEndSession() {
+    if (!socketRef.current) return;
+    socketRef.current.emit("end_session", { sessionId });
     setEnded(true);
-    if (billingRef.current) clearInterval(billingRef.current);
+    if (timerRef.current) clearInterval(timerRef.current);
     setMessages((prev) => [
       ...prev,
       {
-        id: "ended",
+        id: "ended-local",
         senderId: "system",
-        content: `Session ended. Duration: ${Math.floor(duration / 60)}m ${duration % 60}s · Total cost: ₹${(DUMMY_RATE * duration / 60).toFixed(2)}`,
+        content: `Session ended. Duration: ${Math.floor(duration / 60)}m ${duration % 60}s`,
         createdAt: new Date(),
         isMe: false,
       },
@@ -126,6 +221,28 @@ export default function UserChatPage() {
 
   const formatDuration = (secs: number) =>
     `${Math.floor(secs / 60).toString().padStart(2, "0")}:${(secs % 60).toString().padStart(2, "0")}`;
+
+  // ─── Loading / Error states ───────────────────────────────────────────────
+  if (status === "loading") {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center" style={{ position: "relative", zIndex: 1 }}>
+        <div className="text-4xl animate-spin mb-4">🔮</div>
+        <div className="text-purple-300/60 text-sm">Connecting to your astrologer…</div>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center gap-4" style={{ position: "relative", zIndex: 1 }}>
+        <div className="text-4xl">⚠️</div>
+        <div className="text-red-400 text-sm">Could not connect. Please try again.</div>
+        <button onClick={() => router.push("/dashboard")} className="btn-gold px-6 py-2 rounded-xl text-sm font-bold">
+          ← Back to Dashboard
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -158,13 +275,15 @@ export default function UserChatPage() {
             🔮
           </div>
           <div>
-            <div className="text-white font-semibold text-sm">{DUMMY_ASTROLOGER_NAME}</div>
+            <div className="text-white font-semibold text-sm">{astrologerName}</div>
             <div className="flex items-center gap-1.5 text-xs">
               <span
-                className="w-1.5 h-1.5 rounded-full bg-green-400"
-                style={{ boxShadow: "0 0 4px #34d399" }}
+                className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-400" : "bg-red-400"}`}
+                style={connected ? { boxShadow: "0 0 4px #34d399" } : {}}
               />
-              <span className="text-green-400">{connected ? "Connected" : "Connecting…"}</span>
+              <span className={connected ? "text-green-400" : "text-red-400"}>
+                {connected ? "Connected" : "Reconnecting…"}
+              </span>
             </div>
           </div>
         </div>
@@ -227,12 +346,18 @@ export default function UserChatPage() {
         }}
       >
         <span className="text-xs text-purple-300/50">
-          ₹{DUMMY_RATE}/min · Wallet is being deducted in real-time
+          ₹{rate}/min · Wallet is being deducted in real-time
         </span>
       </div>
 
       {/* ─── MESSAGES ─── */}
       <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4">
+        {messages.length === 0 && !ended && (
+          <div className="text-center text-purple-400/40 text-sm py-10">
+            🌟 Session started — say Namaste!
+          </div>
+        )}
+
         {messages.map((msg) => {
           const isSystem = msg.senderId === "system";
 
@@ -360,7 +485,7 @@ export default function UserChatPage() {
               rows={1}
               value={input}
               onChange={(e) => {
-                setInput(e.target.value);
+                handleTyping(e.target.value);
                 e.target.style.height = "auto";
                 e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
               }}

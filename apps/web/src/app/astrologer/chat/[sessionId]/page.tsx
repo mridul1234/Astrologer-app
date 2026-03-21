@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { io, Socket } from "socket.io-client";
 
 interface Message {
   id: string;
@@ -11,38 +12,26 @@ interface Message {
   isMe: boolean;
 }
 
-const DUMMY_ASTRO_ID = "astro-456";
-const DUMMY_USER_NAME = "Rahul M.";
-
 export default function AstrologerChatPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const router = useRouter();
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      senderId: DUMMY_ASTRO_ID,
-      content: "Namaste! 🙏 I am Pandit Ravi Sharma. I can see your aura clearly. Tell me, what guidance are you seeking from the stars today?",
-      createdAt: new Date(),
-      isMe: true,
-    },
-    {
-      id: "user-reply",
-      senderId: "user-123",
-      content: "Namaste Panditji! I wanted to ask about my career — I'm considering a big job switch.",
-      createdAt: new Date(),
-      isMe: false,
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [ended, setEnded] = useState(false);
-  const [duration, setDuration] = useState(62); // Start at 1m 2s to show it's live
-  const [connected] = useState(true);
-  const [rate] = useState(30);
+  const [duration, setDuration] = useState(0);
+  const [connected, setConnected] = useState(false);
+  const [userName, setUserName] = useState("User");
+  const [rate, setRate] = useState(0);
+  const [myUserId, setMyUserId] = useState<string | null>(null);
+  const [earnings, setEarnings] = useState(0);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
+  const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const durationRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,35 +41,165 @@ export default function AstrologerChatPage() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  // Duration timer
   useEffect(() => {
-    if (ended) return;
-    durationRef.current = setInterval(() => setDuration((d) => d + 1), 1000);
-    return () => { if (durationRef.current) clearInterval(durationRef.current); };
-  }, [ended]);
+    if (ended || !connected) return;
+    timerRef.current = setInterval(() => {
+      setDuration((d) => {
+        const next = d + 1;
+        // Update earnings display locally (rate is per minute)
+        setEarnings((next / 60) * rate);
+        return next;
+      });
+    }, 1000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [ended, connected, rate]);
+
+  // ─── Load session info + connect socket ───────────────────────────────────
+  useEffect(() => {
+    let socket: Socket;
+
+    async function init() {
+      try {
+        // 1. Fetch session data
+        const sessionRes = await fetch(`/api/chat/session/${sessionId}`);
+        if (!sessionRes.ok) { setStatus("error"); return; }
+        const sessionData = await sessionRes.json();
+
+        setUserName(sessionData.user?.name || "User");
+        setRate(sessionData.astrologer?.ratePerMin || 0);
+        if (sessionData.status === "ENDED") { setEnded(true); }
+        setEarnings(sessionData.totalCost || 0);
+
+        // 2. Get our own userId
+        const profileRes = await fetch("/api/astrologer/profile");
+        const profile = await profileRes.json();
+        const uid = profile?.userId || profile?.id;
+        setMyUserId(uid);
+
+        // Load existing messages
+        if (sessionData.messages?.length > 0) {
+          setMessages(
+            sessionData.messages.map((m: { id: string; senderId: string; content: string; createdAt: string }) => ({
+              id: m.id,
+              senderId: m.senderId,
+              content: m.content,
+              createdAt: new Date(m.createdAt),
+              isMe: m.senderId === uid,
+            }))
+          );
+        }
+
+        // 3. Get socket token
+        const tokenRes = await fetch("/api/chat/socket-token");
+        if (!tokenRes.ok) { setStatus("error"); return; }
+        const { token } = await tokenRes.json();
+
+        // 4. Connect
+        const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+        socket = io(SOCKET_URL, { auth: { token }, transports: ["websocket"] });
+        socketRef.current = socket;
+
+        socket.on("connect", () => {
+          setConnected(true);
+          setStatus("ready");
+          socket.emit("join_session", { sessionId });
+        });
+
+        socket.on("connect_error", () => {
+          setConnected(false);
+          setStatus("error");
+        });
+
+        socket.on("disconnect", () => setConnected(false));
+
+        socket.on("receive_message", (msg: { id: string; senderId: string; content: string; createdAt: string }) => {
+          setMyUserId((uid) => {
+            const isMe = msg.senderId === uid;
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === msg.id)) return prev;
+              return [...prev, { ...msg, createdAt: new Date(msg.createdAt), isMe }];
+            });
+            return uid;
+          });
+        });
+
+        socket.on("user_typing", ({ isTyping: t }: { isTyping: boolean }) => {
+          setIsTyping(t);
+          if (t) {
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000);
+          }
+        });
+
+        socket.on("session_ended", () => {
+          setEnded(true);
+          if (timerRef.current) clearInterval(timerRef.current);
+        });
+
+        socket.on("error", ({ message }: { message: string }) => {
+          console.error("[Socket] Error:", message);
+        });
+
+      } catch (err) {
+        console.error("[AstrologerChat] Init error:", err);
+        setStatus("error");
+      }
+    }
+
+    init();
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    };
+  }, [sessionId]);
 
   function sendMessage() {
-    if (!input.trim() || ended) return;
-    const msg: Message = {
-      id: Date.now().toString(),
-      senderId: DUMMY_ASTRO_ID,
-      content: input.trim(),
+    if (!input.trim() || ended || !socketRef.current) return;
+    const content = input.trim();
+    setInput("");
+
+    const tempMsg: Message = {
+      id: `tmp_${Date.now()}`,
+      senderId: myUserId || "astro",
+      content,
       createdAt: new Date(),
       isMe: true,
     };
-    setMessages((prev) => [...prev, msg]);
-    setInput("");
+    setMessages((prev) => [...prev, tempMsg]);
+
+    socketRef.current.emit("send_message", { sessionId, content });
+    socketRef.current.emit("typing", { sessionId, isTyping: false });
+  }
+
+  function handleTyping(text: string) {
+    setInput(text);
+    if (!socketRef.current) return;
+    socketRef.current.emit("typing", { sessionId, isTyping: text.length > 0 });
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    if (text.length > 0) {
+      typingTimeoutRef.current = setTimeout(() => {
+        socketRef.current?.emit("typing", { sessionId, isTyping: false });
+      }, 2000);
+    }
   }
 
   function handleEndSession() {
+    if (!socketRef.current) return;
+    socketRef.current.emit("end_session", { sessionId });
     setEnded(true);
-    if (durationRef.current) clearInterval(durationRef.current);
-    const cost = (rate * duration / 60).toFixed(2);
+    if (timerRef.current) clearInterval(timerRef.current);
     setMessages((prev) => [
       ...prev,
       {
-        id: "ended",
+        id: "ended-local",
         senderId: "system",
-        content: `Session ended. Duration: ${Math.floor(duration / 60)}m ${duration % 60}s · Earnings: ₹${cost}`,
+        content: `Session ended. Duration: ${Math.floor(duration / 60)}m ${duration % 60}s · Earnings: ₹${earnings.toFixed(2)}`,
         createdAt: new Date(),
         isMe: false,
       },
@@ -93,7 +212,26 @@ export default function AstrologerChatPage() {
   const formatDuration = (secs: number) =>
     `${Math.floor(secs / 60).toString().padStart(2, "0")}:${(secs % 60).toString().padStart(2, "0")}`;
 
-  const currentEarnings = (rate * duration / 60).toFixed(2);
+  if (status === "loading") {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center" style={{ position: "relative", zIndex: 1 }}>
+        <div className="text-4xl animate-spin mb-4">🔮</div>
+        <div className="text-purple-300/60 text-sm">Loading session…</div>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center gap-4" style={{ position: "relative", zIndex: 1 }}>
+        <div className="text-4xl">⚠️</div>
+        <div className="text-red-400 text-sm">Could not connect to chat server.</div>
+        <button onClick={() => router.push("/astrologer")} className="btn-gold px-6 py-2 rounded-xl text-sm font-bold">
+          ← Back to Dashboard
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -124,16 +262,18 @@ export default function AstrologerChatPage() {
               color: "#6ee7b7",
             }}
           >
-            {DUMMY_USER_NAME[0]}
+            {userName[0]}
           </div>
           <div>
-            <div className="text-white font-semibold text-sm">{DUMMY_USER_NAME}</div>
+            <div className="text-white font-semibold text-sm">{userName}</div>
             <div className="flex items-center gap-1.5 text-xs">
               <span
-                className="w-1.5 h-1.5 rounded-full bg-green-400"
-                style={{ boxShadow: "0 0 4px #34d399" }}
+                className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-400" : "bg-red-400"}`}
+                style={connected ? { boxShadow: "0 0 4px #34d399" } : {}}
               />
-              <span className="text-green-400">{connected ? "Connected" : "Connecting…"}</span>
+              <span className={connected ? "text-green-400" : "text-red-400"}>
+                {connected ? "Connected" : "Reconnecting…"}
+              </span>
             </div>
           </div>
         </div>
@@ -163,7 +303,7 @@ export default function AstrologerChatPage() {
           >
             <div className="text-xs text-purple-300/50">Earned</div>
             <div className="font-cinzel font-bold text-sm text-green-400">
-              ₹{currentEarnings}
+              ₹{earnings.toFixed(0)}
             </div>
           </div>
 
@@ -205,12 +345,18 @@ export default function AstrologerChatPage() {
         }}
       >
         <span className="text-xs text-purple-300/40">
-          🔮 Astrologer View · {DUMMY_USER_NAME}&apos;s consultation
+          🔮 Astrologer View · {userName}&apos;s consultation
         </span>
       </div>
 
       {/* ─── MESSAGES ─── */}
       <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4">
+        {messages.length === 0 && !ended && (
+          <div className="text-center text-purple-400/40 text-sm py-10">
+            🌟 Session started — your client will message you shortly
+          </div>
+        )}
+
         {messages.map((msg) => {
           const isSystem = msg.senderId === "system";
 
@@ -245,7 +391,7 @@ export default function AstrologerChatPage() {
                     color: "#6ee7b7",
                   }}
                 >
-                  {DUMMY_USER_NAME[0]}
+                  {userName[0]}
                 </div>
               )}
               <div className={`max-w-xs lg:max-w-md flex flex-col gap-1 ${msg.isMe ? "items-end" : "items-start"}`}>
@@ -288,7 +434,7 @@ export default function AstrologerChatPage() {
                 color: "#6ee7b7",
               }}
             >
-              {DUMMY_USER_NAME[0]}
+              {userName[0]}
             </div>
             <div
               className="px-4 py-3.5 rounded-2xl flex items-center gap-1"
@@ -339,8 +485,7 @@ export default function AstrologerChatPage() {
               rows={1}
               value={input}
               onChange={(e) => {
-                setInput(e.target.value);
-                setIsTyping(e.target.value.length > 0);
+                handleTyping(e.target.value);
                 e.target.style.height = "auto";
                 e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
               }}
