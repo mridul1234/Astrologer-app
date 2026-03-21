@@ -15,56 +15,15 @@ interface ChatSession {
   duration: number; // minutes
 }
 
-// Dummy sessions data
-const DUMMY_SESSIONS: ChatSession[] = [
-  {
-    id: "s1",
-    userId: "u1",
-    startedAt: new Date(Date.now() - 3600000).toISOString(),
-    endedAt: null,
-    totalCost: 120,
-    status: "ACTIVE",
-    user: { name: "Rahul M.", phone: "98765*****" },
-    duration: 4,
-  },
-  {
-    id: "s2",
-    userId: "u2",
-    startedAt: new Date(Date.now() - 86400000).toISOString(),
-    endedAt: new Date(Date.now() - 82800000).toISOString(),
-    totalCost: 450,
-    status: "ENDED",
-    user: { name: "Priya S.", phone: "91234*****" },
-    duration: 18,
-  },
-  {
-    id: "s3",
-    userId: "u3",
-    startedAt: new Date(Date.now() - 172800000).toISOString(),
-    endedAt: new Date(Date.now() - 169200000).toISOString(),
-    totalCost: 225,
-    status: "ENDED",
-    user: { name: "Ananya K.", phone: "87654*****" },
-    duration: 9,
-  },
-  {
-    id: "s4",
-    userId: "u4",
-    startedAt: new Date(Date.now() - 259200000).toISOString(),
-    endedAt: new Date(Date.now() - 255600000).toISOString(),
-    totalCost: 600,
-    status: "ENDED",
-    user: { name: "Vikram T.", phone: "99887*****" },
-    duration: 24,
-  },
-];
+// No dummy data — sessions will be loaded from the real API
+const EMPTY_SESSIONS: ChatSession[] = [];
 
 export default function AstrologerDashboard() {
   const router = useRouter();
   const [isOnline, setIsOnline] = useState(false);
   const [togglingOnline, setTogglingOnline] = useState(false);
-  const [sessions] = useState<ChatSession[]>(DUMMY_SESSIONS);
-  const [astrologerName] = useState("Pandit Ravi Sharma");
+  const [sessions] = useState<ChatSession[]>(EMPTY_SESSIONS);
+  const [astrologerName] = useState("Astrologer");
 
   const totalEarnings = sessions.reduce((acc, s) => acc + s.totalCost, 0);
   const totalSessions = sessions.length;

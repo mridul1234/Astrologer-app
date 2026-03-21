@@ -4,31 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-// ─── Dummy data (replace with real API call) ──────────────────────────────────
-const DUMMY_USER = {
-  name: "Rahul Mehra",
-  phone: "+91 98765 43210",
-  walletBalance: 500,
-  memberSince: "January 2026",
-  totalSessions: 7,
-  totalSpent: 1450,
-};
-
-const DUMMY_SESSIONS = [
-  { id: "s1", astrologer: "Pandit Ravi Sharma", speciality: "Vedic Astrology", date: "20 Mar 2026", duration: "12 min", cost: 360, status: "ENDED" },
-  { id: "s2", astrologer: "Dr. Meera Joshi", speciality: "Tarot", date: "18 Mar 2026", duration: "8 min", cost: 160, status: "ENDED" },
-  { id: "s3", astrologer: "Guru Arjun Nair", speciality: "KP Astrology", date: "15 Mar 2026", duration: "25 min", cost: 875, status: "ENDED" },
-  { id: "s4", astrologer: "Deepika Rao", speciality: "Natal Chart", date: "10 Mar 2026", duration: "3 min", cost: 55, status: "ENDED" },
-];
-
-const DUMMY_TRANSACTIONS = [
-  { id: "t1", type: "DEBIT", amount: 360, reason: "Chat — Pandit Ravi Sharma", date: "20 Mar 2026" },
-  { id: "t2", type: "CREDIT", amount: 999, reason: "Wallet top-up via Razorpay", date: "19 Mar 2026" },
-  { id: "t3", type: "DEBIT", amount: 160, reason: "Chat — Dr. Meera Joshi", date: "18 Mar 2026" },
-  { id: "t4", type: "DEBIT", amount: 875, reason: "Chat — Guru Arjun Nair", date: "15 Mar 2026" },
-  { id: "t5", type: "CREDIT", amount: 499, reason: "Wallet top-up via Razorpay", date: "14 Mar 2026" },
-  { id: "t6", type: "DEBIT", amount: 55, reason: "Chat — Deepika Rao", date: "10 Mar 2026" },
-];
+const DUMMY_SESSIONS: { id: string; astrologer: string; speciality: string; date: string; duration: string; cost: number; status: string }[] = [];
+const DUMMY_TRANSACTIONS: { id: string; type: string; amount: number; reason: string; date: string }[] = [];
 
 const ZODIAC_AVATARS = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"];
 const ZODIAC_NAMES = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
@@ -38,7 +15,7 @@ type Tab = "overview" | "sessions" | "transactions" | "settings";
 export default function UserProfilePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
-  const [user, setUser] = useState(DUMMY_USER);
+  const [user] = useState({ name: "Seeker", phone: "—", walletBalance: 0, memberSince: "—", totalSessions: 0, totalSpent: 0 });
 
   // Settings state
   const [editName, setEditName] = useState(user.name);
@@ -50,9 +27,8 @@ export default function UserProfilePage() {
   async function handleSaveProfile() {
     if (!editName.trim()) return;
     setSavingProfile(true);
-    // Dummy save — replace with: await fetch("/api/user/profile", { method: "PATCH", body: JSON.stringify({ name: editName }) })
+    // TODO: await fetch("/api/user/profile", { method: "PATCH", body: JSON.stringify({ name: editName }) })
     await new Promise((r) => setTimeout(r, 900));
-    setUser((u) => ({ ...u, name: editName }));
     setSavingProfile(false);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 2500);

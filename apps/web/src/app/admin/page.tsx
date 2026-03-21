@@ -4,36 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-// ─── Dummy Data ───────────────────────────────────────────────────────────────
+// ─── Clean Slate — no dummy data ──────────────────────────────────────────────
 const STATS = {
-  totalUsers: 14205,
-  totalAstrologers: 142,
-  activeSessions: 18,
-  totalRevenue: 2845000,
-  pendingPayouts: 345000,
+  totalUsers: 0,
+  totalAstrologers: 0,
+  activeSessions: 0,
+  totalRevenue: 0,
+  pendingPayouts: 0,
 };
 
-const DUMMY_USERS = [
-  { id: "u1", name: "Rahul M.", email: "rahul@example.com", phone: "+91 98765 43210", balance: 1250, status: "Active", joined: "12 Mar 2026" },
-  { id: "u2", name: "Priya S.", email: "priya@example.com", phone: "+91 87654 32109", balance: 400, status: "Active", joined: "05 Mar 2026" },
-  { id: "u3", name: "Ananya K.", email: "ananya@example.com", phone: "+91 76543 21098", balance: 0, status: "Suspended", joined: "10 Feb 2026" },
-  { id: "u4", name: "Vikram T.", email: "vikram@example.com", phone: "+91 65432 10987", balance: 8900, status: "Active", joined: "20 Jan 2026" },
-];
-
-const DUMMY_ASTROLOGERS = [
-  { id: "a1", name: "Pandit Ravi Sharma", spec: "Vedic Astrology", rate: 30, earned: 96000, status: "Approved", isOnline: true },
-  { id: "a2", name: "Neha Tarot", spec: "Tarot Card reading", rate: 25, earned: 54000, status: "Approved", isOnline: false },
-  { id: "a3", name: "Dr. K.V. Rao", spec: "Numerology", rate: 50, earned: 125000, status: "Approved", isOnline: true },
-  { id: "a4", name: "Sushma Healing", spec: "Crystal Healing", rate: 15, earned: 8000, status: "Pending", isOnline: false },
-  { id: "a5", name: "Amit Jyotish", spec: "Vedic Astrology", rate: 20, earned: 42000, status: "Suspended", isOnline: false },
-];
-
-const DUMMY_TRANSACTIONS = [
-  { id: "tx1", user: "Rahul M.", type: "TOPUP", amount: 1000, date: "21 Mar 2026 10:45 AM", status: "Success" },
-  { id: "tx2", user: "Vikram T.", type: "CHAT_DEDUCT", amount: 750, date: "21 Mar 2026 10:30 AM", status: "Success", ref: "Pandit Ravi Sharma" },
-  { id: "tx3", user: "Priya S.", type: "TOPUP", amount: 500, date: "21 Mar 2026 09:15 AM", status: "Failed" },
-  { id: "tx4", user: "Neha Tarot", type: "PAYOUT", amount: 20000, date: "20 Mar 2026 11:00 AM", status: "Processing" },
-];
+const DUMMY_USERS: { id: string; name: string; email: string; phone: string; balance: number; status: string; joined: string }[] = [];
+const DUMMY_ASTROLOGERS: { id: string; name: string; spec: string; rate: number; earned: number; status: string; isOnline: boolean }[] = [];
+const DUMMY_TRANSACTIONS: { id: string; user: string; type: string; amount: number; date: string; status: string; ref?: string }[] = [];
 
 type Tab = "overview" | "users" | "astrologers" | "finances" | "approvals";
 
