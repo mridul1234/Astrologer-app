@@ -215,59 +215,66 @@ export default function UserDashboard() {
       {/* ─── MAIN CONTENT ─── */}
       <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 py-10">
         
-        {/* Search & Filter Pill Container */}
-        <div className="bg-white rounded-[40px] shadow-sm border border-stone-100 p-2 md:p-3 flex flex-col xl:flex-row items-center justify-between gap-4 mb-10 w-full mx-auto">
-          
-          <div className="flex items-center gap-4 w-full xl:w-auto ml-2">
-            <div className="w-3 h-3 rounded-full bg-[#f5c842] shadow-[0_0_8px_#f5c842]" />
-            <h1 className="text-2xl font-cinzel font-bold text-stone-800 whitespace-nowrap">Chat With Astrologer</h1>
+        {/* ── Section Header ── */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[#f5c842] text-xl">✦</span>
+              <h1 className="text-[28px] font-extrabold text-stone-900 tracking-tight">Chat With Astrologer</h1>
+              <span className="text-[#f5c842] text-xl">✦</span>
+            </div>
           </div>
+          <p className="text-stone-500 text-sm font-medium ml-8">Connect with verified astrologers and get guidance for your life&apos;s journey</p>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto xl:ml-auto">
-            {/* Search Input */}
-            <div className="relative flex-1 min-w-[200px]">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <div className="w-8 h-8 rounded-full bg-[#f5c842] flex items-center justify-center text-white p-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                </div>
+        {/* ── Search + Filter Bar ── */}
+        <div className="bg-white rounded-2xl border border-[#f0e6c8] shadow-sm p-3 flex flex-col sm:flex-row items-center gap-3 mb-8">
+
+          {/* Search Input */}
+          <div className="relative flex-1 w-full">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="w-8 h-8 rounded-full bg-[#f5c842] flex items-center justify-center shadow-sm">
+                <svg className="w-3.5 h-3.5 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
               </div>
-              <input 
-                type="text" 
-                placeholder="Search Name..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-14 pr-4 py-3 rounded-full border border-stone-200 bg-stone-50 focus:bg-white focus:outline-none focus:border-[#FF9933] focus:ring-1 focus:ring-[#FF9933] transition-all text-sm font-medium placeholder:text-stone-400"
-              />
             </div>
-
-            {/* Filter Button */}
-            <button className="flex items-center gap-2 border border-stone-200 rounded-full px-5 py-3 hover:bg-stone-50 transition-colors bg-white font-semibold text-sm text-stone-600">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-              Filter
-            </button>
-
-            {/* Category Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 xl:pb-0 hide-scrollbar">
-              {categories.map((cat, i) => (
-                <button
-                  key={cat}
-                  onClick={() => setCategory(cat)}
-                  className={`flex items-center gap-2 border px-6 py-3 rounded-full font-semibold text-sm whitespace-nowrap transition-all ${
-                    category === cat 
-                    ? "bg-[#ffce4b] border-[#eab308] text-stone-900 shadow-sm"
-                    : "bg-white border-stone-200 text-stone-600 hover:bg-stone-50"
-                  }`}
-                >
-                  {i === 0 && <span className="text-white drop-shadow-sm">⌘</span>}
-                  {i === 1 && <span>❤️</span>}
-                  {i === 2 && <span>🎓</span>}
-                  {i === 3 && <span>💼</span>}
-                  {i === 4 && <span>💍</span>}
-                  {cat}
-                </button>
-              ))}
-            </div>
+            <input
+              type="text"
+              placeholder="Search astrologer by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-14 pr-4 py-2.5 rounded-xl border border-stone-200 bg-[#fdfaf5] focus:bg-white focus:outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all text-sm font-medium placeholder:text-stone-400 text-stone-800"
+            />
           </div>
+
+          {/* Divider */}
+          <div className="hidden sm:block w-px h-8 bg-stone-200 shrink-0" />
+
+          {/* Category Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar shrink-0">
+            {[
+              { label: "All", icon: "✦", color: "text-amber-700" },
+              { label: "Love", icon: "❤️", color: "" },
+              { label: "Education", icon: "🎓", color: "" },
+              { label: "Career", icon: "💼", color: "" },
+              { label: "Marriage", icon: "💍", color: "" },
+            ].map(({ label, icon, color }) => (
+              <button
+                key={label}
+                onClick={() => setCategory(label)}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-semibold text-[13px] whitespace-nowrap transition-all duration-150 ${
+                  category === label
+                    ? "bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 shadow-sm shadow-amber-200/60"
+                    : "bg-[#fdfaf5] border border-stone-200 text-stone-600 hover:border-[#f5c842]/50 hover:text-stone-800"
+                }`}
+              >
+                <span className={color}>{icon}</span>
+                {label}
+              </button>
+            ))}
+          </div>
+
         </div>
 
         {/* Astrologer Cards Grid */}
