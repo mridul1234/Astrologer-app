@@ -72,10 +72,11 @@ export default function AstrologerChatPage() {
         setEarnings(sessionData.totalCost || 0);
 
         // 2. Get our own userId
+        // Ensure we handle it even if we're not an active astrologer yet (e.g., admin doing testing)
         const profileRes = await fetch("/api/astrologer/profile");
         const profile = await profileRes.json();
         const uid = profile?.userId || profile?.id;
-        setMyUserId(uid);
+        if (uid) setMyUserId(uid);
 
         // Load existing messages
         if (sessionData.messages?.length > 0) {
@@ -97,7 +98,13 @@ export default function AstrologerChatPage() {
 
         // 4. Connect
         const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
-        socket = io(SOCKET_URL, { auth: { token }, transports: ["websocket"] });
+        socket = io(SOCKET_URL, {
+          auth: { token },
+          transports: ["polling", "websocket"],
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+        });
         socketRef.current = socket;
 
         socket.on("connect", () => {
@@ -106,9 +113,9 @@ export default function AstrologerChatPage() {
           socket.emit("join_session", { sessionId });
         });
 
-        socket.on("connect_error", () => {
+        socket.on("connect_error", (err) => {
+          console.error("[Socket] connect_error:", err.message);
           setConnected(false);
-          setStatus("error");
         });
 
         socket.on("disconnect", () => setConnected(false));

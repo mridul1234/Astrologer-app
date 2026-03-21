@@ -64,14 +64,13 @@ export default function UserChatPage() {
         setBalance(sessionData.user?.walletBalance || 0);
         if (sessionData.status === "ENDED") { setEnded(true); }
 
-        // Load existing messages
-        if (sessionData.messages?.length > 0) {
-          // We need our own userId to know which messages are "isMe"
-          const profileRes = await fetch("/api/user/profile");
-          const profile = await profileRes.json();
-          const uid = profile?.id;
-          setMyUserId(uid);
+        // Load existing messages - always fetch our userId for attribution
+        const profileRes = await fetch("/api/user/profile");
+        const profile = await profileRes.json();
+        const uid = profile?.id;
+        if (uid) setMyUserId(uid);
 
+        if (sessionData.messages?.length > 0) {
           setMessages(
             sessionData.messages.map((m: { id: string; senderId: string; content: string; createdAt: string }) => ({
               id: m.id,
@@ -89,8 +88,15 @@ export default function UserChatPage() {
         const { token } = await tokenRes.json();
 
         // 3. Connect to socket server
+        // Use polling+websocket so Render free tier works (websocket-only can fail on cold start)
         const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
-        socket = io(SOCKET_URL, { auth: { token }, transports: ["websocket"] });
+        socket = io(SOCKET_URL, {
+          auth: { token },
+          transports: ["polling", "websocket"],
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+        });
         socketRef.current = socket;
 
         socket.on("connect", () => {
@@ -99,9 +105,11 @@ export default function UserChatPage() {
           socket.emit("join_session", { sessionId });
         });
 
-        socket.on("connect_error", () => {
+        socket.on("connect_error", (err) => {
+          console.error("[Socket] connect_error:", err.message);
           setConnected(false);
-          setStatus("error");
+          // Don't immediately set error — let reconnection attempts happen
+          // Only show error state after all retries fail
         });
 
         socket.on("disconnect", () => setConnected(false));
