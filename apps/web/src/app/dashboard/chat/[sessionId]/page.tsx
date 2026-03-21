@@ -148,10 +148,11 @@ export default function UserChatPage() {
         const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
         socket = io(SOCKET_URL, {
           auth: { token },
-          transports: ["polling", "websocket"],
+          transports: ["websocket"], // Enforce websocket immediately to bypass redirect-blocker extensions
+          timeout: 60000,            // Give Render.com time to wake up from sleep
           reconnection: true,
-          reconnectionAttempts: 5,
-          reconnectionDelay: 1000,
+          reconnectionAttempts: 10,
+          reconnectionDelay: 2000,
         });
         socketRef.current = socket;
 
