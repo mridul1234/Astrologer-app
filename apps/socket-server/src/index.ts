@@ -109,6 +109,7 @@ io.on("connection", (socket) => {
         const meta = {
           userId: session.userId,
           astrologerId: session.astrologerId,
+          astrologerUserId: session.astrologer.userId,
           ratePerMin: session.astrologer.ratePerMin,
         };
         activeSessions.set(sessionId, meta);
@@ -124,6 +125,11 @@ io.on("connection", (socket) => {
               data: { walletBalance: { decrement: currentMeta.ratePerMin } },
             });
 
+            await prisma.user.update({
+              where: { id: currentMeta.astrologerUserId },
+              data: { walletBalance: { increment: currentMeta.ratePerMin } },
+            });
+
             await prisma.$transaction([
               prisma.chatSession.update({
                 where: { id: sessionId },
@@ -135,6 +141,14 @@ io.on("connection", (socket) => {
                   amount: currentMeta.ratePerMin,
                   type: "DEBIT",
                   reason: `Chat - session ${sessionId}`,
+                },
+              }),
+              prisma.transaction.create({
+                data: {
+                  userId: currentMeta.astrologerUserId,
+                  amount: currentMeta.ratePerMin,
+                  type: "CREDIT",
+                  reason: `Chat Earnings - session ${sessionId}`,
                 },
               }),
             ]);

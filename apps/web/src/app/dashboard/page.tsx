@@ -117,6 +117,24 @@ export default function UserDashboard() {
             </div>
           </button>
 
+          {/* Ledger */}
+          <button
+            onClick={() => router.push("/transactions")}
+            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl transition-all hover:scale-105"
+            style={{
+              background: "rgba(255,153,51,0.1)",
+              border: "1px solid rgba(255,153,51,0.2)",
+            }}
+          >
+            <span className="text-sm">📜</span>
+            <div className="text-left">
+              <div className="text-xs font-semibold" style={{ color: "rgba(255,153,51,0.6)" }}>History</div>
+              <div className="font-bold text-sm font-cinzel text-white drop-shadow-md">
+                Ledger
+              </div>
+            </div>
+          </button>
+
           {/* Avatar → Profile */}
           <Link
             href="/profile"
