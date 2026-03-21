@@ -103,87 +103,111 @@ export default function UserDashboard() {
   return (
     <div className="min-h-screen bg-[#fdfaf5] text-slate-800 font-sans flex flex-col">
       {/* ─── NAVBAR ─── */}
-      <nav 
-        className="sticky top-0 z-50 bg-white/95 backdrop-blur-lg border-b border-[#f5c842]/20 shadow-sm transition-all"
-      >
-        <div className="max-w-[1400px] mx-auto">
-          {/* Top Row */}
-          <div className="flex items-center justify-between px-6 py-3">
-            
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-[#ffce4b] rounded-full flex items-center justify-center p-1 relative overflow-hidden">
-                {/* Zodiac wheel mock SVG */}
-                <svg viewBox="0 0 100 100" className="w-full h-full text-amber-800 opacity-60 animate-[spin_40s_linear_infinite]">
-                  <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="1" />
-                  <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="1" />
-                  <path d="M50 2 L50 98 M2 50 L98 50 M16 16 L84 84 M16 84 L84 16" stroke="currentColor" strokeWidth="0.5" />
-                  <text x="50" y="20" fontSize="8" textAnchor="middle" fill="currentColor">♈</text>
-                  <text x="80" y="50" fontSize="8" textAnchor="middle" fill="currentColor">♋</text>
-                  <text x="50" y="85" fontSize="8" textAnchor="middle" fill="currentColor">♎</text>
-                  <text x="20" y="50" fontSize="8" textAnchor="middle" fill="currentColor">♑</text>
+      <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8] shadow-[0_2px_16px_rgba(245,200,66,0.08)]">
+        <div className="max-w-[1400px] mx-auto px-6 h-[70px] flex items-center justify-between gap-6">
+
+          {/* ── Logo ── */}
+          <Link href="/dashboard" className="flex items-center gap-3 shrink-0 group">
+            <div className="w-[52px] h-[52px] bg-[#ffce4b] rounded-full flex items-center justify-center border-2 border-[#f0c842]/60 shadow-md p-1 overflow-hidden">
+              <svg viewBox="0 0 100 100" className="w-full h-full text-amber-800 opacity-80 animate-[spin_40s_linear_infinite]">
+                <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2"/>
+                <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
+                <path d="M50 4 L50 96 M4 50 L96 50 M18 18 L82 82 M18 82 L82 18" stroke="currentColor" strokeWidth="0.8"/>
+                <text x="50" y="19" fontSize="9" textAnchor="middle" fill="currentColor">♈</text>
+                <text x="81" y="54" fontSize="9" textAnchor="middle" fill="currentColor">♋</text>
+                <text x="50" y="88" fontSize="9" textAnchor="middle" fill="currentColor">♎</text>
+                <text x="19" y="54" fontSize="9" textAnchor="middle" fill="currentColor">♑</text>
+              </svg>
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">CosmicInsight</span>
+              <span className="text-[9px] uppercase tracking-[0.18em] text-[#d97706] font-bold mt-[3px]">Divine Astro Insight</span>
+            </div>
+          </Link>
+
+          {/* ── Center Nav Links ── */}
+          <div className="hidden lg:flex items-center gap-1">
+            {[
+              { label: "Free Kundli", href: "#" },
+              { label: "Chat with Astrologer", href: "#" },
+            ].map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
+                className="relative px-5 py-2 text-[15px] font-semibold text-stone-700 rounded-full hover:text-[#d97706] transition-colors group"
+              >
+                {label}
+                <span className="absolute bottom-1 left-5 right-5 h-[2px] bg-[#f5c842] rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
+              </Link>
+            ))}
+          </div>
+
+          {/* ── Right: Wallet + Profile ── */}
+          <div className="flex items-center gap-3 shrink-0">
+
+            {/* Wallet Pill */}
+            <button
+              onClick={() => router.push("/wallet")}
+              className="flex items-center gap-2.5 h-10 pl-3 pr-4 rounded-full border border-[#e9d9b0] bg-[#fffdf8] hover:bg-[#fff8e7] hover:border-[#f5c842] hover:shadow-md transition-all group"
+            >
+              {/* Wallet Icon */}
+              <div className="w-7 h-7 rounded-full bg-[#f5c842] flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+                <svg className="w-3.5 h-3.5 text-amber-800" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 4a2 2 0 012-2h12a2 2 0 012 2v1H2V4zm0 3h16v9a2 2 0 01-2 2H4a2 2 0 01-2-2V7zm11 2a1 1 0 100 2h1a1 1 0 100-2h-1z"/>
                 </svg>
               </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-xl leading-none text-black tracking-tight">CosmicInsight</span>
-                <span className="text-[9px] uppercase tracking-widest text-[#d97706] font-semibold mt-0.5">Divine Astro Insight</span>
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">Wallet</span>
+                <span className="text-[14px] font-extrabold text-stone-800">₹{balance.toFixed(0)}</span>
               </div>
-            </div>
+              <span className="text-[10px] font-extrabold text-[#FF9933] uppercase tracking-widest border-l border-[#f0e0b0] pl-2.5 ml-1 group-hover:text-[#d97706] transition-colors">Recharge</span>
+            </button>
 
-            {/* Desktop Center Links */}
-            <div className="hidden lg:flex items-center gap-8 font-bold text-slate-700 text-[15px]">
-              <Link href="#" className="hover:text-[#FF9933] transition-colors flex items-center gap-2 group">
-                 <span className="group-hover:rotate-12 transition-transform text-xl">✨</span> 
-                 <span>Free Kundli</span>
-              </Link>
-              <Link href="#" className="hover:text-[#FF9933] transition-colors flex items-center gap-2 group">
-                 <span className="group-hover:scale-110 transition-transform text-xl">🕉️</span> 
-                 <span>Chat with Astrologer</span>
-              </Link>
-            </div>
-
-            {/* Right Side: Wallet, Profile */}
-            <div className="flex items-center gap-5">
-              
+            {/* Profile Avatar + Dropdown */}
+            <div className="relative" ref={profileRef}>
               <button
-                onClick={() => router.push("/wallet")}
-                className="flex items-center gap-3 px-4 py-2 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-[#FF9933]/40 hover:shadow-md transition-all group"
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f5c842] to-[#FF9933] border-[2.5px] border-white shadow-lg flex items-center justify-center text-white font-extrabold text-base hover:scale-105 hover:shadow-xl transition-all"
+                title={userName}
               >
-                <div className="flex items-center gap-1.5 bg-[#10b981]/10 text-[#10b981] px-2.5 py-1 rounded-lg">
-                  <span className="text-xs">₹</span>
-                  <span className="font-extrabold text-sm font-cinzel">{balance.toFixed(0)}</span>
-                </div>
-                <span className="font-extrabold text-[#FF9933] text-[10px] uppercase tracking-widest group-hover:text-[#e67e22] transition-colors">Recharge ✦</span>
+                {userName[0].toUpperCase()}
               </button>
 
-              <div className="relative" ref={profileRef}>
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#f5c842] to-[#FF9933] border-[3px] border-white shadow-md flex items-center justify-center font-extrabold text-white text-lg hover:scale-105 transition-transform"
-                >
-                  {userName[0].toUpperCase()}
-                </button>
-                
-                {/* Profile Dropdown */}
-                {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-slate-50">
-                      <p className="text-sm font-bold text-slate-800 truncate">{userName}</p>
-                      <p className="text-xs text-slate-500 truncate">Seeker Account</p>
+              {profileOpen && (
+                <div className="absolute right-0 mt-3 w-52 bg-white rounded-2xl shadow-xl border border-stone-100 py-1.5 z-50 overflow-hidden">
+                  {/* User info header */}
+                  <div className="px-4 py-3 bg-gradient-to-r from-[#fffbee] to-[#fff8e0] border-b border-stone-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f5c842] to-[#FF9933] flex items-center justify-center text-white font-extrabold text-sm shrink-0">
+                        {userName[0].toUpperCase()}
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="text-sm font-bold text-stone-800 truncate">{userName}</p>
+                        <p className="text-[11px] text-[#d97706] font-semibold">⭐ Seeker Account</p>
+                      </div>
                     </div>
-                    <button onClick={() => router.push("/profile")} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-orange-50 hover:text-[#FF9933] transition-colors flex items-center gap-2">
-                       <span>👤</span> My Profile
-                    </button>
-                    <button onClick={() => router.push("/transactions")} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-orange-50 hover:text-[#FF9933] transition-colors flex items-center gap-2">
-                      <span>📜</span> Order History
-                    </button>
-                    <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 mt-1 border-t border-slate-50">
-                      <span>🚪</span> Log out
-                    </button>
                   </div>
-                )}
-              </div>
+                  {/* Menu Items */}
+                  <div className="py-1">
+                    {[
+                      { icon: "👤", label: "My Profile", onClick: () => router.push("/profile") },
+                      { icon: "💰", label: "Wallet & Recharge", onClick: () => router.push("/wallet") },
+                      { icon: "📜", label: "Order History", onClick: () => router.push("/transactions") },
+                    ].map(({ icon, label, onClick }) => (
+                      <button key={label} onClick={onClick} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-stone-700 hover:bg-orange-50 hover:text-[#d97706] transition-colors font-medium">
+                        <span className="text-base">{icon}</span> {label}
+                      </button>
+                    ))}
+                    <div className="border-t border-stone-100 mt-1">
+                      <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-medium">
+                        <span className="text-base">🚪</span> Sign Out
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+
           </div>
         </div>
       </nav>
