@@ -4,35 +4,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-// ─── Dummy data ───────────────────────────────────────────────────────────────
-const DUMMY_ASTROLOGER = {
-  name: "Pandit Ravi Sharma",
-  phone: "+91 98765 10101",
-  bio: "25+ years of experience in Vedic Jyotish. Specialized in marriage, career & spiritual guidance.",
-  speciality: "Vedic Astrology · Kundali",
-  ratePerMin: 30,
-  languages: ["Hindi", "English"],
-  memberSince: "December 2024",
-  totalSessions: 3200,
-  totalEarnings: 96000,
-  walletEarnings: 72450, // Pending payout
-  rating: 4.9,
-  totalReviews: 847,
+// ─── No dummy data — will be populated from API ───────────────────────────────
+const EMPTY_ASTROLOGER = {
+  name: "",
+  phone: "—",
+  bio: "",
+  speciality: "",
+  ratePerMin: 20,
+  languages: [] as string[],
+  memberSince: "—",
+  totalSessions: 0,
+  totalEarnings: 0,
+  walletEarnings: 0,
+  rating: 0,
+  totalReviews: 0,
 };
 
-const DUMMY_REVIEWS = [
-  { id: "r1", name: "Rahul M.", sign: "♏", rating: 5, text: "Panditji's career guidance was spot on. Got my dream job within a month!", date: "20 Mar 2026" },
-  { id: "r2", name: "Priya S.", sign: "♋", rating: 5, text: "His Kundali analysis was extremely detailed. Highly recommend for marriage guidance.", date: "18 Mar 2026" },
-  { id: "r3", name: "Vikram T.", sign: "♈", rating: 4, text: "Very knowledgeable and patient. Answered all my questions clearly.", date: "15 Mar 2026" },
-  { id: "r4", name: "Ananya K.", sign: "♍", rating: 5, text: "Amazingly accurate! Predicted something that happened the very next week.", date: "10 Mar 2026" },
-];
-
-const DUMMY_SESSIONS = [
-  { id: "s1", user: "Rahul M.", date: "20 Mar 2026", duration: "12 min", cost: 360, status: "ENDED" },
-  { id: "s2", user: "Priya S.", date: "18 Mar 2026", duration: "8 min", cost: 240, status: "ENDED" },
-  { id: "s3", user: "Vikram T.", date: "15 Mar 2026", duration: "25 min", cost: 750, status: "ENDED" },
-  { id: "s4", user: "Ananya K.", date: "10 Mar 2026", duration: "6 min", cost: 180, status: "ENDED" },
-];
+const EMPTY_REVIEWS: { id: string; name: string; sign: string; rating: number; text: string; date: string }[] = [];
+const EMPTY_SESSIONS: { id: string; user: string; date: string; duration: string; cost: number; status: string }[] = [];
 
 const ZODIAC_AVATARS = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"];
 const ZODIAC_NAMES = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
@@ -52,11 +41,11 @@ export default function AstrologerSettingsPage() {
 
   // Profile edit state
   const [profile, setProfile] = useState({
-    name: DUMMY_ASTROLOGER.name,
-    bio: DUMMY_ASTROLOGER.bio,
-    ratePerMin: DUMMY_ASTROLOGER.ratePerMin,
-    languages: DUMMY_ASTROLOGER.languages,
-    selectedSpecialities: DUMMY_ASTROLOGER.speciality.split(" · "),
+    name: EMPTY_ASTROLOGER.name,
+    bio: EMPTY_ASTROLOGER.bio,
+    ratePerMin: EMPTY_ASTROLOGER.ratePerMin,
+    languages: EMPTY_ASTROLOGER.languages,
+    selectedSpecialities: [] as string[],
   });
   const [selectedZodiac, setSelectedZodiac] = useState(0); // Aries
   const [saving, setSaving] = useState(false);
@@ -172,12 +161,12 @@ export default function AstrologerSettingsPage() {
                   {ZODIAC_NAMES[selectedZodiac]} ✦ Astrologer
                 </span>
               </div>
-              <p className="text-purple-300/50 text-sm mb-4">{DUMMY_ASTROLOGER.phone} · Since {DUMMY_ASTROLOGER.memberSince}</p>
+              <p className="text-purple-300/50 text-sm mb-4">{EMPTY_ASTROLOGER.phone} · Since {EMPTY_ASTROLOGER.memberSince}</p>
               <div className="flex flex-wrap gap-6">
                 {[
-                  { icon: "⭐", label: "Rating", value: `${DUMMY_ASTROLOGER.rating} (${DUMMY_ASTROLOGER.totalReviews})` },
-                  { icon: "💬", label: "Sessions", value: DUMMY_ASTROLOGER.totalSessions.toLocaleString() },
-                  { icon: "💰", label: "Earned", value: `₹${DUMMY_ASTROLOGER.totalEarnings.toLocaleString()}` },
+                  { icon: "⭐", label: "Rating", value: EMPTY_ASTROLOGER.rating === 0 ? "—" : `${EMPTY_ASTROLOGER.rating} (${EMPTY_ASTROLOGER.totalReviews})` },
+                  { icon: "💬", label: "Sessions", value: EMPTY_ASTROLOGER.totalSessions.toLocaleString() },
+                  { icon: "💰", label: "Earned", value: `₹${EMPTY_ASTROLOGER.totalEarnings.toLocaleString()}` },
                 ].map((s) => (
                   <div key={s.label} className="text-center">
                     <div className="text-lg">{s.icon}</div>
@@ -210,7 +199,9 @@ export default function AstrologerSettingsPage() {
           <div className="space-y-6 animate-slide-up">
             <ASection title="Recent Sessions" icon="💬">
               <div className="space-y-3">
-                {DUMMY_SESSIONS.map((s) => (
+                {EMPTY_SESSIONS.length === 0 ? (
+                  <div className="py-8 text-center text-purple-400/40 text-sm">🌙 No sessions yet</div>
+                ) : EMPTY_SESSIONS.map((s) => (
                   <div key={s.id} className="flex items-center justify-between px-4 py-3.5 rounded-xl hover:bg-white/5 transition-all" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs" style={{ background: "linear-gradient(135deg, rgba(52,211,153,0.2), rgba(124,58,237,0.2))", color: "#6ee7b7" }}>{s.user[0]}</div>
@@ -227,7 +218,9 @@ export default function AstrologerSettingsPage() {
 
             <ASection title="Recent Reviews" icon="⭐">
               <div className="space-y-3">
-                {DUMMY_REVIEWS.slice(0, 2).map((r) => (
+                {EMPTY_REVIEWS.length === 0 ? (
+                  <div className="py-8 text-center text-purple-400/40 text-sm">⭐ No reviews yet</div>
+                ) : EMPTY_REVIEWS.slice(0, 2).map((r) => (
                   <ReviewCard key={r.id} review={r} />
                 ))}
                 <button onClick={() => setActiveTab("reviews")} className="text-sm font-medium hover:text-white transition-colors" style={{ color: "#f5c842" }}>View all reviews →</button>
@@ -331,7 +324,7 @@ export default function AstrologerSettingsPage() {
                   <label className="block text-sm font-medium text-purple-200/70 mb-2">Mobile Number <span className="text-purple-400/40">(cannot be changed)</span></label>
                   <div className="px-4 py-3.5 rounded-xl text-purple-300/50 text-sm flex items-center gap-2"
                     style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    🔒 {DUMMY_ASTROLOGER.phone}
+                    🔒 {EMPTY_ASTROLOGER.phone}
                   </div>
                 </div>
 
@@ -375,9 +368,9 @@ export default function AstrologerSettingsPage() {
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { label: "Total Earned", value: `₹${DUMMY_ASTROLOGER.totalEarnings.toLocaleString()}`, icon: "💰", color: "#f5c842", bg: "rgba(245,200,66,0.06)", border: "rgba(245,200,66,0.12)" },
-                { label: "Pending Payout", value: `₹${DUMMY_ASTROLOGER.walletEarnings.toLocaleString()}`, icon: "⏳", color: "#c4b5fd", bg: "rgba(124,58,237,0.06)", border: "rgba(124,58,237,0.12)" },
-                { label: "Total Sessions", value: DUMMY_ASTROLOGER.totalSessions.toLocaleString(), icon: "💬", color: "#6ee7b7", bg: "rgba(52,211,153,0.06)", border: "rgba(52,211,153,0.12)" },
+                { label: "Total Earned", value: `₹${EMPTY_ASTROLOGER.totalEarnings.toLocaleString()}`, icon: "💰", color: "#f5c842", bg: "rgba(245,200,66,0.06)", border: "rgba(245,200,66,0.12)" },
+                { label: "Pending Payout", value: `₹${EMPTY_ASTROLOGER.walletEarnings.toLocaleString()}`, icon: "⏳", color: "#c4b5fd", bg: "rgba(124,58,237,0.06)", border: "rgba(124,58,237,0.12)" },
+                { label: "Total Sessions", value: EMPTY_ASTROLOGER.totalSessions.toLocaleString(), icon: "💬", color: "#6ee7b7", bg: "rgba(52,211,153,0.06)", border: "rgba(52,211,153,0.12)" },
               ].map((s) => (
                 <div key={s.label} className="rounded-2xl p-6 text-center" style={{ background: s.bg, border: `1px solid ${s.border}` }}>
                   <div className="text-3xl mb-2">{s.icon}</div>
@@ -391,11 +384,11 @@ export default function AstrologerSettingsPage() {
             <ASection title="Request Payout" icon="🏦">
               <div className="max-w-md">
                 <p className="text-purple-300/60 text-sm mb-5 leading-relaxed">
-                  You have <span className="font-bold" style={{ color: "#f5c842" }}>₹{DUMMY_ASTROLOGER.walletEarnings.toLocaleString()}</span> pending. Request a payout to your registered bank account (dummy — real bank integration coming soon).
+                  You have <span className="font-bold" style={{ color: "#f5c842" }}>₹{EMPTY_ASTROLOGER.walletEarnings.toLocaleString()}</span> pending. Request a payout to your registered bank account.
                 </p>
                 <button id="request-payout-btn" onClick={() => setShowPayoutModal(true)}
                   className="btn-gold px-8 py-3.5 rounded-2xl font-bold">
-                  Request Payout ₹{DUMMY_ASTROLOGER.walletEarnings.toLocaleString()} →
+                  Request Payout ₹{EMPTY_ASTROLOGER.walletEarnings.toLocaleString()} →
                 </button>
               </div>
             </ASection>
@@ -403,7 +396,9 @@ export default function AstrologerSettingsPage() {
             {/* Session earnings list */}
             <ASection title="Session Earnings" icon="📋">
               <div className="space-y-3">
-                {DUMMY_SESSIONS.map((s) => (
+                {EMPTY_SESSIONS.length === 0 ? (
+                  <div className="py-8 text-center text-purple-400/40 text-sm">🌙 No session earnings yet</div>
+                ) : EMPTY_SESSIONS.map((s) => (
                   <div key={s.id} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ border: "1px solid rgba(255,255,255,0.05)" }}>
                     <div>
                       <div className="text-white text-sm font-medium">{s.user}</div>
@@ -420,18 +415,18 @@ export default function AstrologerSettingsPage() {
         {/* ─── REVIEWS TAB ─── */}
         {activeTab === "reviews" && (
           <div className="animate-slide-up">
-            <ASection title={`Reviews (${DUMMY_ASTROLOGER.totalReviews})`} icon="⭐">
+            <ASection title={`Reviews (${EMPTY_ASTROLOGER.totalReviews})`} icon="⭐">
               {/* Average rating card */}
               <div className="flex items-center gap-6 mb-6 px-5 py-4 rounded-2xl"
                 style={{ background: "rgba(245,200,66,0.05)", border: "1px solid rgba(245,200,66,0.12)" }}>
                 <div className="text-center">
-                  <div className="font-cinzel text-5xl font-black" style={{ color: "#f5c842" }}>{DUMMY_ASTROLOGER.rating}</div>
+                  <div className="font-cinzel text-5xl font-black" style={{ color: "#f5c842" }}>{EMPTY_ASTROLOGER.rating || "—"}</div>
                   <div className="text-yellow-400 text-xl mt-1">★★★★★</div>
-                  <div className="text-purple-400/50 text-xs mt-1">{DUMMY_ASTROLOGER.totalReviews} reviews</div>
+                  <div className="text-purple-400/50 text-xs mt-1">{EMPTY_ASTROLOGER.totalReviews} reviews</div>
                 </div>
                 <div className="flex-1 space-y-2">
                   {[5, 4, 3, 2, 1].map((star) => {
-                    const pct = star === 5 ? 78 : star === 4 ? 16 : star === 3 ? 4 : 1;
+                    const pct = 0;
                     return (
                       <div key={star} className="flex items-center gap-2">
                         <span className="text-xs text-purple-400/50 w-4">{star}★</span>
@@ -446,7 +441,9 @@ export default function AstrologerSettingsPage() {
               </div>
 
               <div className="space-y-4">
-                {DUMMY_REVIEWS.map((r) => (
+                {EMPTY_REVIEWS.length === 0 ? (
+                  <div className="py-8 text-center text-purple-400/40 text-sm">⭐ No reviews yet</div>
+                ) : EMPTY_REVIEWS.map((r) => (
                   <ReviewCard key={r.id} review={r} />
                 ))}
               </div>
@@ -457,7 +454,7 @@ export default function AstrologerSettingsPage() {
 
       {/* ─── PAYOUT MODAL ─── */}
       {showPayoutModal && (
-        <PayoutModal amount={DUMMY_ASTROLOGER.walletEarnings} onClose={() => setShowPayoutModal(false)} />
+        <PayoutModal amount={EMPTY_ASTROLOGER.walletEarnings} onClose={() => setShowPayoutModal(false)} />
       )}
     </div>
   );

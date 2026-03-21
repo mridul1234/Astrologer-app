@@ -167,8 +167,8 @@ export default function AstrologerDashboard() {
             {
               icon: "⭐",
               label: "Avg Rating",
-              value: "4.9 ★",
-              sub: "128 reviews",
+              value: "—",
+              sub: "No reviews yet",
               color: "#fde68a",
             },
             {
