@@ -30,8 +30,9 @@ const packs: Pack[] = [
 
 export default function WalletPage() {
   const router = useRouter();
-  const { status } = useSession();
+  const { status, data: session } = useSession();
   const [balance, setBalance] = useState<number | null>(null);
+  const userName = session?.user?.name ?? "U";
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -54,26 +55,26 @@ export default function WalletPage() {
 
   if (status === "loading" || balance === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#05030a" }}>
-        <div className="animate-spin text-4xl">🔮</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#faf8f5]">
+        <div className="animate-spin text-4xl opacity-50 drop-shadow-sm">🪷</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen text-white bg-[#05030a]" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen text-slate-800 bg-[#faf8f5]" style={{ fontFamily: "'Inter', sans-serif" }}>
       {/* ─── NAVBAR ─── */}
       <nav
-        className="sticky top-0 z-50 px-6 py-4 flex items-center justify-between"
+        className="sticky top-0 z-50 px-6 py-4 flex items-center justify-between shadow-sm"
         style={{
-          background: "rgba(5,3,17,0.85)",
+          background: "rgba(255,255,255,0.95)",
           backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          borderBottom: "1px solid rgba(245,200,66,0.15)",
         }}
       >
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🔮</span>
-          <span className="font-cinzel text-lg font-bold" style={{ color: "#f5c842" }}>
+          <span className="text-2xl drop-shadow-sm">✨</span>
+          <span className="font-cinzel text-xl font-bold tracking-wider" style={{ color: "#FF9933" }}>
             CosmicChat
           </span>
         </div>
@@ -81,67 +82,67 @@ export default function WalletPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/dashboard"
-            className="text-sm font-semibold text-white/60 hover:text-white transition-colors"
+            className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-[#FF9933] transition-colors"
           >
             Dashboard
           </Link>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-amber-500 border border-white/20 flex items-center justify-center font-bold text-xs">
-            U
+          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#f5c842] to-[#FF9933] border-2 border-white shadow-sm flex items-center justify-center font-bold text-sm text-white">
+            {userName[0]}
           </div>
         </div>
       </nav>
 
       {/* ─── MAIN CONTENT ─── */}
-      <main className="max-w-6xl mx-auto px-6 mt-8 mb-24">
+      <main className="max-w-6xl mx-auto px-6 mt-10 mb-24">
         {/* Banner Section */}
-        <div className="bg-[#110e20] border border-[#f5c842]/20 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden shadow-[0_0_40px_rgba(245,200,66,0.05)]">
+        <div className="bg-white border border-[#f5c842]/30 rounded-3xl p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden shadow-[0_10px_40px_rgba(245,200,66,0.1)]">
           {/* Decorative Glow */}
-          <div className="absolute top-[-50px] right-[-50px] w-64 h-64 bg-[#f5c842]/5 rounded-full blur-[80px] pointer-events-none" />
+          <div className="absolute top-[-50%] right-[-10%] w-96 h-96 bg-gradient-to-bl from-[#FF9933]/15 to-transparent rounded-full pointer-events-none" />
           
           <div className="relative z-10">
-            <h1 className="text-3xl font-cinzel font-bold text-[#f5c842] mb-2">Add Money to Wallet</h1>
-            <p className="text-white/60 text-sm mb-5">Choose a quick recharge or pick a larger pack for extra value.</p>
-            <div className="flex flex-wrap gap-2 text-[11px] font-medium tracking-wide">
-              <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Secure payments</span>
-              <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">Instant wallet credit</span>
-              <span className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">UPI, Cards, Netbanking</span>
+            <h1 className="text-4xl font-cinzel font-bold text-slate-800 mb-3 tracking-tight">Add Money to Wallet</h1>
+            <p className="text-slate-500 font-medium text-sm mb-6">Choose a quick recharge or pick a larger pack for extra value.</p>
+            <div className="flex flex-wrap gap-2 text-[10px] font-extrabold tracking-widest uppercase">
+              <span className="bg-orange-50 border border-orange-100 text-orange-600 px-4 py-2 rounded-full shadow-sm">Secure payments</span>
+              <span className="bg-orange-50 border border-orange-100 text-orange-600 px-4 py-2 rounded-full shadow-sm">Instant wallet credit</span>
+              <span className="bg-orange-50 border border-orange-100 text-orange-600 px-4 py-2 rounded-full shadow-sm">UPI, Cards, Netbanking</span>
             </div>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-5 min-w-[200px] relative z-10 backdrop-blur-md self-stretch md:self-auto flex flex-col justify-center">
-            <div className="text-xs text-white/50 uppercase tracking-widest mb-1 font-semibold">Available Balance</div>
-            <div className="text-3xl font-cinzel font-bold text-[#34d399]">₹ {balance.toFixed(0)}</div>
+          <div className="bg-[#faf8f5] border border-[#f5c842]/40 rounded-2xl p-6 min-w-[220px] relative z-10 self-stretch md:self-auto flex flex-col justify-center shadow-inner">
+            <div className="text-[10px] text-slate-400 uppercase tracking-widest mb-1 font-bold">Available Balance</div>
+            <div className="text-4xl font-cinzel font-bold text-[#10b981] drop-shadow-sm">₹ {balance.toFixed(0)}</div>
           </div>
         </div>
 
         {/* Grid Title */}
-        <div className="mt-14 mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-white/10 pb-4">
-          <h2 className="text-xl font-cinzel font-bold text-white">Popular Recharge</h2>
-          <span className="text-xs text-white/40 font-medium">Tap any amount to continue</span>
+        <div className="mt-14 mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200 pb-4">
+          <h2 className="text-2xl font-cinzel font-bold text-slate-800">Popular Recharge</h2>
+          <span className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Tap any amount to continue</span>
         </div>
 
         {/* Recharge Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {packs.map((pack) => (
             <button
               key={pack.amount}
               onClick={() => handleRecharge(pack.amount)}
-              className="relative bg-[#0d0b17] border border-white/5 hover:border-[#f5c842]/60 hover:bg-[#151226] transition-all p-5 rounded-2xl flex flex-col items-start group shadow-lg shadow-black/40"
+              className="relative bg-white border border-slate-200 hover:border-[#FF9933]/60 hover:shadow-[0_8px_30px_rgba(255,153,51,0.15)] transition-all p-6 rounded-2xl flex flex-col items-start group shadow-sm"
             >
               {pack.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#f5c842] to-[#ffb01f] text-black text-[10px] font-bold px-3 py-[3px] rounded-full shadow-[0_0_15px_rgba(245,200,66,0.4)] tracking-wider">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#FF9933] to-[#f5c842] text-white text-[9px] font-extrabold px-4 py-[4px] rounded-full shadow-md tracking-widest uppercase">
                   POPULAR
                 </div>
               )}
               
-              <div className="w-full text-[10px] text-white/40 uppercase tracking-widest mb-1 font-bold">Recharge</div>
-              <div className="w-full text-2xl font-bold text-white mb-4 tracking-tight">₹ {pack.amount}</div>
+              <div className="w-full text-[10px] text-slate-400 uppercase tracking-widest mb-2 font-bold">Recharge</div>
+              <div className="w-full text-[26px] font-extrabold text-slate-800 mb-5 tracking-tight">₹ {pack.amount}</div>
               
-              <div className="w-full bg-[#34d399]/10 border border-[#34d399]/20 text-[#34d399] text-xs font-bold py-1.5 rounded-lg text-center mb-5 tracking-wide">
+              <div className="w-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981] text-xs font-extrabold py-2 rounded-xl text-center mb-6 tracking-wide">
                 {pack.bonusPercentage}% Extra
               </div>
               
-              <div className="w-full text-[11px] text-white/30 group-hover:text-[#f5c842] transition-colors mt-auto font-medium">
+              <div className="w-full text-[10px] text-slate-400 font-bold uppercase tracking-widest group-hover:text-[#FF9933] transition-colors mt-auto text-center">
                 Tap to pay →
               </div>
             </button>

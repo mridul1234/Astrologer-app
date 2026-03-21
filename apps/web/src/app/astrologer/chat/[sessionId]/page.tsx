@@ -235,42 +235,40 @@ export default function AstrologerChatPage() {
   return (
     <div
       className="flex flex-col h-screen"
-      style={{ position: "relative", zIndex: 1 }}
+      style={{
+        background: "#faf8f5",
+        fontFamily: "'Inter', sans-serif"
+      }}
     >
       {/* ─── HEADER ─── */}
       <header
-        className="flex items-center justify-between px-5 py-3.5 shrink-0"
+        className="flex items-center justify-between px-5 py-3.5 shrink-0 shadow-sm"
         style={{
-          background: "rgba(5,3,17,0.9)",
+          background: "rgba(255,255,255,0.95)",
           backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          borderBottom: "1px solid rgba(245,200,66,0.15)",
         }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <button
             onClick={() => router.push("/astrologer")}
-            className="text-purple-400/60 hover:text-white transition-colors text-lg"
+            className="text-slate-400 hover:text-[#FF9933] transition-colors text-lg font-bold"
           >
             ←
           </button>
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm"
-            style={{
-              background: "linear-gradient(135deg, rgba(52,211,153,0.2), rgba(124,58,237,0.2))",
-              border: "1px solid rgba(52,211,153,0.2)",
-              color: "#6ee7b7",
-            }}
+            className="w-11 h-11 rounded-xl flex items-center justify-center font-bold text-lg shadow-inner bg-slate-50 border border-slate-200 text-slate-500"
           >
             {userName[0]}
           </div>
           <div>
-            <div className="text-white font-semibold text-sm">{userName}</div>
-            <div className="flex items-center gap-1.5 text-xs">
+            <div className="text-slate-800 font-extrabold text-[15px] tracking-tight">{userName}</div>
+            <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-bold mt-0.5">
               <span
-                className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-green-400" : "bg-red-400"}`}
-                style={connected ? { boxShadow: "0 0 4px #34d399" } : {}}
+                className={`w-2 h-2 rounded-full ${connected ? "bg-emerald-400" : "bg-red-400"}`}
+                style={connected ? { boxShadow: "0 0 6px #34d399" } : {}}
               />
-              <span className={connected ? "text-green-400" : "text-red-400"}>
+              <span className={connected ? "text-emerald-500" : "text-red-500"}>
                 {connected ? "Connected" : "Reconnecting…"}
               </span>
             </div>
@@ -280,56 +278,38 @@ export default function AstrologerChatPage() {
         <div className="flex items-center gap-3">
           {/* Timer */}
           <div
-            className="px-3 py-1.5 rounded-lg text-center"
-            style={{
-              background: "rgba(245,200,66,0.08)",
-              border: "1px solid rgba(245,200,66,0.15)",
-            }}
+            className="px-4 py-1.5 rounded-xl text-center bg-orange-50 border border-orange-100 shadow-sm"
           >
-            <div className="text-xs text-purple-300/50">Duration</div>
-            <div className="font-cinzel font-bold text-sm" style={{ color: "#f5c842" }}>
+            <div className="text-[9px] uppercase tracking-widest font-bold text-orange-400 mb-0.5">Duration</div>
+            <div className="font-cinzel font-bold text-sm text-orange-600">
               {formatDuration(duration)}
             </div>
           </div>
 
           {/* Earnings */}
           <div
-            className="px-3 py-1.5 rounded-lg text-center"
-            style={{
-              background: "rgba(52,211,153,0.08)",
-              border: "1px solid rgba(52,211,153,0.15)",
-            }}
+            className="px-4 py-1.5 rounded-xl text-center shadow-sm bg-emerald-50 border border-emerald-100"
           >
-            <div className="text-xs text-purple-300/50">Earned</div>
-            <div className="font-cinzel font-bold text-sm text-green-400">
+            <div className="text-[9px] uppercase tracking-widest font-bold mb-0.5 text-emerald-500">Earned</div>
+            <div className="font-cinzel font-extrabold text-sm text-emerald-600">
               ₹{earnings.toFixed(0)}
             </div>
           </div>
 
           {/* Rate badge */}
           <div
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold"
-            style={{
-              background: "rgba(245,200,66,0.06)",
-              border: "1px solid rgba(245,200,66,0.12)",
-              color: "rgba(253,230,138,0.7)",
-            }}
+            className="hidden sm:block px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-widest bg-white border border-[#FF9933]/30 text-[#FF9933] shadow-sm ml-2"
           >
-            ₹{rate}/min
+            ₹{rate} / MIN
           </div>
 
           {!ended && (
             <button
               id="end-session-btn"
               onClick={handleEndSession}
-              className="px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105"
-              style={{
-                background: "rgba(239,68,68,0.1)",
-                border: "1px solid rgba(239,68,68,0.25)",
-                color: "#f87171",
-              }}
+              className="px-5 py-2.5 rounded-xl text-xs uppercase tracking-widest font-extrabold transition-all hover:scale-105 bg-red-50 border border-red-200 text-red-500 shadow-sm ml-2"
             >
-              End Session
+              End
             </button>
           )}
         </div>
@@ -337,22 +317,19 @@ export default function AstrologerChatPage() {
 
       {/* Astrologer role banner */}
       <div
-        className="px-5 py-2 flex items-center justify-center gap-2 shrink-0"
-        style={{
-          background: "rgba(245,200,66,0.04)",
-          borderBottom: "1px solid rgba(245,200,66,0.07)",
-        }}
+        className="px-5 py-2 flex items-center justify-center gap-2 shrink-0 bg-white border-b border-slate-100 shadow-sm z-10"
       >
-        <span className="text-xs text-purple-300/40">
-          🔮 Astrologer View · {userName}&apos;s consultation
+        <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500">
+          <span className="text-[#FF9933]">🔮 Astrologer View</span> <span className="text-slate-300 mx-2">|</span> Guiding {userName}
         </span>
       </div>
 
       {/* ─── MESSAGES ─── */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4">
+      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-5">
         {messages.length === 0 && !ended && (
-          <div className="text-center text-purple-400/40 text-sm py-10">
-            🌟 Session started — your client will message you shortly
+          <div className="text-center py-12 flex flex-col items-center">
+            <span className="text-4xl mb-3 opacity-60 drop-shadow-sm">🌟</span>
+            <span className="text-slate-400 font-bold uppercase tracking-widest text-[11px]">Session started. Await client's message.</span>
           </div>
         )}
 
@@ -361,14 +338,9 @@ export default function AstrologerChatPage() {
 
           if (isSystem) {
             return (
-              <div key={msg.id} className="flex justify-center">
+              <div key={msg.id} className="flex justify-center my-4">
                 <div
-                  className="px-5 py-2.5 rounded-2xl text-xs text-center max-w-sm"
-                  style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    color: "rgba(196,181,253,0.6)",
-                  }}
+                  className="px-6 py-2.5 rounded-full text-[10px] uppercase tracking-widest font-bold text-center max-w-sm bg-slate-100 border border-slate-200 text-slate-400 shadow-sm"
                 >
                   {msg.content}
                 </div>
@@ -379,43 +351,26 @@ export default function AstrologerChatPage() {
           return (
             <div
               key={msg.id}
-              className={`flex gap-2 ${msg.isMe ? "justify-end" : "justify-start"}`}
+              className={`flex gap-3 ${msg.isMe ? "justify-end" : "justify-start"}`}
             >
               {!msg.isMe && (
                 <div
-                  className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 mt-auto"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(52,211,153,0.2), rgba(124,58,237,0.2))",
-                    border: "1px solid rgba(52,211,153,0.2)",
-                    color: "#6ee7b7",
-                  }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shrink-0 mt-auto bg-slate-50 border border-slate-200 shadow-sm text-slate-500"
                 >
                   {userName[0]}
                 </div>
               )}
-              <div className={`max-w-xs lg:max-w-md flex flex-col gap-1 ${msg.isMe ? "items-end" : "items-start"}`}>
+              <div className={`max-w-[75%] lg:max-w-md ${msg.isMe ? "items-end" : "items-start"} flex flex-col gap-1.5`}>
                 <div
-                  className="px-4 py-3 rounded-2xl text-sm leading-relaxed"
-                  style={
+                  className={`px-5 py-3.5 rounded-[20px] text-[15px] leading-relaxed font-medium shadow-sm transition-all ${
                     msg.isMe
-                      ? {
-                          background: "linear-gradient(135deg, #d97706, #f5c842)",
-                          color: "#1a0533",
-                          borderBottomRightRadius: "4px",
-                          boxShadow: "0 4px 20px rgba(217,119,6,0.25)",
-                          fontWeight: 500,
-                        }
-                      : {
-                          background: "rgba(255,255,255,0.06)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                          color: "rgba(233,213,255,0.9)",
-                          borderBottomLeftRadius: "4px",
-                        }
-                  }
+                      ? "bg-gradient-to-r from-[#FF9933] to-[#f5c842] text-white rounded-br-sm shadow-[0_4px_15px_rgba(255,153,51,0.2)]"
+                      : "bg-white border border-slate-100 text-slate-800 rounded-bl-sm"
+                  }`}
                 >
                   {msg.content}
                 </div>
-                <span className="text-xs text-purple-500/40 px-1">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-slate-300 px-2 mt-0.5">
                   {formatTime(msg.createdAt)}
                 </span>
               </div>
@@ -424,28 +379,19 @@ export default function AstrologerChatPage() {
         })}
 
         {isTyping && (
-          <div className="flex gap-2 justify-start">
+          <div className="flex gap-3 justify-start">
             <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0"
-              style={{
-                background: "linear-gradient(135deg, rgba(52,211,153,0.2), rgba(124,58,237,0.2))",
-                border: "1px solid rgba(52,211,153,0.2)",
-                color: "#6ee7b7",
-              }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shrink-0 mt-auto bg-slate-50 border border-slate-200 shadow-sm text-slate-500"
             >
               {userName[0]}
             </div>
             <div
-              className="px-4 py-3.5 rounded-2xl flex items-center gap-1"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
+              className="px-5 py-4 rounded-[20px] rounded-bl-sm flex items-center gap-1.5 bg-white border border-slate-100 shadow-sm"
             >
               {[0, 0.2, 0.4].map((delay, i) => (
                 <span
                   key={i}
-                  className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-bounce"
+                  className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-bounce"
                   style={{ animationDelay: `${delay}s` }}
                 />
               ))}
@@ -454,13 +400,13 @@ export default function AstrologerChatPage() {
         )}
 
         {ended && (
-          <div className="flex justify-center pt-4">
+          <div className="flex justify-center pt-8">
             <button
               id="back-to-astrologer-btn"
               onClick={() => router.push("/astrologer")}
-              className="btn-gold px-8 py-3 rounded-2xl font-bold"
+              className="bg-white border border-[#FF9933]/30 text-[#FF9933] hover:bg-[#FF9933]/5 px-8 py-3.5 rounded-2xl font-bold uppercase tracking-widest text-xs transition-colors shadow-sm"
             >
-              ← Back to Dashboard
+              ← Back to Portal
             </button>
           </div>
         )}
@@ -471,14 +417,9 @@ export default function AstrologerChatPage() {
       {/* ─── INPUT ─── */}
       {!ended && (
         <div
-          className="px-4 py-4 shrink-0"
-          style={{
-            background: "rgba(5,3,17,0.9)",
-            backdropFilter: "blur(20px)",
-            borderTop: "1px solid rgba(255,255,255,0.07)",
-          }}
+          className="px-5 py-4 shrink-0 bg-white border-t border-slate-200 shadow-[0_-5px_20px_rgba(0,0,0,0.02)] z-10"
         >
-          <div className="flex gap-3 items-end max-w-4xl mx-auto">
+          <div className="flex gap-3 items-end max-w-5xl mx-auto">
             <textarea
               id="astro-chat-input"
               rows={1}
@@ -494,24 +435,21 @@ export default function AstrologerChatPage() {
                   sendMessage();
                 }
               }}
-              placeholder="Share your cosmic insight… (Enter to send)"
-              className="cosmic-input flex-1 px-4 py-3.5 rounded-2xl text-sm resize-none overflow-hidden"
-              style={{ minHeight: "50px", maxHeight: "120px", lineHeight: "1.5" }}
+              placeholder="Share your cosmic insight... (Enter to send)"
+              className="flex-1 px-5 py-4 rounded-2xl text-[15px] font-medium resize-none overflow-hidden bg-slate-50 border border-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-[#FF9933]/40 focus:bg-white transition-colors shadow-inner"
+              style={{ minHeight: "56px", maxHeight: "120px", lineHeight: "1.5" }}
             />
             <button
               id="astro-send-btn"
               onClick={sendMessage}
               disabled={!input.trim()}
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all shrink-0 disabled:opacity-40"
-              style={{
-                background: input.trim()
-                  ? "linear-gradient(135deg, #d97706, #f5c842)"
-                  : "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                boxShadow: input.trim() ? "0 4px 20px rgba(217,119,6,0.3)" : "none",
-              }}
+              className={`w-[56px] h-[56px] rounded-2xl flex items-center justify-center transition-all shrink-0 shadow-sm ${
+                input.trim()
+                  ? "bg-gradient-to-tr from-[#FF9933] to-[#f5c842] hover:shadow-md hover:scale-105"
+                  : "bg-slate-100 text-slate-300 cursor-not-allowed"
+              }`}
             >
-              <span className="text-base" style={{ color: input.trim() ? "#1a0533" : "white" }}>↑</span>
+              <span className={`text-xl ${input.trim() ? "text-white" : ""}`}>↑</span>
             </button>
           </div>
         </div>
