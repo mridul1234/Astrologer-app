@@ -213,7 +213,7 @@ export default function UserDashboard() {
       </nav>
 
       {/* ─── MAIN CONTENT ─── */}
-      <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 py-10">
+      <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 py-5">
         
         {/* ── Section Header ── */}
         <div className="mb-6">
@@ -304,7 +304,7 @@ export default function UserDashboard() {
               return (
                 <div
                   key={a.id}
-                  className="bg-white rounded-3xl p-5 relative flex gap-4 border border-stone-100 shadow-[0_4px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(255,153,51,0.12)] transition-all duration-300 group"
+                  className="bg-white rounded-3xl p-5 relative flex gap-4 border border-stone-100 shadow-[0_4px_15px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(245,200,66,0.18)] hover:-translate-y-1.5 hover:border-[#f5c842]/40 transition-all duration-300 cursor-pointer group"
                 >
                   {/* Top Choice Ribbon for the first few */}
                   {index < 2 && (
@@ -317,7 +317,7 @@ export default function UserDashboard() {
 
                   {/* Left Column: Avatar & Rating */}
                   <div className="flex flex-col items-center shrink-0 w-24">
-                    <div className="w-20 h-20 rounded-full border-[3px] border-[#f5c842] p-1 mb-2 relative">
+                    <div className="w-20 h-20 rounded-full border-[3px] border-[#f5c842] p-1 mb-2 relative group-hover:border-[#d97706] group-hover:scale-105 transition-all duration-300 shadow-sm group-hover:shadow-amber-200/60 group-hover:shadow-lg">
                       <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-3xl overflow-hidden object-cover bg-gradient-to-b from-[#fef3c7] to-[#fde68a]">
                         👨🏽‍🦱
                       </div>
@@ -358,9 +358,11 @@ export default function UserDashboard() {
                       <button
                         onClick={() => startChat(a.id, a.ratePerMin)}
                         disabled={!!starting}
-                        className="px-5 py-2 rounded-xl text-sm font-bold border border-[#16a34a] text-[#16a34a] hover:bg-[#16a34a]/5 bg-transparent"
+                        className="px-5 py-2 rounded-xl text-sm font-bold border-2 border-[#16a34a] text-[#16a34a] bg-transparent hover:bg-[#16a34a] hover:text-white hover:shadow-lg hover:shadow-green-200/60 hover:scale-105 active:scale-100 transition-all duration-200 disabled:opacity-50"
                       >
-                         {starting === a.id ? "..." : (a.ratePerMin === 0 ? "Free Chat" : "Chat")}
+                        {starting === a.id ? (
+                          <span className="flex items-center gap-1.5"><span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"/> Starting...</span>
+                        ) : (a.ratePerMin === 0 ? "Free Chat" : "Chat")}
                       </button>
                     </div>
                   </div>
