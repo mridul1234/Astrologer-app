@@ -20,7 +20,7 @@ export default function UserDashboard() {
   const { data: session } = useSession();
   const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
   const [loadingAstrologers, setLoadingAstrologers] = useState(true);
-  const [balance, setBalance] = useState(500);
+  const [balance, setBalance] = useState(0);
   const [starting, setStarting] = useState<string | null>(null);
   const [showWallet, setShowWallet] = useState(false);
   const [filter, setFilter] = useState<"all" | "online">("all");
@@ -28,10 +28,17 @@ export default function UserDashboard() {
   const userName = session?.user?.name ?? "Seeker";
 
   useEffect(() => {
+    // 1. Fetch astrologers
     fetch("/api/astrologers")
       .then((r) => r.json())
       .then((data) => { setAstrologers(data); setLoadingAstrologers(false); })
       .catch(() => setLoadingAstrologers(false));
+
+    // 2. Fetch proper user balance
+    fetch("/api/user/profile")
+      .then((r) => r.json())
+      .then((p) => { if (p?.walletBalance !== undefined) setBalance(p.walletBalance); })
+      .catch(() => {});
   }, []);
 
   const displayedAstrologers = filter === "online"
@@ -39,16 +46,32 @@ export default function UserDashboard() {
     : astrologers;
 
   async function startChat(astrologerId: string, rate: number) {
-    if (balance < rate * 2) {
+    if (balance < rate) {
       setShowWallet(true);
       return;
     }
+    
     setStarting(astrologerId);
-    // Simulate starting a session — replace with real API call
-    await new Promise((r) => setTimeout(r, 1200));
-    setStarting(null);
-    // Redirect to a dummy chat page
-    router.push(`/dashboard/chat/demo-session-${astrologerId}`);
+    try {
+      const res = await fetch("/api/chat/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ astrologerId }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        if (res.status === 402) setShowWallet(true); // Insufficient balance
+        setStarting(null);
+        return;
+      }
+
+      router.push(`/dashboard/chat/${data.sessionId}`);
+    } catch (err) {
+      console.error("Failed to start chat:", err);
+      setStarting(null);
+    }
   }
 
   return (
