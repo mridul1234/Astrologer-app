@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -57,7 +58,23 @@ export default function SignupPage() {
     setLoading(true);
     setStep("loading");
     await new Promise((r) => setTimeout(r, 1000));
-    router.push(form.role === "ASTROLOGER" ? "/astrologer" : "/dashboard");
+    
+    const res = await signIn("OTP", {
+      phone: form.phone,
+      role: form.role,
+      name: form.name,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      setError("Signup failed.");
+      setStep("form");
+      setLoading(false);
+      return;
+    }
+
+    // Refresh instantly so middleware handles routing to either /dashboard or /astrologer seamlessly
+    window.location.href = "/";
   }
 
   if (step === "loading") {

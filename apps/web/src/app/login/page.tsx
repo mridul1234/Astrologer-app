@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 type Step = "phone" | "otp" | "loading";
 
@@ -86,11 +87,25 @@ export default function LoginPage() {
       return;
     }
 
-    // Simulate login — in production, call signIn() or your auth endpoint
+    // Simulate API delay for UI effect
     setStep("loading");
     await new Promise((r) => setTimeout(r, 800));
-    // Redirect to dashboard (dummy role: user)
-    router.push("/dashboard");
+
+    // NextAuth Sign In with phone OTP mock flow
+    const res = await signIn("OTP", {
+      phone,
+      redirect: false,
+    });
+
+    if (res?.error) {
+      setError("Login failed.");
+      setStep("phone");
+      setLoading(false);
+      return;
+    }
+
+    // Refresh instantly so middleware handles routing to either /dashboard or /astrologer seamlessly
+    window.location.href = "/";
   }
 
   async function handleResend() {
