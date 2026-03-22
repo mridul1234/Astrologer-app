@@ -107,10 +107,11 @@ export default function UserProfilePage() {
   const totalCredits = profile?.transactions.filter((t) => t.type === "CREDIT").reduce((a, t) => a + t.amount, 0) ?? 0;
   const totalDebits = profile?.transactions.filter((t) => t.type === "DEBIT").reduce((a, t) => a + t.amount, 0) ?? 0;
   const memberSince = profile ? new Date(profile.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" }) : "—";
-  const initials = profile?.name?.slice(0, 2).toUpperCase() ?? "??";
   // Phone: the user logs in with phone, which may be stored as email-like. Show it cleanly.
   const phone = sessionData?.user?.email ?? profile?.email ?? "";
   const displayPhone = phone.includes("@") ? phone.split("@")[0] : phone;
+  // Use phone digits for initials (ignore stored name which may be 'Seeker XXXX')
+  const initials = displayPhone.replace(/\D/g, "").slice(0, 2) || "??";
 
   const tabStyle = (t: Tab) =>
     `px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
@@ -166,7 +167,7 @@ export default function UserProfilePage() {
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-extrabold text-stone-900 mb-1">{profile?.name ?? "User"}</h1>
+              <h1 className="text-2xl font-extrabold text-stone-900 mb-1">{displayPhone}</h1>
               <p className="text-stone-400 text-sm mb-4 flex items-center gap-1.5">
                 <span>📱</span>
                 <span>{displayPhone}</span>

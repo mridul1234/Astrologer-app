@@ -33,7 +33,8 @@ export default function UserDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
 
-  const userName = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "User";
+  // Phone number: ignore stored name (may be 'Seeker XXXX'), use email/phone only
+  const userPhone = session?.user?.email?.split("@")[0] ?? "User";
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -194,9 +195,9 @@ export default function UserDashboard() {
               <button
                 onClick={() => setProfileOpen(!profileOpen)}
                 className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f5c842] to-[#FF9933] border-[2.5px] border-white shadow-lg flex items-center justify-center text-white font-extrabold text-base hover:scale-105 hover:shadow-xl transition-all"
-                title={userName}
+                title={userPhone}
               >
-                {userName[0].toUpperCase()}
+                {userPhone[0].toUpperCase()}
               </button>
 
               {profileOpen && (
@@ -205,10 +206,10 @@ export default function UserDashboard() {
                   <div className="px-4 py-3 bg-gradient-to-r from-[#fffbee] to-[#fff8e0] border-b border-stone-100">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f5c842] to-[#FF9933] flex items-center justify-center text-white font-extrabold text-sm shrink-0">
-                        {userName[0].toUpperCase()}
+                        {userPhone[0].toUpperCase()}
                       </div>
                       <div className="overflow-hidden">
-                        <p className="text-sm font-bold text-stone-800 truncate">{userName}</p>
+                        <p className="text-sm font-bold text-stone-800 truncate">{userPhone}</p>
                         <p className="text-[11px] text-[#d97706] font-semibold">My Account</p>
                       </div>
                     </div>
