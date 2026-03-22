@@ -19,7 +19,7 @@ export async function GET() {
       createdAt: true,
       transactions: {
         orderBy: { createdAt: "desc" },
-        take: 20,
+        take: 30,
         select: {
           id: true,
           amount: true,
@@ -30,10 +30,17 @@ export async function GET() {
       },
       chatSessions: {
         orderBy: { startedAt: "desc" },
-        take: 10,
-        include: {
+        take: 20,
+        select: {
+          id: true,
+          startedAt: true,
+          endedAt: true,
+          totalCost: true,
+          status: true,
           astrologer: {
-            include: {
+            select: {
+              speciality: true,
+              ratePerMin: true,
               user: { select: { name: true } },
             },
           },
