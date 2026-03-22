@@ -154,7 +154,7 @@ export default function UserDashboard() {
           {/* ── Center Nav Links ── */}
           <div className="hidden lg:flex items-center gap-1">
             {[
-              { label: "Free Kundli", href: "#" },
+              { label: "Free Kundli", href: "/kundli" },
               { label: "Chat with Astrologer", href: "#" },
             ].map(({ label, href }) => (
               <Link
