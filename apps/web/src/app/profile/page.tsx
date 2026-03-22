@@ -292,41 +292,20 @@ export default function UserProfilePage() {
         {/* ─── SETTINGS ─── */}
         {activeTab === "settings" && (
           <div className="space-y-6">
-            <Card title="Edit Profile" icon="✏️">
-              <div className="space-y-5 max-w-md">
-                <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-1.5">Display Name</label>
-                  <input
-                    type="text"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-[#fdfaf5] focus:outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 text-sm font-medium text-stone-800 transition-all"
-                    placeholder="Your name"
-                  />
-                </div>
+            <Card title="Account Info" icon="📱">
+              <div className="space-y-4 max-w-md">
                 <div>
                   <label className="block text-sm font-semibold text-stone-700 mb-1.5">Mobile Number <span className="text-stone-400 font-normal">(cannot be changed)</span></label>
-                  <div className="px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-stone-400 text-sm flex items-center gap-2">
+                  <div className="px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-stone-600 text-sm flex items-center gap-2 font-medium">
                     🔒 {displayPhone}
                   </div>
                 </div>
-                {saveSuccess && (
-                  <div className="px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium text-center">
-                    ✅ Name updated successfully!
+                <div>
+                  <label className="block text-sm font-semibold text-stone-700 mb-1.5">Member Since</label>
+                  <div className="px-4 py-3 rounded-xl bg-stone-50 border border-stone-200 text-stone-600 text-sm flex items-center gap-2 font-medium">
+                    📅 {memberSince}
                   </div>
-                )}
-                <button
-                  onClick={handleSaveProfile}
-                  disabled={savingProfile || editName.trim() === profile?.name}
-                  className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold text-sm hover:shadow-lg hover:shadow-amber-200/60 hover:scale-[1.02] active:scale-100 transition-all duration-200 disabled:opacity-50"
-                >
-                  {savingProfile ? (
-                    <span className="flex items-center gap-2">
-                      <span className="w-4 h-4 border-2 border-stone-900 border-t-transparent rounded-full animate-spin" />
-                      Saving…
-                    </span>
-                  ) : "Save Changes ✦"}
-                </button>
+                </div>
               </div>
             </Card>
 

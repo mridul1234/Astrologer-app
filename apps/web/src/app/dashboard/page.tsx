@@ -33,7 +33,7 @@ export default function UserDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
 
-  const userName = session?.user?.name ?? "Seeker";
+  const userName = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "User";
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -209,7 +209,7 @@ export default function UserDashboard() {
                       </div>
                       <div className="overflow-hidden">
                         <p className="text-sm font-bold text-stone-800 truncate">{userName}</p>
-                        <p className="text-[11px] text-[#d97706] font-semibold">⭐ Seeker Account</p>
+                        <p className="text-[11px] text-[#d97706] font-semibold">My Account</p>
                       </div>
                     </div>
                   </div>
