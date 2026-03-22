@@ -10,10 +10,14 @@ interface Astrologer {
   speciality: string | null;
   ratePerMin: number;
   isOnline: boolean;
+  isBusy: boolean;
+  sessionStartedAt: string | null;
   bio: string | null;
   user: { name: string };
   averageRating: number;
   reviewCount: number;
+  experienceYears?: number;
+  languages?: string;
 }
 
 export default function UserDashboard() {
@@ -48,6 +52,17 @@ export default function UserDashboard() {
       .then((p) => { if (p?.walletBalance !== undefined) setBalance(p.walletBalance); })
       .catch(() => {});
 
+    // Auto-refresh astrologer availability every 30 seconds
+    const pollInterval = setInterval(() => {
+      fetch("/api/astrologers")
+        .then((r) => r.json())
+        .then((data) => {
+          const sorted = data.sort((a: Astrologer, b: Astrologer) => b.reviewCount - a.reviewCount);
+          setAstrologers(sorted);
+        })
+        .catch(() => {});
+    }, 30000);
+
     // Click outside for dropdown
     function handleClickOutside(event: MouseEvent) {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -55,7 +70,10 @@ export default function UserDashboard() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      clearInterval(pollInterval);
+    };
   }, []);
 
   const categories = ["All", "Love", "Education", "Career", "Marriage"];
@@ -98,6 +116,14 @@ export default function UserDashboard() {
     const originalRate = Math.floor(rate * 1.5);
     const orders = reviews === 0 ? (seed % 200) + 15 : reviews * 12 + (seed % 50);
     return { exp, originalRate, orders };
+  };
+
+  // Estimate wait time from session start (assume avg session is 15 min)
+  const getWaitMins = (sessionStartedAt: string | null): number => {
+    if (!sessionStartedAt) return 5;
+    const elapsed = (Date.now() - new Date(sessionStartedAt).getTime()) / 60000;
+    const remaining = Math.max(2, Math.round(15 - elapsed));
+    return remaining;
   };
 
   return (
@@ -347,24 +373,64 @@ export default function UserDashboard() {
                       <p>Experience: {exp} Years</p>
                     </div>
 
-                    <div className="flex items-center justify-between mt-auto pt-3">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-red-500 font-bold text-sm line-through decoration-red-500/50">₹ {originalRate}</span>
-                        <span className="font-extrabold text-lg text-black">
-                          <span className="text-[#16a34a]">₹ {a.ratePerMin}</span>
-                          <span className="text-xs text-stone-500 font-bold">/min</span>
-                        </span>
+                    {/* Price + Action Row */}
+                    <div className="mt-auto pt-3 space-y-2">
+
+                      {/* Price row */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-red-500 font-bold text-sm line-through decoration-red-500/50">₹ {originalRate}</span>
+                          <span className="font-extrabold text-lg text-black">
+                            <span className="text-[#16a34a]">₹ {a.ratePerMin}</span>
+                            <span className="text-xs text-stone-500 font-bold">/min</span>
+                          </span>
+                        </div>
+
+                        {/* Status badge */}
+                        {a.isBusy ? (
+                          <div className="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-full px-2.5 py-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
+                            <span className="text-[11px] font-bold text-red-600 uppercase tracking-wide">In Session</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-full px-2.5 py-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
+                            <span className="text-[11px] font-bold text-green-600 uppercase tracking-wide">Available</span>
+                          </div>
+                        )}
                       </div>
-                      <button
-                        onClick={() => startChat(a.id, a.ratePerMin)}
-                        disabled={!!starting}
-                        className="px-5 py-2 rounded-xl text-sm font-bold border-2 border-[#16a34a] text-[#16a34a] bg-transparent hover:bg-[#16a34a] hover:text-white hover:shadow-lg hover:shadow-green-200/60 hover:scale-105 active:scale-100 transition-all duration-200 disabled:opacity-50"
-                      >
-                        {starting === a.id ? (
-                          <span className="flex items-center gap-1.5"><span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"/> Starting...</span>
-                        ) : (a.ratePerMin === 0 ? "Free Chat" : "Chat")}
-                      </button>
+
+                      {/* Action button row */}
+                      {a.isBusy ? (
+                        <div className="flex items-center justify-between gap-2">
+                          <button
+                            disabled
+                            className="flex-1 px-5 py-2 rounded-xl text-sm font-bold border-2 border-orange-300 text-orange-400 bg-orange-50 cursor-not-allowed opacity-80"
+                          >
+                            🔴 Busy
+                          </button>
+                          <div className="text-right">
+                            <p className="text-[11px] text-stone-400 font-medium leading-tight">Est. wait</p>
+                            <p className="text-sm font-extrabold text-orange-500">~{getWaitMins(a.sessionStartedAt)} min</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => startChat(a.id, a.ratePerMin)}
+                          disabled={!!starting}
+                          className="w-full px-5 py-2 rounded-xl text-sm font-bold border-2 border-[#16a34a] text-[#16a34a] bg-transparent hover:bg-[#16a34a] hover:text-white hover:shadow-lg hover:shadow-green-200/60 hover:scale-105 active:scale-100 transition-all duration-200 disabled:opacity-50"
+                        >
+                          {starting === a.id ? (
+                            <span className="flex items-center justify-center gap-1.5">
+                              <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"/>
+                              Starting...
+                            </span>
+                          ) : (a.ratePerMin === 0 ? "💬 Free Chat" : "💬 Chat Now")}
+                        </button>
+                      )}
+
                     </div>
+
                   </div>
 
                 </div>
