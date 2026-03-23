@@ -231,14 +231,7 @@ export default function UserDashboard() {
                   key={a.id}
                   className="bg-white rounded-3xl p-5 relative flex gap-4 border border-stone-100 shadow-[0_4px_15px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(245,200,66,0.18)] hover:-translate-y-1.5 hover:border-[#f5c842]/40 transition-all duration-300 cursor-pointer group"
                 >
-                  {/* Top Choice Ribbon for the first few */}
-                  {index < 2 && (
-                    <div className="absolute top-0 left-0 overflow-hidden w-20 h-20 rounded-tl-3xl z-10">
-                      <div className="absolute top-4 -left-7 bg-[#2e2e2e] text-[#f5c842] text-[9px] font-bold uppercase tracking-widest py-1 w-32 text-center -rotate-45 shadow-sm">
-                        Top Choice
-                      </div>
-                    </div>
-                  )}
+
 
                   {/* Left Column: Avatar & Rating */}
                   <div className="flex flex-col items-center shrink-0 w-24">
