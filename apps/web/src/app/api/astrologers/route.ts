@@ -26,6 +26,7 @@ export async function GET() {
       userId: a.userId,
       bio: a.bio,
       speciality: a.speciality,
+      categories: a.categories,
       ratePerMin: a.ratePerMin,
       isOnline: a.isOnline,
       isBusy: !!activeSession,

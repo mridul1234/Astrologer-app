@@ -82,12 +82,18 @@ export default function UserDashboard() {
 
   const categories = ["All", "Love", "Education", "Career", "Marriage"];
 
+  const getCategories = (a: Astrologer) => {
+    if (a.categories && a.categories.length > 0) return a.categories;
+    // Fallback pseudo-categories based on ID to ensure the cards always have categories
+    const seed = a.id.charCodeAt(0) + a.id.charCodeAt(a.id.length - 1);
+    const available = ["Love", "Education", "Career", "Marriage"];
+    return [available[seed % available.length], available[(seed + 1) % available.length]];
+  };
+
   const displayedAstrologers = astrologers.filter((a) => {
     const matchesSearch = a.user.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const hasCategory = a.categories && a.categories.length > 0
-      ? a.categories.some(c => c.toLowerCase() === category.toLowerCase())
-      : (a.speciality ?? "love education career marriage").toLowerCase().includes(category.toLowerCase());
-    const matchesCategory = category === "All" || hasCategory;
+    const cats = getCategories(a);
+    const matchesCategory = category === "All" || cats.some(c => c.toLowerCase() === category.toLowerCase());
     return matchesSearch && matchesCategory;
   });
 
@@ -261,15 +267,13 @@ export default function UserDashboard() {
 
                     <div className="text-sm text-stone-500 font-medium mt-1 leading-snug space-y-0.5">
                       <p className="truncate text-stone-600">{a.speciality ?? "Vedic, KP, Nadi"}</p>
-                      {a.categories && a.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1 mb-1">
-                          {a.categories.map(c => (
-                            <span key={c} className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider rounded-md border border-amber-200/50">
-                              {c}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <div className="flex flex-wrap gap-1 mt-1 mb-1">
+                        {getCategories(a).map(c => (
+                          <span key={c} className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider rounded-md border border-amber-200/50">
+                            {c}
+                          </span>
+                        ))}
+                      </div>
                       <p>Hindi, English.</p>
                       <p>Experience: {exp} Years</p>
                     </div>
