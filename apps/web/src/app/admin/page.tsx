@@ -246,12 +246,11 @@ export default function AdminDashboard() {
                        <th className="px-6 py-4 font-bold">Name & Email</th>
                        <th className="px-6 py-4 font-bold">Speciality</th>
                        <th className="px-6 py-4 font-bold text-center">Rate</th>
-                       <th className="px-6 py-4 font-bold text-center">Status</th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-stone-50">
                      {astrologers.length === 0 ? (
-                       <tr><td colSpan={4} className="px-6 py-12 text-center text-stone-400 font-medium border-b border-stone-50">No astrologers found.</td></tr>
+                       <tr><td colSpan={3} className="px-6 py-12 text-center text-stone-400 font-medium border-b border-stone-50">No astrologers found.</td></tr>
                      ) : (
                        astrologers.map((a) => (
                          <tr key={a.id} className="hover:bg-amber-50/30 transition-colors group">
@@ -266,17 +265,6 @@ export default function AdminDashboard() {
                              <div className="inline-flex items-center px-2.5 py-1 rounded-lg bg-stone-50 border border-stone-200 font-mono font-bold text-[#d97706] text-xs">
                                ₹{a.astrologerProfile?.ratePerMin || 0}/min
                              </div>
-                           </td>
-                           <td className="px-6 py-4 text-center">
-                             {a.astrologerProfile?.isOnline ? (
-                               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-100 tracking-wide uppercase">
-                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online
-                               </span>
-                             ) : (
-                               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-50 text-stone-500 text-[11px] font-bold border border-stone-200 tracking-wide uppercase">
-                                 Offline
-                               </span>
-                             )}
                            </td>
                          </tr>
                        ))

@@ -19,8 +19,6 @@ export default function AstrologerDashboard() {
   const router = useRouter();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isOnline, setIsOnline] = useState(false);
-  const [togglingOnline, setTogglingOnline] = useState(false);
   const [astrologerName, setAstrologerName] = useState("Astro");
   const previousActiveCount = useRef(-1);
 
@@ -62,8 +60,6 @@ export default function AstrologerDashboard() {
         playChime();
       }
       previousActiveCount.current = activeNow;
-
-      setIsOnline(!!data.isOnline);
     } catch {
     } finally {
       setLoading(false);
@@ -82,24 +78,6 @@ export default function AstrologerDashboard() {
     const interval = setInterval(fetchStats, 5000);
     return () => clearInterval(interval);
   }, [fetchStats]);
-
-  const toggleOnline = async () => {
-    if (togglingOnline) return;
-    setTogglingOnline(true);
-    try {
-      const targetState = !isOnline;
-      const res = await fetch("/api/astrologer/status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isOnline: targetState }),
-      });
-      if (res.ok) setIsOnline(targetState);
-    } catch (err) {
-      console.error("Status toggle error:", err);
-    } finally {
-      setTogglingOnline(false);
-    }
-  };
 
   const joinChat = (sessionId: string) => {
     router.push(`/astrologer/chat/${sessionId}`);
@@ -159,33 +137,6 @@ export default function AstrologerDashboard() {
                 Ledger
               </div>
             </div>
-          </button>
-
-          {/* Online toggle */}
-          <button
-            id="online-toggle-btn"
-            onClick={toggleOnline}
-            disabled={togglingOnline}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all uppercase tracking-widest cursor-pointer shadow-sm hover:scale-105"
-            style={
-              isOnline
-                ? {
-                    background: "rgba(16,185,129,0.1)",
-                    border: "1px solid rgba(16,185,129,0.3)",
-                    color: "#059669",
-                  }
-                : {
-                    background: "rgba(241,245,249,1)",
-                    border: "1px solid rgba(203,213,225,1)",
-                    color: "#64748b",
-                  }
-            }
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`}
-              style={isOnline ? { boxShadow: "0 0 8px #10b981" } : {}}
-            />
-            {togglingOnline ? "Syncing…" : isOnline ? "Online" : "Go Online"}
           </button>
 
           {/* Avatar → Settings */}
@@ -251,12 +202,12 @@ export default function AstrologerDashboard() {
               bg: "bg-white",
             },
             {
-              icon: isOnline ? "🟢" : "⚫",
-              label: "Status",
-              value: isOnline ? "Online" : "Offline",
-              sub: isOnline ? "Receiving energy" : "Toggle to go live",
-              color: isOnline ? "#10b981" : "#64748b",
-              bg: isOnline ? "bg-emerald-50" : "bg-white",
+              icon: "🧿",
+              label: "Portal",
+              value: "Active",
+              sub: "Ready for requests",
+              color: "#10b981",
+              bg: "bg-emerald-50",
             },
           ].map((stat) => (
             <div
@@ -321,25 +272,6 @@ export default function AstrologerDashboard() {
           </div>
         )}
 
-        {/* ─── OFFLINE PROMPT ─── */}
-        {!isOnline && (
-          <div className="mb-10 px-6 py-6 rounded-2xl flex items-center justify-between gap-5 bg-orange-50 border border-orange-200 shadow-sm">
-            <div className="flex items-center gap-4">
-              <span className="text-4xl drop-shadow-sm">💡</span>
-              <div>
-                <div className="text-orange-600 font-extrabold text-sm tracking-wide">You're currently offline</div>
-                <div className="text-orange-500/80 text-xs font-bold mt-1">Go online to start receiving spiritual consultation requests</div>
-              </div>
-            </div>
-            <button
-              onClick={toggleOnline}
-              disabled={togglingOnline}
-              className="bg-gradient-to-r from-[#FF9933] to-[#f5c842] text-white px-8 py-3 rounded-xl text-sm font-extrabold tracking-wide hover:shadow-lg shadow-sm transition-transform hover:scale-105 shrink-0"
-            >
-              Go Online
-            </button>
-          </div>
-        )}
 
         {/* ─── SESSION HISTORY ─── */}
         <div>

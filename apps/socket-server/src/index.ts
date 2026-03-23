@@ -45,6 +45,30 @@ setInterval(async () => {
   }
 }, 2000);
 
+// ─── Ghost Session Cleanup ───────────────────────────────────────────────────
+// Sweeps the database every minute to end sessions that started >10 mins ago but
+// astrologer never joined (i.e. zero chat activity & no billing timer).
+setInterval(async () => {
+  try {
+    const tenMinsAgo = new Date(Date.now() - 10 * 60 * 1000);
+    const ghostSessions = await prisma.chatSession.findMany({
+      where: {
+        status: "ACTIVE",
+        startedAt: { lt: tenMinsAgo },
+        totalCost: 0,
+      },
+    });
+
+    for (const s of ghostSessions) {
+      if (!billingTimers.has(s.id)) {
+        await endSession(s.id, "astrologer_timeout");
+      }
+    }
+  } catch (err) {
+    console.error("[GhostCleanup] Error:", err);
+  }
+}, 60000);
+
 // ─── Per-session billing state ────────────────────────────────────────────────
 interface SessionMeta {
   userId: string;

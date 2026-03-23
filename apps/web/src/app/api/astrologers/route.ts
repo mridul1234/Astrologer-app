@@ -13,7 +13,6 @@ export async function GET() {
         take: 1,
       },
     },
-    orderBy: { isOnline: "desc" },
   });
 
   const formatted = astrologers.map(a => {
