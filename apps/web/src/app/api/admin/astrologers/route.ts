@@ -58,3 +58,47 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+export async function GET() {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
+
+  try {
+    const astrologers = await prisma.user.findMany({
+      where: { role: "ASTROLOGER" },
+      include: { astrologerProfile: true },
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json({ astrologers });
+  } catch (error) {
+    console.error("Failed to fetch astrologers:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
+
+  try {
+    const { id, ratePerMin, speciality, bio } = await req.json();
+    if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+
+    const updated = await prisma.astrologerProfile.update({
+      where: { userId: id },
+      data: {
+        ...(ratePerMin && { ratePerMin: Number(ratePerMin) }),
+        ...(speciality && { speciality }),
+        ...(bio && { bio }),
+      },
+    });
+    return NextResponse.json({ success: true, profile: updated });
+  } catch (error) {
+    console.error("Failed to update astrologer:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
