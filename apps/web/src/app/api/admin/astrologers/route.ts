@@ -88,7 +88,7 @@ export async function PATCH(req: NextRequest) {
     const { id, ratePerMin, speciality, bio } = await req.json();
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
-    const updated = await prisma.astrologerProfile.update({
+    const updated = await prisma.astrologer.update({
       where: { userId: id },
       data: {
         ...(ratePerMin && { ratePerMin: Number(ratePerMin) }),
