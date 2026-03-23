@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
@@ -217,10 +217,9 @@ export default function UserDashboard() {
                   {/* Menu Items */}
                   <div className="py-1">
                     {[
-                      { icon: "👤", label: "My Profile", onClick: () => router.push("/profile") },
-                      { icon: "💰", label: "Wallet & Recharge", onClick: () => router.push("/wallet") },
-                      { icon: "📜", label: "Order History", onClick: () => router.push("/transactions") },
-                    ].map(({ icon, label, onClick }) => (
+                       { icon: "💰", label: "Wallet Transactions", onClick: () => router.push("/wallet") },
+                       { icon: "📜", label: "Order History", onClick: () => router.push("/transactions") },
+                     ].map(({ icon, label, onClick }) => (
                       <button key={label} onClick={onClick} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-stone-700 hover:bg-orange-50 hover:text-[#d97706] transition-colors font-medium">
                         <span className="text-base">{icon}</span> {label}
                       </button>
