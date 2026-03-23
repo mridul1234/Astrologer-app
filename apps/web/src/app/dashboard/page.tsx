@@ -217,7 +217,7 @@ export default function UserDashboard() {
                   {/* Menu Items */}
                   <div className="py-1">
                     {[
-                       { icon: "💰", label: "Wallet Transactions", onClick: () => router.push("/wallet") },
+                       { icon: "💰", label: "Wallet Transactions", onClick: () => router.push("/transactions") },
                        { icon: "📜", label: "Order History", onClick: () => router.push("/transactions") },
                      ].map(({ icon, label, onClick }) => (
                       <button key={label} onClick={onClick} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-stone-700 hover:bg-orange-50 hover:text-[#d97706] transition-colors font-medium">
