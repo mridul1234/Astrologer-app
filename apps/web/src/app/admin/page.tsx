@@ -49,6 +49,7 @@ export default function AdminDashboard() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [speciality, setSpeciality] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
   const [bio, setBio] = useState("");
   const [ratePerMin, setRatePerMin] = useState("15");
   const [experienceYears, setExperienceYears] = useState("0");
@@ -90,7 +91,7 @@ export default function AdminDashboard() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        name, email, password, speciality, bio, 
+        name, email, password, speciality, categories, bio, 
         ratePerMin: Number(ratePerMin), 
         experienceYears: Number(experienceYears), 
         languages, 
@@ -103,7 +104,7 @@ export default function AdminDashboard() {
 
     if (res.ok) {
       setMsg({ text: `Successfully registered ${name}! They can now log in.`, type: "success" });
-      setName(""); setEmail(""); setPassword(""); setSpeciality(""); setBio(""); 
+      setName(""); setEmail(""); setPassword(""); setSpeciality(""); setCategories([]); setBio(""); 
       setRatePerMin("15"); setExperienceYears("0"); setLanguages("Hindi, English"); setProfileImage("");
     } else {
       setMsg({ text: data.error || "Failed to register astrologer", type: "error" });
@@ -336,6 +337,26 @@ export default function AdminDashboard() {
                 <div className="col-span-2 sm:col-span-1">
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Speciality</label>
                   <input required value={speciality} onChange={e => setSpeciality(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400" placeholder="Vedic, Tarot..." />
+                </div>
+
+                <div className="col-span-2">
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Categories (Multi-Select)</label>
+                  <div className="flex flex-wrap gap-2">
+                    {["Love", "Education", "Career", "Marriage", "Health", "Wealth"].map(cat => (
+                      <button
+                        type="button"
+                        key={cat}
+                        onClick={() => setCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                          categories.includes(cat)
+                            ? "bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 border-2 border-transparent shadow-sm"
+                            : "bg-[#fdfaf5] text-stone-500 border border-stone-200 hover:border-[#f5c842]/60 hover:text-[#d97706]"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="col-span-2">

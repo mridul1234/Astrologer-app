@@ -18,6 +18,7 @@ interface Astrologer {
   reviewCount: number;
   experienceYears?: number;
   languages?: string;
+  categories?: string[];
 }
 
 export default function UserDashboard() {
@@ -81,7 +82,10 @@ export default function UserDashboard() {
 
   const displayedAstrologers = astrologers.filter((a) => {
     const matchesSearch = a.user.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = category === "All" || (a.speciality ?? "love education career marriage").toLowerCase().includes(category.toLowerCase());
+    const hasCategory = a.categories && a.categories.length > 0
+      ? a.categories.some(c => c.toLowerCase() === category.toLowerCase())
+      : (a.speciality ?? "love education career marriage").toLowerCase().includes(category.toLowerCase());
+    const matchesCategory = category === "All" || hasCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -369,6 +373,15 @@ export default function UserDashboard() {
 
                     <div className="text-sm text-stone-500 font-medium mt-1 leading-snug space-y-0.5">
                       <p className="truncate text-stone-600">{a.speciality ?? "Vedic, KP, Nadi"}</p>
+                      {a.categories && a.categories.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1 mb-1">
+                          {a.categories.map(c => (
+                            <span key={c} className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider rounded-md border border-amber-200/50">
+                              {c}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       <p>Hindi, English.</p>
                       <p>Experience: {exp} Years</p>
                     </div>

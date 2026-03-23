@@ -51,6 +51,7 @@ model Astrologer {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   bio             String?
   speciality      String?
+  categories      String[] @default([])
   experienceYears Int      @default(0)
   languages       String   @default("Hindi, English")
   profileImage    String?

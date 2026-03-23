@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { name, email, password, bio, speciality, ratePerMin, experienceYears, languages, profileImage } = await req.json();
+    const { name, email, password, bio, speciality, categories, ratePerMin, experienceYears, languages, profileImage } = await req.json();
 
     if (!name || !email || !password || !ratePerMin) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
           create: {
             bio: bio || "A guiding light.",
             speciality: speciality || "Vedic Astrology",
+            categories: categories || [],
             ratePerMin: Number(ratePerMin),
             experienceYears: experienceYears ? Number(experienceYears) : 0,
             languages: languages || "Hindi, English",
