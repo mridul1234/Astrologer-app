@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
@@ -292,7 +292,7 @@ export default function UserDashboard() {
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-semibold text-[13px] whitespace-nowrap transition-all duration-150 ${
                   category === label
                     ? "bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 shadow-sm shadow-amber-200/60"
-                    : "bg-[#fdfaf5] border border-stone-200 text-stone-600 hover:border-[#f5c842]/50 hover:text-stone-800"
+                    : "bg-[#fdfaf5] border border-stone-200 text-stone-600 hover:border-[#f5c842]/60 hover:text-[#d97706] hover:bg-amber-50 hover:shadow-sm hover:scale-[1.04]"
                 }`}
               >
                 <span className={color}>{icon}</span>
@@ -503,9 +503,9 @@ export default function UserDashboard() {
                 <span className="absolute -bottom-2 left-0 w-8 h-0.5 bg-[#f5c842] rounded-full block"></span>
               </h3>
               <ul className="space-y-3 mt-4">
-                {["About Us", "Contact Us", "Product Details", "Careers", "Blog"].map((item) => (
+                {["About Us", "Contact Us", "Product Details"].map((item) => (
                   <li key={item}>
-                    <Link href="#" className="text-stone-600 hover:text-[#FF9933] text-sm font-medium transition-colors flex items-center gap-2 group">
+                    <Link href={`/${item.toLowerCase().replace(/ /g, "-").replace(/&/g, "and")}`} className="text-stone-600 hover:text-[#FF9933] text-sm font-medium transition-colors flex items-center gap-2 group">
                       <span className="w-1 h-1 rounded-full bg-[#f5c842] group-hover:w-3 transition-all duration-200 shrink-0"></span>
                       {item}
                     </Link>
@@ -521,9 +521,9 @@ export default function UserDashboard() {
                 <span className="absolute -bottom-2 left-0 w-8 h-0.5 bg-[#f5c842] rounded-full block"></span>
               </h3>
               <ul className="space-y-3 mt-4">
-                {["Privacy Policy", "Terms & Conditions", "Refund & Cancellation", "Astrologer Login", "User Guidelines"].map((item) => (
+                {["Privacy Policy", "Terms & Conditions", "Refund & Cancellation", "User Guidelines"].map((item) => (
                   <li key={item}>
-                    <Link href="#" className="text-stone-600 hover:text-[#FF9933] text-sm font-medium transition-colors flex items-center gap-2 group">
+                    <Link href={`/${item.toLowerCase().replace(/ /g, "-").replace(/&/g, "and")}`} className="text-stone-600 hover:text-[#FF9933] text-sm font-medium transition-colors flex items-center gap-2 group">
                       <span className="w-1 h-1 rounded-full bg-[#f5c842] group-hover:w-3 transition-all duration-200 shrink-0"></span>
                       {item}
                     </Link>
