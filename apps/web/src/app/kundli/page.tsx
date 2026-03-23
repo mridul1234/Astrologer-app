@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import UserHeader from "@/components/UserHeader";
+import UserFooter from "@/components/UserFooter";
 
 // ─────────────────────────────────────────────
 //  Constants
@@ -232,23 +234,7 @@ export default function KundliPage() {
 
   return (
     <div className="min-h-screen bg-[#fdfaf5] font-sans">
-      {/* ─── Nav ─── */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8] shadow-[0_2px_12px_rgba(245,200,66,0.08)]">
-        <div className="max-w-[1400px] mx-auto px-6 h-[64px] flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#ffce4b] rounded-full flex items-center justify-center shadow-sm">
-              <span className="text-amber-800 text-lg">☽</span>
-            </div>
-            <div>
-              <div className="text-[18px] font-extrabold text-stone-900">CosmicInsight</div>
-              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
-            </div>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-sm font-semibold text-stone-600 hover:text-[#d97706] transition-colors px-4 py-2 rounded-full hover:bg-amber-50">← Dashboard</Link>
-          </div>
-        </div>
-      </nav>
+      <UserHeader />
 
       {/* ─── Hero ─── */}
       <div className="text-center py-12 px-4 bg-gradient-to-b from-[#fef9ec] to-[#fdfaf5] border-b border-[#f0e6c8]">
@@ -405,6 +391,7 @@ export default function KundliPage() {
           </div>
         )}
       </div>
+      <UserFooter />
     </div>
   );
 }

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import UserHeader from "@/components/UserHeader";
+import UserFooter from "@/components/UserFooter";
 
 interface ChatSession {
   id: string;
@@ -103,28 +105,7 @@ export default function OrderHistoryPage() {
   return (
     <div className="min-h-screen bg-[#fdfaf5] font-sans text-stone-800">
 
-      {/* ─── NAVBAR ─── */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8] shadow-[0_2px_12px_rgba(245,200,66,0.08)]">
-        <div className="max-w-5xl mx-auto px-6 h-[64px] flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-[#ffce4b] rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-              <span className="text-amber-800 text-lg">☽</span>
-            </div>
-            <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">CosmicInsight</div>
-              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
-            </div>
-          </Link>
-          <div className="flex items-center gap-2 text-xs">
-            <Link href="/dashboard" className="px-3 py-1.5 rounded-full bg-[#f5c842] text-stone-900 font-bold hover:shadow-md transition-all">
-              ← Dashboard
-            </Link>
-            <span className="px-3 py-1.5 rounded-full bg-amber-50 border border-[#f5c842]/40 text-[#d97706] font-bold">
-              Order History
-            </span>
-          </div>
-        </div>
-      </nav>
+      <UserHeader />
 
       <main className="max-w-5xl mx-auto px-4 py-10">
 
@@ -260,6 +241,7 @@ export default function OrderHistoryPage() {
           </p>
         )}
       </main>
+      <UserFooter />
     </div>
   );
 }

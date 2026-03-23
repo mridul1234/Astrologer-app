@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import UserHeader from "@/components/UserHeader";
+import UserFooter from "@/components/UserFooter";
 
 interface Pack {
   amount: number;
@@ -63,34 +65,7 @@ export default function WalletPage() {
 
   return (
     <div className="min-h-screen text-slate-800 bg-[#faf8f5]" style={{ fontFamily: "'Inter', sans-serif" }}>
-      {/* ─── NAVBAR ─── */}
-      <nav
-        className="sticky top-0 z-50 px-6 py-4 flex items-center justify-between shadow-sm"
-        style={{
-          background: "rgba(255,255,255,0.95)",
-          backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(245,200,66,0.15)",
-        }}
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-2xl drop-shadow-sm">✨</span>
-          <span className="font-cinzel text-xl font-bold tracking-wider" style={{ color: "#FF9933" }}>
-            CosmicChat
-          </span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Link
-            href="/dashboard"
-            className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-[#FF9933] transition-colors"
-          >
-            Dashboard
-          </Link>
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#f5c842] to-[#FF9933] border-2 border-white shadow-sm flex items-center justify-center font-bold text-sm text-white">
-            {userName[0]}
-          </div>
-        </div>
-      </nav>
+      <UserHeader />
 
       {/* ─── MAIN CONTENT ─── */}
       <main className="max-w-6xl mx-auto px-6 mt-10 mb-24">
@@ -149,6 +124,7 @@ export default function WalletPage() {
           ))}
         </div>
       </main>
+      <UserFooter />
     </div>
   );
 }
