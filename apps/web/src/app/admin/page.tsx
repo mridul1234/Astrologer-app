@@ -50,7 +50,6 @@ export default function AdminDashboard() {
   const [password, setPassword] = useState("");
   const [speciality, setSpeciality] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
-  const [bio, setBio] = useState("");
   const [ratePerMin, setRatePerMin] = useState("15");
   const [experienceYears, setExperienceYears] = useState("0");
   const [languages, setLanguages] = useState("Hindi, English");
@@ -91,8 +90,8 @@ export default function AdminDashboard() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        name, email, password, speciality, categories, bio, 
-        ratePerMin: Number(ratePerMin), 
+        name, email, password, speciality, categories, 
+        ratePerMin: Number(ratePerMin),  
         experienceYears: Number(experienceYears), 
         languages, 
         profileImage 
@@ -104,7 +103,7 @@ export default function AdminDashboard() {
 
     if (res.ok) {
       setMsg({ text: `Successfully registered ${name}! They can now log in.`, type: "success" });
-      setName(""); setEmail(""); setPassword(""); setSpeciality(""); setCategories([]); setBio(""); 
+      setName(""); setEmail(""); setPassword(""); setSpeciality(""); setCategories([]); 
       setRatePerMin("15"); setExperienceYears("0"); setLanguages("Hindi, English"); setProfileImage("");
     } else {
       setMsg({ text: data.error || "Failed to register astrologer", type: "error" });
@@ -364,10 +363,6 @@ export default function AdminDashboard() {
                   <input required type="url" value={profileImage} onChange={e => setProfileImage(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400" placeholder="https://example.com/photo.jpg" />
                 </div>
 
-                <div className="col-span-2">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Public Biography</label>
-                  <textarea required value={bio} onChange={e => setBio(e.target.value)} rows={3} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400 resize-none" />
-                </div>
 
                 <div className="col-span-2 mt-6">
                   <button disabled={loading} type="submit" className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-3.5 rounded-xl hover:shadow-lg hover:shadow-amber-200/60 active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:active:scale-100">
