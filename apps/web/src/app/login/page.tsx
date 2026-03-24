@@ -182,7 +182,7 @@ export default function LoginPage() {
             <>
               <div className="text-center mb-10">
                 <div className="text-5xl mb-4 drop-shadow-sm">📱</div>
-                <h1 className="font-cinzel text-3xl font-bold text-slate-800 tracking-wide">Welcome Back</h1>
+                <h1 className="font-cinzel text-3xl font-bold text-slate-800 tracking-wide">Welcome to CosmicChat</h1>
                 <p className="text-slate-500 font-medium mt-3 text-sm">
                   Enter your mobile number to receive a one-time passcode
                 </p>
@@ -237,12 +237,6 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              <p className="text-center text-slate-500 font-medium text-sm mt-8">
-                <span className="text-slate-400">New to the cosmos? </span>
-                <button onClick={() => window.location.reload()} className="font-bold hover:text-[#d97706] transition-colors" style={{ color: "#FF9933" }}>
-                  Join Us
-                </button>
-              </p>
             </>
           )}
 

@@ -82,7 +82,7 @@ export default function ProductDetailsPage() {
           <p className="text-stone-500 text-sm font-medium mb-8">Getting started is simple</p>
           <div className="grid sm:grid-cols-4 gap-4">
             {[
-              { step: "01", title: "Sign Up", desc: "Create your account with just your phone number — no email required." },
+              { step: "01", title: "Login", desc: "Access your account or create a new one with just your phone number — no email required." },
               { step: "02", title: "Add Wallet Balance", desc: "Recharge your CosmicInsight wallet with any amount starting from ₹50." },
               { step: "03", title: "Choose an Astrologer", desc: "Browse verified astrologers filtered by speciality, rating, and language." },
               { step: "04", title: "Start Chatting", desc: "Begin your live chat session and get guidance. End whenever you want." },

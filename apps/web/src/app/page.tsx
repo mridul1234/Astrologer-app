@@ -188,7 +188,7 @@ export default function Home() {
         </h2>
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { num: "01", title: "Sign Up", desc: "Create your account in 30 seconds with OTP verification.", icon: "📱" },
+            { num: "01", title: "Login", desc: "Easily login or create your account in 30 seconds with OTP verification.", icon: "📱" },
             { num: "02", title: "Add Balance", desc: "Top up your wallet securely using Razorpay.", icon: "💳" },
             { num: "03", title: "Start Chatting", desc: "Pick an astrologer and begin your cosmic conversation.", icon: "💬" },
           ].map((step) => (
