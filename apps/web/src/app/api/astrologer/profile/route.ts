@@ -15,6 +15,10 @@ export async function GET() {
       user: {
         select: { id: true, name: true, email: true, createdAt: true },
       },
+      reviews: {
+        include: { user: { select: { name: true } } },
+        orderBy: { createdAt: "desc" },
+      },
       chatSessions: {
         orderBy: { startedAt: "desc" },
         take: 20,
@@ -33,7 +37,11 @@ export async function GET() {
     .filter((s) => s.status === "ENDED")
     .reduce((acc, s) => acc + s.totalCost, 0);
 
-  return NextResponse.json({ ...astrologer, totalEarnings });
+  const avgRating = astrologer.reviews.length > 0 
+    ? astrologer.reviews.reduce((acc, r) => acc + r.rating, 0) / astrologer.reviews.length 
+    : 0;
+
+  return NextResponse.json({ ...astrologer, totalEarnings, avgRating });
 }
 
 // PATCH /api/astrologer/profile
