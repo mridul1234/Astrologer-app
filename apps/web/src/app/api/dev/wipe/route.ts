@@ -11,7 +11,13 @@ export async function GET(req: Request) {
     const sessions = await prisma.chatSession.deleteMany({});
     const transactions = await prisma.transaction.deleteMany({});
     const astrologers = await prisma.astrologer.deleteMany({});
-    const users = await prisma.user.deleteMany({});
+    const users = await prisma.user.deleteMany({
+      where: {
+        role: {
+          not: "ADMIN"
+        }
+      }
+    });
 
     return NextResponse.json({
       success: true,
