@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 
 interface ChatSession {
   id: string;
@@ -49,6 +50,19 @@ export default function AstrologerPortal() {
   // Settings Form State
   const [isUpdating, setIsUpdating] = useState(false);
   const [editProfile, setEditProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0 });
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Timers
   const previousActiveCount = useRef(-1);
@@ -183,17 +197,64 @@ export default function AstrologerPortal() {
   return (
     <div className="min-h-screen bg-[#faf8f5] text-slate-800 font-sans pb-20">
       {/* ─── HEADER ─── */}
-      <nav className="bg-white px-8 py-5 flex items-center justify-between sticky top-0 z-50 border-b border-slate-200 shadow-sm">
-        <div className="font-cinzel text-xl md:text-2xl font-black tracking-tight flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab("dashboard")}>
-          <span className="text-[#FF9933] drop-shadow-sm text-3xl">🔮</span>
-          <span>Astrologer Portal</span>
-        </div>
-        <div className="flex items-center gap-6">
-          <button onClick={() => router.push("/login")} className="text-xs text-slate-500 hover:text-red-500 font-bold uppercase tracking-widest transition-colors">
-            Sign out
-          </button>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FF9933] to-[#d97706] text-white flex items-center justify-center font-extrabold shadow-md border-2 border-white ring-2 ring-[#FF9933]/20 cursor-pointer hover:scale-105 transition-transform" onClick={() => setActiveTab("settings")} title="Profile Settings">
-            {astrologerName[0]}
+      <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8] shadow-[0_2px_16px_rgba(245,200,66,0.08)] w-full">
+        <div className="max-w-[1400px] mx-auto px-6 h-[70px] flex items-center justify-between gap-6">
+          {/* ── Logo ── */}
+          <div className="flex items-center gap-3 shrink-0 group cursor-pointer" onClick={() => setActiveTab("dashboard")}>
+            <div className="w-[52px] h-[52px] bg-[#ffce4b] rounded-full flex items-center justify-center border-2 border-[#f0c842]/60 shadow-md p-1 overflow-hidden">
+              <svg viewBox="0 0 100 100" className="w-full h-full text-amber-800 opacity-80 animate-[spin_40s_linear_infinite]">
+                <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2"/>
+                <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
+                <path d="M50 4 L50 96 M4 50 L96 50 M18 18 L82 82 M18 82 L82 18" stroke="currentColor" strokeWidth="0.8"/>
+                <text x="50" y="19" fontSize="9" textAnchor="middle" fill="currentColor">♈</text>
+                <text x="81" y="54" fontSize="9" textAnchor="middle" fill="currentColor">♋</text>
+                <text x="50" y="88" fontSize="9" textAnchor="middle" fill="currentColor">♎</text>
+                <text x="19" y="54" fontSize="9" textAnchor="middle" fill="currentColor">♑</text>
+              </svg>
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">CosmicInsight</span>
+              <span className="text-[9px] uppercase tracking-[0.18em] text-[#d97706] font-bold mt-[3px]">Astrologer Portal</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            {/* Profile Avatar + Dropdown */}
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f5c842] to-[#FF9933] border-[2.5px] border-white shadow-lg flex items-center justify-center text-white font-extrabold text-base hover:scale-105 hover:shadow-xl transition-all"
+                title="Profile"
+              >
+                {astrologerName[0].toUpperCase()}
+              </button>
+
+              {profileOpen && (
+                <div className="absolute right-0 mt-3 w-52 bg-white rounded-2xl shadow-xl border border-stone-100 py-1.5 z-50 overflow-hidden">
+                  <div className="px-4 py-3 bg-gradient-to-r from-[#fffbee] to-[#fff8e0] border-b border-stone-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f5c842] to-[#FF9933] flex items-center justify-center text-white font-extrabold text-sm shrink-0">
+                        {astrologerName[0].toUpperCase()}
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="text-sm font-bold text-stone-800 truncate">{astrologerName}</p>
+                        <p className="text-[11px] text-[#d97706] font-semibold">Portal Access</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="py-1">
+                    <button onClick={() => { setActiveTab("settings"); setProfileOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-stone-700 hover:bg-orange-50 hover:text-[#d97706] transition-colors font-medium">
+                      <span className="text-base">⚙️</span> Profile Settings
+                    </button>
+                    <div className="border-t border-stone-100 mt-1">
+                      <button onClick={() => signOut({ callbackUrl: "/login" })} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-medium">
+                        <span className="text-base">🚪</span> Sign Out
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>
@@ -220,12 +281,11 @@ export default function AstrologerPortal() {
         {activeTab === "dashboard" && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Stats row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
               {[
                 { icon: "💰", label: "Total Earnings", value: `₹${totalEarnings.toLocaleString()}`, sub: "All time", color: "#d97706" },
                 { icon: "💬", label: "Total Consults", value: sessions.length, sub: "Lifetime sessions", color: "#8b5cf6" },
                 { icon: "⭐", label: "Avg Rating", value: avgRating > 0 ? avgRating.toFixed(1) : "—", sub: `${reviews.length} reviews`, color: "#f5c842" },
-                { icon: "🧿", label: "Status", value: "Active", sub: "Ready for requests", color: "#10b981", bg: "bg-emerald-50/50" },
               ].map((s, i) => (
                 <div key={i} className={`${s.bg || "bg-white"} border border-slate-100 shadow-sm rounded-2xl p-6 text-center hover:shadow-md transition-all hover:-translate-y-1`}>
                   <div className="text-3xl mb-3 drop-shadow-sm">{s.icon}</div>
@@ -420,13 +480,6 @@ export default function AstrologerPortal() {
           </div>
         )}
       </div>
-
-      {/* Admin Panel Link Footer */}
-      <footer className="py-8 text-center mt-20 border-t border-slate-200 bg-white">
-        <Link href="/admin" className="text-[10px] uppercase font-extrabold tracking-widest px-6 py-2.5 rounded-full border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition shadow-sm">
-          👑 View Admin Panel Prototype
-        </Link>
-      </footer>
     </div>
   );
 }
