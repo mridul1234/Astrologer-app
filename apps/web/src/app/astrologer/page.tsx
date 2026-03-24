@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
+import VedicLoader from "../../components/VedicLoader";
 
 interface ChatSession {
   id: string;
@@ -346,9 +347,8 @@ export default function AstrologerPortal() {
                 <span>Recent Consults</span>
               </h2>
               {loading ? (
-                <div className="bg-white rounded-2xl py-20 text-center border border-slate-100 shadow-sm animate-pulse">
-                  <div className="w-8 h-8 rounded-full border-2 border-[#d97706] border-t-transparent animate-spin mx-auto mb-4"></div>
-                  <div className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Loading cosmic records...</div>
+                <div className="bg-white rounded-2xl py-20 flex items-center justify-center border border-slate-100 shadow-sm">
+                  <VedicLoader size="sm" text="Loading cosmic records..." />
                 </div>
               ) : pastSessionsList.length === 0 ? (
                 <div className="bg-white rounded-2xl py-24 text-center border border-slate-100 shadow-sm">

@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
+import VedicLoader from "@/components/VedicLoader";
 
 interface Pack {
   amount: number;
@@ -57,8 +58,11 @@ export default function WalletPage() {
 
   if (status === "loading" || balance === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#faf8f5]">
-        <div className="animate-spin text-4xl opacity-50 drop-shadow-sm">🪷</div>
+      <div className="min-h-screen flex flex-col bg-[#faf8f5]">
+        <UserHeader />
+        <div className="flex-1 flex items-center justify-center">
+          <VedicLoader size="lg" text="Loading wallet..." />
+        </div>
       </div>
     );
   }

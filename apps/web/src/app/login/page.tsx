@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import VedicLoader from "../../components/VedicLoader";
 
 type Step = "phone" | "otp" | "loading";
 
@@ -111,10 +112,9 @@ export default function LoginPage() {
   if (step === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#faf8f5]" style={{ position: "relative", zIndex: 1 }}>
-        <div className="text-center">
-          <div className="text-6xl animate-spin-slow mb-6 opacity-80 drop-shadow-sm">🪷</div>
-          <p className="font-cinzel text-xl text-slate-800 font-bold mb-2 tracking-wide">Aligning the Stars…</p>
-          <p className="text-slate-500 font-medium text-sm">Preparing your cosmic dashboard</p>
+        <div className="text-center pt-10">
+          <VedicLoader size="xl" text="Aligning the Stars…" />
+          <p className="text-slate-500 font-medium text-sm mt-4">Preparing your cosmic dashboard</p>
         </div>
       </div>
     );

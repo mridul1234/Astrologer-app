@@ -6,6 +6,7 @@ import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import VedicLoader from "@/components/VedicLoader";
 
 interface Astrologer {
   id: string;
@@ -210,16 +211,8 @@ export default function UserDashboard() {
 
         {/* Astrologer Cards Grid */}
         {loadingAstrologers ? (
-          <div className="flex flex-col items-center justify-center py-32 space-y-6">
-            <div className="relative w-24 h-24 text-[#FF9933] animate-[spin_10s_linear_infinite]">
-              <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
-                 <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="5,5"/>
-                 <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
-                 <path d="M50 5 L50 95 M5 50 L95 50 M18 18 L82 82 M18 82 L82 18" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
-                 <polygon points="50,15 60,35 80,40 65,55 70,75 50,65 30,75 35,55 20,40 40,35" fill="currentColor" opacity="0.8"/>
-              </svg>
-            </div>
-            <div className="text-stone-500 font-bold uppercase tracking-widest text-sm animate-pulse">Aligning the Starts...</div>
+          <div className="flex flex-col items-center justify-center py-32">
+            <VedicLoader size="lg" text="Aligning the Stars..." />
           </div>
         ) : displayedAstrologers.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-[32px] border border-stone-100 shadow-sm">

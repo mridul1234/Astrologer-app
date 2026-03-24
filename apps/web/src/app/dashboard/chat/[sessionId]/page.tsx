@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
+import VedicLoader from "../../../../components/VedicLoader";
 
 interface Message {
   id: string;
@@ -310,9 +311,8 @@ export default function UserChatPage() {
   // ─── Loading / Error states ───────────────────────────────────────────────
   if (status === "loading") {
     return (
-      <div className="flex flex-col h-screen items-center justify-center" style={{ position: "relative", zIndex: 1 }}>
-        <div className="text-4xl animate-spin mb-4">🔮</div>
-        <div className="text-purple-300/60 text-sm">Connecting to your astrologer…</div>
+      <div className="flex flex-col h-screen items-center justify-center p-4 bg-black/90 backdrop-blur-xl" style={{ position: "relative", zIndex: 1, background: "#050311" }}>
+        <VedicLoader size="lg" text="Connecting to your cosmos…" />
       </div>
     );
   }
@@ -340,8 +340,10 @@ export default function UserChatPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen relative p-4" style={{ background: "#050311" }}>
         <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 50% 30%, rgba(245,200,66,0.15) 0%, transparent 40%)" }} />
-        <div className="z-10 bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl flex flex-col items-center text-center max-w-sm w-full">
-          <div className="w-20 h-20 mb-6 rounded-full border-t-2 border-[#f5c842] border-r-2 border-r-[#f5c842]/30 animate-spin" />
+        <div className="z-10 bg-black/40 backdrop-blur-xl border border-[#f5c842]/20 p-8 rounded-3xl flex flex-col items-center text-center max-w-sm w-full shadow-[0_0_50px_rgba(245,200,66,0.05)]">
+          <div className="mb-8">
+             <VedicLoader size="lg" />
+          </div>
           <h2 className="text-2xl font-cinzel font-bold text-[#f5c842] mb-2">Waiting for Astrologer</h2>
           <p className="text-sm opacity-80 text-white/70 mb-6">
             Connecting you to {astrologerName}...

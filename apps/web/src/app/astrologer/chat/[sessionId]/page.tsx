@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
+import VedicLoader from "../../../../components/VedicLoader";
 
 interface Message {
   id: string;
@@ -213,9 +214,8 @@ export default function AstrologerChatPage() {
 
   if (status === "loading") {
     return (
-      <div className="flex flex-col h-screen items-center justify-center" style={{ position: "relative", zIndex: 1 }}>
-        <div className="text-4xl animate-spin mb-4">🔮</div>
-        <div className="text-purple-300/60 text-sm">Loading session…</div>
+      <div className="flex flex-col h-screen items-center justify-center bg-[#faf8f5]" style={{ position: "relative", zIndex: 1 }}>
+        <VedicLoader size="lg" text="Loading session…" />
       </div>
     );
   }

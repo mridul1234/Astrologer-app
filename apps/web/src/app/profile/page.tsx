@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import VedicLoader from "@/components/VedicLoader";
 
 type Tab = "overview" | "sessions" | "transactions" | "settings";
 
@@ -122,10 +123,19 @@ export default function UserProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fdfaf5] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-[#f5c842] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-stone-400 font-medium">Loading your profile…</p>
+      <div className="min-h-screen flex flex-col bg-[#fdfaf5]">
+        <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8] shadow-[0_2px_12px_rgba(245,200,66,0.08)]">
+          <div className="max-w-5xl mx-auto px-6 h-[64px] flex items-center justify-between">
+            <Link href="/dashboard" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#ffce4b] rounded-full flex items-center justify-center">
+                <span className="text-xl">✨</span>
+              </div>
+              <span className="text-xl font-extrabold text-stone-900 tracking-tight">CosmicInsight</span>
+            </Link>
+          </div>
+        </nav>
+        <div className="flex-1 flex items-center justify-center">
+          <VedicLoader size="lg" text="Loading your profile…" />
         </div>
       </div>
     );

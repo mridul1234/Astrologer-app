@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
+import VedicLoader from "@/components/VedicLoader";
 
 interface ChatSession {
   id: string;
@@ -96,8 +97,11 @@ export default function OrderHistoryPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-[#fdfaf5] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#f5c842] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex flex-col bg-[#fdfaf5]">
+        <UserHeader />
+        <div className="flex-1 flex items-center justify-center">
+          <VedicLoader size="lg" text="Loading orders..." />
+        </div>
       </div>
     );
   }
