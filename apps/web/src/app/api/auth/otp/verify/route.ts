@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
 import bcrypt from "bcryptjs";
-import { signIn } from "@/auth";
 
 const BASE_URL = "https://cpaas.messagecentral.com";
 const CUSTOMER_ID = process.env.MC_CUSTOMER_ID!;
@@ -55,17 +54,19 @@ export async function POST(req: NextRequest) {
     });
 
     const validateData = await validateRes.json();
+    console.log("MC Validate OTP response:", JSON.stringify(validateData));
 
+    // MC response: verificationStatus === 'VERIFICATION_COMPLETED' on success
     const isVerified =
-      validateData?.data?.verificationStatus === "VERIFICATION_COMPLETED" &&
-      !validateData?.data?.errorMessage;
+      validateData?.data?.verificationStatus === "VERIFICATION_COMPLETED" ||
+      validateData?.message === "VERIFICATION_COMPLETED";
 
     if (!isVerified) {
-      console.error("MC Validate OTP error:", validateData);
       return NextResponse.json(
         {
           error:
             validateData?.data?.errorMessage ||
+            validateData?.message ||
             "Invalid OTP. Please try again.",
         },
         { status: 401 }

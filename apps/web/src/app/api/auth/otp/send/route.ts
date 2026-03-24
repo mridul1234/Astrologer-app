@@ -60,20 +60,21 @@ export async function POST(req: NextRequest) {
 
     const sendData = await sendRes.json();
 
-    // MC returns responseCode 200 inside body.data on success
-    if (
-      sendData?.data?.responseCode === 200 &&
-      !sendData?.data?.errorMessage
-    ) {
+    // MC returns responseCode as string '200' (not number), check loosely
+    const responseCode = sendData?.data?.responseCode;
+    const verificationId = sendData?.data?.verificationId;
+    const topLevelSuccess = sendData?.message === "SUCCESS" || sendData?.responseCode == 200;
+
+    if ((responseCode == 200 || topLevelSuccess) && verificationId) {
       return NextResponse.json({
         success: true,
-        verificationId: sendData.data.verificationId as string,
+        verificationId: verificationId as string,
       });
     }
 
     console.error("MC Send OTP error:", sendData);
     return NextResponse.json(
-      { error: sendData?.data?.errorMessage || "Failed to send OTP." },
+      { error: sendData?.data?.errorMessage || sendData?.message || "Failed to send OTP." },
       { status: 500 }
     );
   } catch (err) {
