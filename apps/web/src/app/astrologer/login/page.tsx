@@ -32,48 +32,80 @@ export default function AstrologerLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "linear-gradient(to bottom, #0a0815, #05030a)", fontFamily: "'Inter', sans-serif" }}>
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <Link href="/" className="inline-flex flex-col items-center">
-            <span className="text-4xl mb-2">🔮</span>
-            <span className="font-cinzel text-xl font-bold text-[#f5c842]">Astrologer Portal</span>
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-20 bg-[#faf8f5] overflow-hidden"
+      style={{ position: "relative", zIndex: 1 }}
+    >
+      {/* Decorative Glows */}
+      <div className="absolute top-1/4 left-0 w-96 h-96 bg-[#FF9933]/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-[#f5c842]/10 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Floating Vedic Symbols */}
+      <div className="absolute top-[15%] right-[10%] text-[#FF9933]/20 font-bold text-6xl animate-float pointer-events-none select-none" style={{ animationDelay: '0s' }}>ॐ</div>
+      <div className="absolute bottom-[20%] left-[15%] text-[#FF9933]/20 font-bold text-7xl animate-float pointer-events-none select-none" style={{ animationDelay: '1.5s' }}>卐</div>
+      <div className="absolute top-[25%] left-[10%] text-[#FF9933]/20 font-bold text-5xl animate-float pointer-events-none select-none" style={{ animationDelay: '0.8s' }}>☀️</div>
+      <div className="absolute bottom-[15%] right-[20%] text-[#FF9933]/20 font-bold text-6xl animate-float pointer-events-none select-none" style={{ animationDelay: '2.2s' }}>🌙</div>
+
+      <div className="w-full max-w-md relative z-10">
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2 mb-6 hover:scale-105 transition-transform">
+            <span className="text-3xl animate-float inline-block drop-shadow-sm">🔮</span>
+            <span className="font-cinzel text-2xl font-bold tracking-wider" style={{ color: "#FF9933" }}>
+              Astrologer Portal
+            </span>
           </Link>
         </div>
 
-        <div className="bg-[#110e20] border border-[#f5c842]/20 rounded-3xl p-8">
-          <h1 className="text-2xl font-cinzel font-bold text-white mb-6">Staff Login</h1>
-          {error && <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm mb-6">{error}</div>}
+        <div className="glass-card rounded-[2rem] px-8 py-10 bg-white/80 shadow-2xl border border-white/40">
+          <div className="text-center mb-8">
+            <h1 className="font-cinzel text-2xl font-bold text-slate-800 tracking-wide">Staff Login</h1>
+            <p className="text-slate-500 font-medium mt-2 text-sm">
+              Enter credentials to access your portal
+            </p>
+          </div>
+
+          {error && (
+            <div
+              className="text-sm font-semibold px-5 py-4 rounded-xl shadow-sm mb-6"
+              style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)", color: "#ef4444" }}
+            >
+              {error}
+            </div>
+          )}
           
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-2">Email Address</label>
+              <label className="block text-xs font-bold uppercase tracking-widest text-slate-600 mb-3 ml-1">
+                Email Address
+              </label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#f5c842]/50 focus:outline-none"
+                className="w-full cosmic-input px-5 py-4 rounded-xl text-lg font-bold shadow-sm bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-[#FF9933]"
                 placeholder="yours@cosmic.chat"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-2">Password</label>
+              <label className="block text-xs font-bold uppercase tracking-widest text-slate-600 mb-3 ml-1">
+                Password
+              </label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#f5c842]/50 focus:outline-none"
+                className="w-full cosmic-input px-5 py-4 rounded-xl text-lg font-bold shadow-sm bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-[#FF9933]"
                 placeholder="••••••••"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#f5c842] hover:bg-[#ffe175] text-black font-bold py-3 rounded-xl transition-colors disabled:opacity-50"
+              className="btn-gold w-full py-4 rounded-xl text-lg font-extrabold uppercase tracking-wide shadow-lg mt-4 disabled:opacity-50"
             >
-              {loading ? "Authenticating..." : "Access Portal"}
+              {loading ? "Authenticating..." : "Access Portal ✦"}
             </button>
           </form>
         </div>

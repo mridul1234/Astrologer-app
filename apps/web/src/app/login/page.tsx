@@ -156,15 +156,21 @@ export default function LoginPage() {
       </div>
     );
   }
-
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-4 py-20 bg-[#faf8f5]"
+      className="min-h-screen flex items-center justify-center px-4 py-20 bg-[#faf8f5] overflow-hidden"
       style={{ position: "relative", zIndex: 1 }}
     >
       {/* Decorative Glows */}
       <div className="absolute top-1/4 left-0 w-96 h-96 bg-[#FF9933]/10 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-[#f5c842]/10 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Floating Vedic Symbols */}
+      <div className="absolute top-[15%] left-[10%] text-[#FF9933]/20 font-bold text-6xl animate-float pointer-events-none select-none" style={{ animationDelay: '0s' }}>ॐ</div>
+      <div className="absolute bottom-[20%] right-[15%] text-[#FF9933]/20 font-bold text-7xl animate-float pointer-events-none select-none" style={{ animationDelay: '1.5s' }}>卐</div>
+      <div className="absolute top-[25%] right-[10%] text-[#FF9933]/20 font-bold text-5xl animate-float pointer-events-none select-none" style={{ animationDelay: '0.8s' }}>☀️</div>
+      <div className="absolute bottom-[15%] left-[20%] text-[#FF9933]/20 font-bold text-6xl animate-float pointer-events-none select-none" style={{ animationDelay: '2.2s' }}>🌙</div>
+
 
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
