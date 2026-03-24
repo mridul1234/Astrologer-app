@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [verificationId, setVerificationId] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
@@ -25,6 +26,24 @@ export default function LoginPage() {
     return () => clearTimeout(t);
   }, [resendTimer]);
 
+  async function sendOtp(phoneNumber: string): Promise<boolean> {
+    const res = await fetch("/api/auth/otp/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: phoneNumber }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.verificationId) {
+      setError(data.error || "Failed to send OTP. Please try again.");
+      return false;
+    }
+
+    setVerificationId(data.verificationId);
+    return true;
+  }
+
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault();
     if (phone.length < 10) {
@@ -34,13 +53,14 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    // Dummy OTP send — replace with real API later
-    await new Promise((r) => setTimeout(r, 1200));
+    const ok = await sendOtp(phone);
     setLoading(false);
-    setStep("otp");
-    setResendTimer(30);
-    // Focus first OTP input
-    setTimeout(() => otpRefs.current[0]?.focus(), 100);
+
+    if (ok) {
+      setStep("otp");
+      setResendTimer(30);
+      setTimeout(() => otpRefs.current[0]?.focus(), 100);
+    }
   }
 
   function handleOtpChange(index: number, value: string) {
@@ -78,35 +98,52 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    // Dummy verification — accept any 6-digit OTP
-    // In production: call your real OTP API here
-    await new Promise((r) => setTimeout(r, 1200));
+    // Step 1: Validate OTP with Message Central
+    const verifyRes = await fetch("/api/auth/otp/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, verificationId, otp: code }),
+    });
 
-    if (code === "000000") {
-      setError("Invalid OTP. Please try again.");
+    const verifyData = await verifyRes.json();
+
+    if (!verifyRes.ok || !verifyData.success) {
+      setError(verifyData.error || "Invalid OTP. Please try again.");
       setLoading(false);
       return;
     }
 
-    // Simulate API delay for UI effect
+    // Step 2: OTP verified — sign in via NextAuth credentials
     setStep("loading");
-    await new Promise((r) => setTimeout(r, 800));
 
-    // NextAuth Sign In with phone OTP mock flow
-    await signIn("credentials", {
+    const result = await signIn("credentials", {
       phone,
-      callbackUrl: "/dashboard",
+      redirect: false,
     });
+
+    if (result?.error) {
+      setError("Sign-in failed. Please try again.");
+      setStep("otp");
+      setLoading(false);
+      return;
+    }
+
+    router.push("/dashboard");
   }
 
   async function handleResend() {
     if (resendTimer > 0) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setLoading(false);
     setOtp(["", "", "", "", "", ""]);
-    setResendTimer(30);
-    setTimeout(() => otpRefs.current[0]?.focus(), 100);
+    setError("");
+
+    const ok = await sendOtp(phone);
+    setLoading(false);
+
+    if (ok) {
+      setResendTimer(30);
+      setTimeout(() => otpRefs.current[0]?.focus(), 100);
+    }
   }
 
   if (step === "loading") {
@@ -140,9 +177,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <div
-          className="glass-card rounded-[2rem] px-8 py-10"
-        >
+        <div className="glass-card rounded-[2rem] px-8 py-10">
           {step === "phone" && (
             <>
               <div className="text-center mb-10">
@@ -161,10 +196,7 @@ export default function LoginPage() {
                   <div className="flex gap-3">
                     <div
                       className="flex items-center px-4 rounded-2xl text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 shadow-inner"
-                      style={{
-                        minWidth: "70px",
-                        justifyContent: "center",
-                      }}
+                      style={{ minWidth: "70px", justifyContent: "center" }}
                     >
                       🇮🇳 +91
                     </div>
@@ -224,7 +256,7 @@ export default function LoginPage() {
                   <span className="text-slate-800 font-bold">+91 {phone}</span>
                 </p>
                 <button
-                  onClick={() => { setStep("phone"); setOtp(["","","","","",""]); setError(""); }}
+                  onClick={() => { setStep("phone"); setOtp(["","","","","",""]); setError(""); setVerificationId(""); }}
                   className="text-[11px] font-bold uppercase tracking-widest mt-2 hover:text-[#d97706] transition-colors"
                   style={{ color: "#FF9933" }}
                 >
@@ -285,23 +317,11 @@ export default function LoginPage() {
                       className="font-bold hover:text-[#d97706] transition-colors"
                       style={{ color: "#FF9933" }}
                     >
-                      Resend OTP
+                      {loading ? "Resending…" : "Resend OTP"}
                     </button>
                   )}
                 </div>
               </form>
-
-              {/* Demo hint */}
-              <div
-                className="mt-8 px-5 py-4 rounded-2xl text-center text-xs font-semibold shadow-sm"
-                style={{
-                  background: "rgba(255,153,51,0.05)",
-                  border: "1px solid rgba(255,153,51,0.2)",
-                  color: "#d97706",
-                }}
-              >
-                🧪 Demo mode: enter any 6-digit OTP (except 000000) to proceed
-              </div>
             </>
           )}
         </div>

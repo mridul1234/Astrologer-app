@@ -251,22 +251,24 @@ export default function UserDashboard() {
                   {/* Right Column: Details */}
                   <div className="flex-1 flex flex-col pt-1">
                     <div className="flex items-start justify-between">
-                      <h2 className="text-lg font-extrabold text-[#111827] uppercase tracking-tight">{a.user.name}</h2>
+                      <div className="flex flex-col">
+                        <h2 className="text-lg font-extrabold text-[#111827] uppercase tracking-tight leading-none">{a.user.name}</h2>
+                        <div className="flex flex-wrap gap-1 mt-1.5 mb-1">
+                          {getCategories(a).map(c => (
+                            <span key={c} className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[9px] font-bold uppercase tracking-wider rounded-md border border-amber-200/50">
+                              {c}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                       {/* Verified Badge */}
-                      <svg className="w-5 h-5 text-[#84cc16]" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="w-5 h-5 text-[#84cc16] shrink-0" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                       </svg>
                     </div>
 
                     <div className="text-sm text-stone-500 font-medium mt-1 leading-snug space-y-0.5">
-                      <p className="truncate text-stone-600">{a.speciality ?? "Vedic, KP, Nadi"}</p>
-                      <div className="flex flex-wrap gap-1 mt-1 mb-1">
-                        {getCategories(a).map(c => (
-                          <span key={c} className="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold uppercase tracking-wider rounded-md border border-amber-200/50">
-                            {c}
-                          </span>
-                        ))}
-                      </div>
+                      <p className="truncate text-stone-600 italic">{a.speciality ?? "Vedic Astrology Expert"}</p>
                       <p>Hindi, English.</p>
                       <p>Experience: {exp} Years</p>
                     </div>
@@ -284,16 +286,11 @@ export default function UserDashboard() {
                           </span>
                         </div>
 
-                        {/* Status badge */}
-                        {a.isBusy ? (
+                        {/* Status badge - Only show if Busy */}
+                        {a.isBusy && (
                           <div className="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-full px-2.5 py-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
                             <span className="text-[11px] font-bold text-red-600 uppercase tracking-wide">In Session</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-full px-2.5 py-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
-                            <span className="text-[11px] font-bold text-green-600 uppercase tracking-wide">Available</span>
                           </div>
                         )}
                       </div>
