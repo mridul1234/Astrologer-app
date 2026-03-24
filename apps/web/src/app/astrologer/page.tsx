@@ -287,7 +287,7 @@ export default function AstrologerPortal() {
                 { icon: "💬", label: "Total Consults", value: sessions.length, sub: "Lifetime sessions", color: "#8b5cf6" },
                 { icon: "⭐", label: "Avg Rating", value: avgRating > 0 ? avgRating.toFixed(1) : "—", sub: `${reviews.length} reviews`, color: "#f5c842" },
               ].map((s, i) => (
-                <div key={i} className={`${s.bg || "bg-white"} border border-slate-100 shadow-sm rounded-2xl p-6 text-center hover:shadow-md transition-all hover:-translate-y-1`}>
+                <div key={i} className="bg-white border border-slate-100 shadow-sm rounded-2xl p-6 text-center hover:shadow-md transition-all hover:-translate-y-1">
                   <div className="text-3xl mb-3 drop-shadow-sm">{s.icon}</div>
                   <div className="font-cinzel text-3xl font-extrabold mb-1" style={{ color: s.color }}>{s.value}</div>
                   <div className="text-slate-700 text-[11px] font-black uppercase tracking-widest mb-1">{s.label}</div>
