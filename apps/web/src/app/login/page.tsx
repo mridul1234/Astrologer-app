@@ -12,7 +12,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const [verificationId, setVerificationId] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,7 +68,7 @@ export default function LoginPage() {
     const newOtp = [...otp];
     newOtp[index] = value.slice(-1);
     setOtp(newOtp);
-    if (value && index < 5) {
+    if (value && index < 3) {
       otpRefs.current[index + 1]?.focus();
     }
   }
@@ -81,18 +81,18 @@ export default function LoginPage() {
 
   function handleOtpPaste(e: React.ClipboardEvent) {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
     const newOtp = [...otp];
     pasted.split("").forEach((char, i) => { newOtp[i] = char; });
     setOtp(newOtp);
-    otpRefs.current[Math.min(pasted.length, 5)]?.focus();
+    otpRefs.current[Math.min(pasted.length, 3)]?.focus();
   }
 
   async function handleVerifyOtp(e: React.FormEvent) {
     e.preventDefault();
     const code = otp.join("");
-    if (code.length < 6) {
-      setError("Please enter the full 6-digit OTP.");
+    if (code.length < 4) {
+      setError("Please enter the full 4-digit OTP.");
       return;
     }
     setError("");
@@ -134,7 +134,7 @@ export default function LoginPage() {
   async function handleResend() {
     if (resendTimer > 0) return;
     setLoading(true);
-    setOtp(["", "", "", "", "", ""]);
+    setOtp(["", "", "", ""]);
     setError("");
 
     const ok = await sendOtp(phone);
@@ -252,11 +252,11 @@ export default function LoginPage() {
                 <div className="text-5xl mb-4 drop-shadow-sm">✨</div>
                 <h1 className="font-cinzel text-3xl font-bold text-slate-800 tracking-wide">Verify OTP</h1>
                 <p className="text-slate-500 font-medium mt-3 text-sm">
-                  We sent a 6-digit code to{" "}
+                  We sent a 4-digit code to{" "}
                   <span className="text-slate-800 font-bold">+91 {phone}</span>
                 </p>
                 <button
-                  onClick={() => { setStep("phone"); setOtp(["","","","","",""]); setError(""); setVerificationId(""); }}
+                  onClick={() => { setStep("phone"); setOtp(["","","",""]); setError(""); setVerificationId(""); }}
                   className="text-[11px] font-bold uppercase tracking-widest mt-2 hover:text-[#d97706] transition-colors"
                   style={{ color: "#FF9933" }}
                 >
@@ -300,7 +300,7 @@ export default function LoginPage() {
                 <button
                   id="verify-otp-btn"
                   type="submit"
-                  disabled={loading || otp.join("").length < 6}
+                  disabled={loading || otp.join("").length < 4}
                   className="btn-gold w-full py-4 rounded-2xl text-lg font-extrabold uppercase tracking-wide shadow-lg"
                 >
                   {loading ? "Verifying…" : "Verify & Enter ✦"}

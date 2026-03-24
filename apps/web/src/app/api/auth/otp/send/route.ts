@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     const authToken = await getMCAuthToken();
 
-    const sendUrl = `${BASE_URL}/verification/v3/send?countryCode=91&customerId=${CUSTOMER_ID}&flowType=SMS&mobileNumber=${phone}`;
+    const sendUrl = `${BASE_URL}/verification/v3/send?countryCode=91&customerId=${CUSTOMER_ID}&flowType=SMS&mobileNumber=${phone}&otpLength=4`;
 
     const sendRes = await fetch(sendUrl, {
       method: "POST",
