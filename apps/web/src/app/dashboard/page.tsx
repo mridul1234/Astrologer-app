@@ -250,12 +250,12 @@ export default function UserDashboard() {
                         👨🏽‍🦱
                       </div>
                     </div>
-                    {/* Stars */}
-                    <div className="flex text-[#f5c842] text-xs gap-[1px] tracking-tight">
-                       {a.averageRating > 0 ? stars : "☆☆☆☆☆"}
+                    {/* Stars + Rating */}
+                    <div className="flex items-center gap-1 text-[#16a34a] text-base font-bold leading-none">
+                      {a.averageRating > 0 ? stars : "☆☆☆☆☆"}
                     </div>
-                    <div className="text-[10px] text-stone-500 font-medium mt-1">
-                      {a.orderCount} orders
+                    <div className="text-[10px] text-stone-500 font-semibold mt-0.5">
+                      {a.averageRating > 0 ? `${a.averageRating.toFixed(1)} · ` : ""}{a.orderCount} orders
                     </div>
                   </div>
 
