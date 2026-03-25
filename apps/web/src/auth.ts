@@ -49,7 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           // Auto-create USER on first OTP login
           if (!user) {
-            const name = (credentials.name as string) || `Seeker ${phone.slice(-4)}`;
+            const name = (credentials.name as string) || phone;
             const hashed = await bcrypt.hash("dummy_otp_pass", 10);
             
             user = await prisma.user.create({

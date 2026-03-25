@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       const hashed = await bcrypt.hash("otp_verified_user", 10);
       user = await prisma.user.create({
         data: {
-          name: `Seeker ${phone.slice(-4)}`,
+          name: phone,
           email,
           password: hashed,
           role: "USER",
