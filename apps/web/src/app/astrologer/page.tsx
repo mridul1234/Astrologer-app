@@ -455,16 +455,6 @@ export default function AstrologerPortal() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Public Biography</label>
-                  <textarea 
-                    rows={4}
-                    value={editProfile.bio || ""} 
-                    onChange={e => setEditProfile({...editProfile, bio: e.target.value})}
-                    placeholder="Tell users a bit about your journey and expertise..." 
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#d97706]/50 focus:border-[#d97706] transition-all bg-slate-50 focus:bg-white resize-none"
-                  />
-                </div>
 
                 <div className="pt-4 border-t border-slate-100">
                   <button 
