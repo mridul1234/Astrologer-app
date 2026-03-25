@@ -19,6 +19,7 @@ interface Astrologer {
   user: { name: string };
   averageRating: number;
   reviewCount: number;
+  orderCount: number;
   experienceYears?: number;
   languages?: string;
   categories?: string[];
@@ -123,14 +124,22 @@ export default function UserDashboard() {
     }
   }
 
-  // Helper for deterministic mocked data based on ID
-  const getMockData = (id: string, rate: number, reviews: number) => {
+  // Derive a deterministic experience years from id (still mock - no real DB field for this yet)
+  const getExpYears = (id: string) => {
     const seed = id.charCodeAt(0) + id.charCodeAt(id.length - 1);
-    const exp = (seed % 15) + 1;
-    const originalRate = Math.floor(rate * 1.5);
-    const orders = reviews === 0 ? (seed % 200) + 15 : reviews * 12 + (seed % 50);
-    return { exp, originalRate, orders };
+    return (seed % 15) + 1;
   };
+
+  // Generate star display from averageRating (0-5)
+  const getStars = (avg: number) => {
+    const full = Math.floor(avg);
+    const half = avg - full >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+    return "★".repeat(full) + (half ? "½" : "") + "☆".repeat(empty);
+  };
+
+  // Derive a fake original (crossed-out) rate from actual rate
+  const getOriginalRate = (rate: number) => Math.floor(rate * 1.5);
 
   // Estimate wait time from session start (assume avg session is 15 min)
   const getWaitMins = (sessionStartedAt: string | null): number => {
@@ -222,8 +231,10 @@ export default function UserDashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {displayedAstrologers.map((a, index) => {
-              const { exp, originalRate, orders } = getMockData(a.id, a.ratePerMin, a.reviewCount);
+            {displayedAstrologers.map((a) => {
+              const exp = a.experienceYears ?? getExpYears(a.id);
+              const originalRate = getOriginalRate(a.ratePerMin);
+              const stars = getStars(a.averageRating);
               
               return (
                 <div
@@ -240,11 +251,11 @@ export default function UserDashboard() {
                       </div>
                     </div>
                     {/* Stars */}
-                    <div className="flex text-[#16a34a] text-xs gap-[1px]">
-                       ★★★★★
+                    <div className="flex text-[#f5c842] text-xs gap-[1px] tracking-tight">
+                       {a.averageRating > 0 ? stars : "☆☆☆☆☆"}
                     </div>
                     <div className="text-[10px] text-stone-500 font-medium mt-1">
-                      {orders} orders
+                      {a.orderCount} orders
                     </div>
                   </div>
 
