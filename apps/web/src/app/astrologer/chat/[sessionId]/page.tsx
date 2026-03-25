@@ -48,8 +48,9 @@ export default function AstrologerChatPage() {
     timerRef.current = setInterval(() => {
       setDuration((d) => {
         const next = d + 1;
-        // Update earnings display locally (rate is per minute)
-        setEarnings((next / 60) * rate);
+        // Billing: ceil(minutes) × rate — each started minute is fully charged
+        const minutesBilled = Math.ceil(next / 60);
+        setEarnings(minutesBilled * rate);
         return next;
       });
     }, 1000);
@@ -199,7 +200,7 @@ export default function AstrologerChatPage() {
       {
         id: "ended-local",
         senderId: "system",
-        content: `Session ended. Duration: ${Math.floor(duration / 60)}m ${duration % 60}s · Earnings: ₹${earnings.toFixed(2)}`,
+        content: `Session ended. Duration: ${Math.floor(duration / 60)}m ${duration % 60}s · Billed: ${Math.ceil(duration / 60)} min · Earnings: ₹${Math.ceil(duration / 60) * rate}`,
         createdAt: new Date(),
         isMe: false,
       },
@@ -294,6 +295,7 @@ export default function AstrologerChatPage() {
             <div className="font-cinzel font-extrabold text-sm text-emerald-600">
               ₹{earnings.toFixed(0)}
             </div>
+            <div className="text-[8px] text-emerald-400 font-semibold">{Math.ceil(duration / 60)} min billed</div>
           </div>
 
           {/* Rate badge */}
