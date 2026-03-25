@@ -31,6 +31,7 @@ export default function UserDashboard() {
   const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
   const [loadingAstrologers, setLoadingAstrologers] = useState(true);
   const [balance, setBalance] = useState(0);
+  const [balanceLoaded, setBalanceLoaded] = useState(false);
   const [starting, setStarting] = useState<string | null>(null);
   
   // New UI states
@@ -55,8 +56,13 @@ export default function UserDashboard() {
 
     fetch("/api/user/profile")
       .then((r) => r.json())
-      .then((p) => { if (p?.walletBalance !== undefined) setBalance(p.walletBalance); })
-      .catch(() => {});
+      .then((p) => {
+        if (p?.walletBalance !== undefined) {
+          setBalance(Number(p.walletBalance));
+          setBalanceLoaded(true);
+        }
+      })
+      .catch((err) => console.error("Profile fetch error:", err));
 
     // Auto-refresh astrologer availability every 30 seconds
     const pollInterval = setInterval(() => {
@@ -100,7 +106,8 @@ export default function UserDashboard() {
   });
 
   async function startChat(astrologerId: string, rate: number) {
-    if (balance < rate) {
+    // Only do front-end balance guard if we've successfully loaded the balance
+    if (balanceLoaded && balance < rate) {
       router.push("/wallet");
       return;
     }
