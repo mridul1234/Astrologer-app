@@ -148,7 +148,7 @@ export default function LoginPage() {
 
   if (step === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#faf8f5]" style={{ position: "relative", zIndex: 1 }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#faf8f5" }}>
         <div className="text-center pt-10">
           <VedicLoader size="xl" text="Aligning the Stars…" />
           <p className="text-slate-500 font-medium text-sm mt-4">Preparing your cosmic dashboard</p>
@@ -157,31 +157,29 @@ export default function LoginPage() {
     );
   }
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-20 bg-[#faf8f5] overflow-hidden"
-      style={{ position: "relative", zIndex: 1 }}
-    >
-      {/* Decorative Glows */}
-      <div className="absolute top-1/4 left-0 w-96 h-96 bg-[#FF9933]/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-[#f5c842]/10 rounded-full blur-[100px] pointer-events-none" />
+    <div className="min-h-screen flex flex-col" style={{ background: "#faf8f5" }}>
 
-      {/* Floating Vedic Symbols */}
-      <div className="absolute top-[15%] left-[10%] text-[#FF9933]/20 font-bold text-6xl animate-float pointer-events-none select-none" style={{ animationDelay: '0s' }}>ॐ</div>
-      <div className="absolute bottom-[20%] right-[15%] text-[#FF9933]/20 font-bold text-7xl animate-float pointer-events-none select-none" style={{ animationDelay: '1.5s' }}>卐</div>
-      <div className="absolute top-[25%] right-[10%] text-[#FF9933]/20 font-bold text-5xl animate-float pointer-events-none select-none" style={{ animationDelay: '0.8s' }}>☀️</div>
-      <div className="absolute bottom-[15%] left-[20%] text-[#FF9933]/20 font-bold text-6xl animate-float pointer-events-none select-none" style={{ animationDelay: '2.2s' }}>🌙</div>
-
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6 hover:scale-105 transition-transform">
-            <span className="text-3xl animate-float inline-block drop-shadow-sm">✨</span>
-            <span className="font-cinzel text-2xl font-bold tracking-wider" style={{ color: "#FF9933" }}>
-              CosmicChat
-            </span>
+      {/* ── Navy Header Band ── */}
+      <div style={{ background: "linear-gradient(160deg, #1a1040 0%, #2d1b69 50%, #160d35 100%)", position: "relative", overflow: "hidden" }}>
+        {/* Subtle star dots */}
+        {[[8,20],[18,75],[28,45],[38,88],[52,12],[62,60],[72,33]].map(([t,l],i)=>(
+          <div key={i} className="absolute rounded-full bg-white pointer-events-none" style={{ top:`${t}%`,left:`${l}%`,width:i%2===0?2:1.5,height:i%2===0?2:1.5,opacity:0.15+i*0.03 }}/>
+        ))}
+        <div className="relative max-w-md mx-auto px-5 py-10 text-center">
+          <Link href="/" className="inline-flex items-center gap-2.5 mb-5 hover:opacity-90 transition-opacity">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-lg" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
+            <span className="font-cinzel font-black text-white text-xl tracking-wide">CosmicInsight</span>
           </Link>
+          <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>Your cosmic journey starts here</p>
         </div>
+        {/* Wave divider */}
+        <svg viewBox="0 0 1440 40" preserveAspectRatio="none" style={{ width:"100%", height:"40px", display:"block", marginTop:"-1px" }}>
+          <path d="M0,20 C360,40 1080,0 1440,20 L1440,40 L0,40 Z" fill="#faf8f5"/>
+        </svg>
+      </div>
+
+      {/* ── Form Area ── */}
+      <div className="flex-1 flex items-start justify-center px-4 py-10">
 
         <div className="glass-card rounded-[2rem] px-8 py-10">
           {step === "phone" && (
@@ -327,8 +325,8 @@ export default function LoginPage() {
         </div>
 
         {/* Bottom decoration */}
-        <div className="text-center mt-10 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
-          ✦ Protected by CosmicChat Security ✦
+        <div className="text-center mt-8 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
+          ✦ Protected by CosmicInsight Security ✦
         </div>
       </div>
     </div>

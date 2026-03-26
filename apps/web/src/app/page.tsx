@@ -96,7 +96,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: "'Inter', sans-serif", background: "#F4ECD8" }}>
+    <div className="min-h-screen" style={{ fontFamily: "'Inter', sans-serif", background: "#faf8f5" }}>
 
       {/* ── HERO (dark navy section) ── */}
       <div style={{ background: "linear-gradient(160deg, #1a1040 0%, #2d1b69 40%, #1e1245 70%, #160d35 100%)" }}>
