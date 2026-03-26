@@ -206,9 +206,45 @@ export default function UserChatPage() {
           setAstrologerJoined(true);
         });
 
+        // Astrologer rejected the session
+        socket.on("session_cancelled", () => {
+          setEnded(true);
+          if (timerRef.current) clearInterval(timerRef.current);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: "cancelled-notice",
+              senderId: "system",
+              content: "The astrologer has declined this session. You have not been charged.",
+              createdAt: new Date(),
+              isMe: false,
+            },
+          ]);
+        });
+
         socket.on("error", ({ message }: { message: string }) => {
           console.error("[Socket] Error:", message);
         });
+
+        // ── Reload edge case: poll DB while waiting for astrologer ──────────
+        // If the user reloaded before the astrologer joined, we won't get the
+        // astrologer_joined socket event. Poll every 5s to detect if they joined.
+        const pollWait = setInterval(async () => {
+          if (astrologerJoined || ended) { clearInterval(pollWait); return; }
+          try {
+            const r = await fetch(`/api/chat/session/${sessionId}`);
+            if (!r.ok) return;
+            const d = await r.json();
+            if (d.status === "ENDED") {
+              setEnded(true);
+              clearInterval(pollWait);
+            } else if (d.messages?.length > 0) {
+              // Astrologer has sent or received messages — they joined
+              setAstrologerJoined(true);
+              clearInterval(pollWait);
+            }
+          } catch { /* ignore */ }
+        }, 5000);
 
       } catch (err) {
         console.error("[Chat] Init error:", err);

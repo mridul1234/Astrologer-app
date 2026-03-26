@@ -177,6 +177,25 @@ export default function AstrologerPortal() {
     router.push(`/astrologer/chat/${sessionId}`);
   };
 
+  const rejectChat = async (sessionId: string) => {
+    if (!confirm("Cancel this incoming chat request? The user will not be charged.")) return;
+    try {
+      const res = await fetch("/api/chat/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      });
+      if (res.ok) {
+        fetchProfileData(); // Refresh session list
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to cancel session.");
+      }
+    } catch (e) {
+      alert("Something went wrong.");
+    }
+  };
+
   const activeSessionsList = sessions.filter((s) => s.status === "ACTIVE");
   const pastSessionsList = sessions.filter((s) => s.status === "ENDED");
 
@@ -331,9 +350,17 @@ export default function AstrologerPortal() {
                             </div>
                           </div>
                         </div>
-                        <button onClick={() => joinChat(s.id)} disabled={remaining === 0} className="bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white px-8 py-3.5 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30 transition-all hover:-translate-y-1 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed">
-                          🔮 Join Chat Now
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => rejectChat(s.id)}
+                            className="px-5 py-3.5 rounded-xl text-sm font-black uppercase tracking-widest border-2 border-red-200 text-red-500 bg-red-50 hover:bg-red-100 transition-all"
+                          >
+                            ✕ Reject
+                          </button>
+                          <button onClick={() => joinChat(s.id)} disabled={remaining === 0} className="bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white px-8 py-3.5 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30 transition-all hover:-translate-y-1 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed">
+                            🔮 Join Chat Now
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
