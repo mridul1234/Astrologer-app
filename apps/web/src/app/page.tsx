@@ -130,10 +130,10 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-slate-800" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen bg-[#EDE4CE] text-slate-800" style={{ fontFamily: "'Inter', sans-serif" }}>
 
       {/* ── NAVBAR ── */}
-      <nav className="sticky top-0 z-50 bg-[#FDFBF7]/90 backdrop-blur-lg border-b border-stone-200/70">
+      <nav className="sticky top-0 z-50 bg-[#EDE4CE]/90 backdrop-blur-lg border-b border-stone-200/70">
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#FF9933] flex items-center justify-center">
@@ -184,7 +184,7 @@ export default function Home() {
           <span className="font-cinzel font-black text-[#FF9933]" style={{ fontSize: "clamp(160px,35vw,400px)" }}>ॐ</span>
         </div>
 
-        <div className="relative max-w-4xl mx-auto">
+        <div className="relative max-w-4xl mx-auto animate-fade-in">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-[#FF9933]/10 border border-[#FF9933]/25 text-[#c97000] text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-8">
             <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><polygon points="10 1 12.63 7.18 19.51 7.64 14.5 11.97 16.18 18.64 10 14.9 3.82 18.64 5.5 11.97 .49 7.64 7.37 7.18"/></svg>
@@ -258,7 +258,7 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="px-5 py-20 bg-white border-y border-stone-100">
+      <section className="px-5 py-20 bg-white/95 border-y border-stone-200/60">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-[#FF9933] text-xs font-bold uppercase tracking-[0.2em] mb-3">Why CosmicInsight</p>
@@ -267,7 +267,7 @@ export default function Home() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f) => (
-              <div key={f.title} className="rounded-2xl border border-stone-100 p-7 hover:border-[#FF9933]/25 hover:shadow-md transition-all duration-300 group bg-[#FDFBF7]">
+              <div key={f.title} className="rounded-2xl border border-stone-200/60 p-7 hover:border-[#FF9933]/30 hover:shadow-md transition-all duration-300 group bg-white">
                 <div className="w-11 h-11 rounded-xl bg-[#FF9933]/10 flex items-center justify-center text-[#FF9933] mb-5 group-hover:bg-[#FF9933]/15 transition-colors">
                   {f.icon}
                 </div>
@@ -343,7 +343,7 @@ export default function Home() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section id="testimonials" className="px-5 py-20 bg-white border-y border-stone-100">
+      <section id="testimonials" className="px-5 py-20 bg-white/95 border-y border-stone-200/60">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-[#FF9933] text-xs font-bold uppercase tracking-[0.2em] mb-3">Real Stories</p>
@@ -353,7 +353,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="bg-[#FDFBF7] border border-stone-100 rounded-2xl p-6 hover:shadow-md hover:border-stone-200 transition-all duration-300 flex flex-col">
+              <div key={t.name} className="bg-white border border-stone-200/60 rounded-2xl p-6 hover:shadow-md hover:border-stone-300/60 transition-all duration-300 flex flex-col">
                 <StarRating n={t.rating} />
                 <p className="text-slate-600 text-sm leading-relaxed mt-4 mb-6 flex-1">"{t.text}"</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-stone-100">
@@ -416,7 +416,7 @@ export default function Home() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-stone-200 bg-white">
+      <footer className="border-t border-stone-300/50 bg-white">
         <div className="max-w-6xl mx-auto px-5 py-14">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
             {/* Brand */}
