@@ -180,13 +180,13 @@ export default function LoginPage() {
 
       {/* ── Form Area ── */}
       <div className="flex-1 flex items-start justify-center px-4 py-10">
-
+        <div className="w-full max-w-md">
         <div className="glass-card rounded-[2rem] px-8 py-10">
           {step === "phone" && (
             <>
               <div className="text-center mb-10">
-                <div className="text-5xl mb-4 drop-shadow-sm">📱</div>
-                <h1 className="font-cinzel text-3xl font-bold text-slate-800 tracking-wide">Welcome to CosmicChat</h1>
+                <div className="w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center font-black text-white text-2xl" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
+                <h1 className="font-cinzel text-3xl font-bold text-slate-800 tracking-wide">Welcome Back</h1>
                 <p className="text-slate-500 font-medium mt-3 text-sm">
                   Enter your mobile number to receive a one-time passcode
                 </p>
@@ -247,7 +247,7 @@ export default function LoginPage() {
           {step === "otp" && (
             <>
               <div className="text-center mb-10">
-                <div className="text-5xl mb-4 drop-shadow-sm">✨</div>
+                <div className="w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center font-black text-white text-2xl" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>✦</div>
                 <h1 className="font-cinzel text-3xl font-bold text-slate-800 tracking-wide">Verify OTP</h1>
                 <p className="text-slate-500 font-medium mt-3 text-sm">
                   We sent a 4-digit code to{" "}
@@ -327,6 +327,7 @@ export default function LoginPage() {
         {/* Bottom decoration */}
         <div className="text-center mt-8 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
           ✦ Protected by CosmicInsight Security ✦
+        </div>
         </div>
       </div>
     </div>

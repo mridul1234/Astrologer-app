@@ -32,7 +32,9 @@ export default function UserHeader() {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8] shadow-[0_2px_16px_rgba(245,200,66,0.08)] w-full">
+    <nav className="sticky top-0 z-50 w-full" style={{ background: "white", borderBottom: "1px solid #f0e6c8", boxShadow: "0 2px 16px rgba(245,200,66,0.08)" }}>
+      {/* Navy brand identity bar — same as landing page & login */}
+      <div style={{ height: "4px", background: "linear-gradient(90deg, #1a1040 0%, #2d1b69 40%, #FF9933 70%, #f5c842 100%)" }} />
       <div className="max-w-[1400px] mx-auto px-6 h-[70px] flex items-center justify-between gap-6">
         {/* ── Logo ── */}
         <Link href="/dashboard" className="flex items-center gap-3 shrink-0 group">
