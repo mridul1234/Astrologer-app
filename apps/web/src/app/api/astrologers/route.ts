@@ -7,17 +7,23 @@ export async function GET() {
       user: { select: { name: true } },
       reviews: { select: { rating: true } },
       chatSessions: {
+        where: { status: "ACTIVE" },
+        take: 1,
         select: { id: true, startedAt: true, status: true },
-        orderBy: { startedAt: "desc" },
       },
+      _count: {
+        select: {
+          chatSessions: { where: { status: "ENDED" } }
+        }
+      }
     },
   });
 
   const formatted = astrologers.map(a => {
     const total = a.reviews.length;
     const avg = total > 0 ? a.reviews.reduce((sum, r) => sum + r.rating, 0) / total : 0;
-    const activeSession = a.chatSessions.find(s => s.status === "ACTIVE") ?? null;
-    const orderCount = a.chatSessions.filter(s => s.status === "ENDED").length;
+    const activeSession = a.chatSessions[0] ?? null;
+    const orderCount = a._count.chatSessions;
     
     return { 
       id: a.id,
