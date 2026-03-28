@@ -7,6 +7,9 @@ import Link from "next/link";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
 import VedicLoader from "@/components/VedicLoader";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface ChatSession {
   id: string;
@@ -70,30 +73,19 @@ function StatusBadge({ status }: { status: string }) {
 export default function OrderHistoryPage() {
   const router = useRouter();
   const { status } = useSession();
-  const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [totalSpent, setTotalSpent] = useState(0);
-  const [loading, setLoading] = useState(true);
+  
+  const { data: profile, isLoading } = useSWR("/api/user/profile", fetcher);
+  
+  const sessions: ChatSession[] = profile?.chatSessions ?? [];
+  const totalSpent = (profile?.transactions ?? [])
+    .filter((t: { type: string }) => t.type === "DEBIT")
+    .reduce((a: number, t: { amount: number }) => a + t.amount, 0);
+
+  const loading = isLoading;
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login?callbackUrl=/orders");
   }, [status, router]);
-
-  useEffect(() => {
-    if (status !== "authenticated") return;
-
-    fetch("/api/user/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        const s: ChatSession[] = data.chatSessions ?? [];
-        setSessions(s);
-        const spent = (data.transactions ?? [])
-          .filter((t: { type: string }) => t.type === "DEBIT")
-          .reduce((a: number, t: { amount: number }) => a + t.amount, 0);
-        setTotalSpent(spent);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [status]);
 
   if (status === "loading") {
     return (

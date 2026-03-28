@@ -7,6 +7,9 @@ import Link from "next/link";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
 import VedicLoader from "@/components/VedicLoader";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Pack {
   amount: number;
@@ -34,23 +37,16 @@ const packs: Pack[] = [
 export default function WalletPage() {
   const router = useRouter();
   const { status, data: session } = useSession();
-  const [balance, setBalance] = useState<number | null>(null);
   const userName = session?.user?.name ?? "U";
+
+  const { data: profile, isLoading } = useSWR("/api/user/profile", fetcher);
+  const balance = profile?.walletBalance !== undefined ? Number(profile.walletBalance) : null;
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login?callbackUrl=/wallet");
     }
   }, [status, router]);
-
-  useEffect(() => {
-    fetch("/api/user/profile")
-      .then((r) => r.json())
-      .then((p) => {
-        if (p?.walletBalance !== undefined) setBalance(p.walletBalance);
-      })
-      .catch(() => {});
-  }, []);
 
   const handleRecharge = (amount: number) => {
     alert(`In Phase 2, this will mount the Razorpay Modal for ₹${amount}.`);
