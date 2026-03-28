@@ -23,13 +23,13 @@ export default function UserFooter() {
                 </svg>
               </div>
               <div>
-                <div className="font-extrabold text-2xl text-stone-900 tracking-tight leading-none">CosmicInsight</div>
-                <div className="text-[10px] uppercase tracking-widest text-[#d97706] font-bold mt-1">Divine Astro Insight</div>
+                <div className="font-extrabold text-2xl text-stone-900 tracking-tight leading-none">AstroWalla</div>
+                <div className="text-[10px] uppercase tracking-widest text-[#d97706] font-bold mt-1">Your Celestial Guide</div>
               </div>
             </div>
 
             <p className="text-stone-600 text-sm leading-relaxed max-w-sm mb-6 font-medium">
-              CosmicInsight is your trusted platform for authentic astrology consultations. Connect with verified astrologers and get guidance for all aspects of your life through chat, call, or video consultations.
+              AstroWalla is your trusted platform for authentic astrology consultations. Connect with verified astrologers and get guidance for all aspects of your life through chat, call, or video consultations.
             </p>
 
             {/* Social Icons */}
@@ -52,9 +52,9 @@ export default function UserFooter() {
               ))}
             </div>
 
-            <a href="mailto:support@cosmicinsight.in" className="flex items-center gap-2 text-stone-600 hover:text-[#FF9933] transition-colors text-sm font-semibold group">
+            <a href="mailto:support@astrowalla.in" className="flex items-center gap-2 text-stone-600 hover:text-[#FF9933] transition-colors text-sm font-semibold group">
               <svg className="w-4 h-4 text-[#FF9933]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              support@cosmicinsight.in
+              support@astrowalla.in
             </a>
           </div>
 
@@ -100,7 +100,7 @@ export default function UserFooter() {
       {/* Bottom Bar */}
       <div style={{ borderTop: "1px solid #e9d9b0" }} className="max-w-[1400px] mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
         <span className="text-xs text-stone-400 font-semibold tracking-wide">
-          © 2026 CosmicInsight. All Rights Reserved. Made with 🌟 in India.
+          © 2026 AstroWalla. All Rights Reserved. Made with 🌟 in India.
         </span>
         <div className="flex items-center gap-2 text-xs text-stone-400 font-semibold">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>

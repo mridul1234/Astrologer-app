@@ -387,7 +387,7 @@ export default function AstrologerChatPage() {
                 e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
               }}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-              placeholder="Share your cosmic insight… ✦ Enter to send"
+              placeholder="Share your astrological insight… ✦ Enter to send"
               className="flex-1 px-5 py-4 rounded-2xl text-[14.5px] font-medium resize-none overflow-hidden bg-[#faf8f5] border border-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-[#f5c842]/50 focus:ring-2 focus:ring-[#f5c842]/15 transition-all"
               style={{ minHeight: "56px", maxHeight: "120px", lineHeight: "1.5" }}
             />

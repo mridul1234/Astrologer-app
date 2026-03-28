@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Privacy Policy – CosmicInsight" };
+export const metadata = { title: "Privacy Policy – AstroWalla" };
 
 const sections = [
   {
@@ -51,7 +51,7 @@ const sections = [
       "Right to correction: Update inaccurate or incomplete personal data",
       "Right to deletion: Request deletion of your account and associated data",
       "Right to portability: Receive your data in a machine-readable format",
-      "To exercise any of these rights, contact us at privacy@cosmicinsight.in",
+      "To exercise any of these rights, contact us at privacy@astrowalla.in",
     ],
   },
   {
@@ -84,7 +84,7 @@ export default function PrivacyPolicyPage() {
               <span className="text-amber-800 text-lg">☽</span>
             </div>
             <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">CosmicInsight</div>
+              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">AstroWalla</div>
               <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
             </div>
           </Link>
@@ -127,7 +127,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-base font-extrabold text-stone-900 mb-2">Contact Our Privacy Team</h2>
           <p className="text-sm text-stone-600 font-medium">
             For any privacy-related queries, write to us at{" "}
-            <a href="mailto:privacy@cosmicinsight.in" className="text-[#d97706] font-bold hover:underline">privacy@cosmicinsight.in</a>
+            <a href="mailto:privacy@astrowalla.in" className="text-[#d97706] font-bold hover:underline">privacy@astrowalla.in</a>
             {" "}or reach out through our{" "}
             <Link href="/contact-us" className="text-[#d97706] font-bold hover:underline">Contact page</Link>.
           </p>
@@ -135,7 +135,7 @@ export default function PrivacyPolicyPage() {
       </main>
 
       <footer className="max-w-5xl mx-auto px-6 py-8 border-t border-[#f0e6c8] text-center text-xs text-stone-400 font-medium">
-        © 2026 CosmicInsight. All Rights Reserved.
+        © 2026 AstroWalla. All Rights Reserved.
       </footer>
     </div>
   );

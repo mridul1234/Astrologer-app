@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "User Guidelines – CosmicInsight" };
+export const metadata = { title: "User Guidelines – AstroWalla" };
 
 const doList = [
   "Be respectful and courteous to astrologers at all times",
@@ -14,7 +14,7 @@ const doList = [
 
 const dontList = [
   "Share your phone number, email, or WhatsApp with any astrologer",
-  "Attempt to contact astrologers outside the CosmicInsight platform",
+  "Attempt to contact astrologers outside the AstroWalla platform",
   "Use abusive, threatening, or sexually explicit language in chat",
   "Create multiple accounts to abuse free consultation credits",
   "Record or share screenshots of your private consultation sessions",
@@ -40,7 +40,7 @@ export default function UserGuidelinesPage() {
               <span className="text-amber-800 text-lg">☽</span>
             </div>
             <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">CosmicInsight</div>
+              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">AstroWalla</div>
               <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
             </div>
           </Link>
@@ -54,7 +54,7 @@ export default function UserGuidelinesPage() {
             ✦ Guidelines
           </div>
           <h1 className="text-4xl font-extrabold text-stone-900 mb-2">User Guidelines</h1>
-          <p className="text-stone-500 text-sm font-medium">For a respectful, safe, and productive experience on CosmicInsight</p>
+          <p className="text-stone-500 text-sm font-medium">For a respectful, safe, and productive experience on AstroWalla</p>
         </div>
       </div>
 
@@ -125,13 +125,13 @@ export default function UserGuidelinesPage() {
           </div>
           <p className="text-xs text-stone-400 font-medium mt-4">
             All violations are reviewed by our Trust & Safety team. To report an issue, contact{" "}
-            <a href="mailto:support@cosmicinsight.in" className="text-[#d97706] font-bold hover:underline">support@cosmicinsight.in</a>
+            <a href="mailto:support@astrowalla.in" className="text-[#d97706] font-bold hover:underline">support@astrowalla.in</a>
           </p>
         </div>
       </main>
 
       <footer className="max-w-5xl mx-auto px-6 py-8 border-t border-[#f0e6c8] text-center text-xs text-stone-400 font-medium">
-        © 2026 CosmicInsight. All Rights Reserved.
+        © 2026 AstroWalla. All Rights Reserved.
       </footer>
     </div>
   );

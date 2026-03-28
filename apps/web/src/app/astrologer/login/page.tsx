@@ -84,7 +84,7 @@ export default function AstrologerLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full cosmic-input px-5 py-4 rounded-xl text-lg font-bold shadow-sm bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:border-[#FF9933]"
-                placeholder="yours@cosmic.chat"
+                placeholder="yours@astrowalla.com"
               />
             </div>
             <div>

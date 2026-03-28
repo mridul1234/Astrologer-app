@@ -233,7 +233,7 @@ export default function AstrologerPortal() {
               </svg>
             </div>
             <div className="flex flex-col leading-none">
-              <span className="text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">CosmicInsight</span>
+              <span className="text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
               <span className="text-[9px] uppercase tracking-[0.18em] text-[#d97706] font-bold mt-[3px]">Astrologer Portal</span>
             </div>
           </div>
@@ -375,7 +375,7 @@ export default function AstrologerPortal() {
               </h2>
               {loading ? (
                 <div className="bg-white rounded-2xl py-20 flex items-center justify-center border border-slate-100 shadow-sm">
-                  <VedicLoader size="sm" text="Loading cosmic records..." />
+                  <VedicLoader size="sm" text="Loading astrological records..." />
                 </div>
               ) : pastSessionsList.length === 0 ? (
                 <div className="bg-white rounded-2xl py-24 text-center border border-slate-100 shadow-sm">

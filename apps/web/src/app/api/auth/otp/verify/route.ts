@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     }
 
     // OTP is valid — upsert user in DB
-    const email = `${phone}@cosmic.chat`;
+    const email = `${phone}@astrowalla.com`;
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {

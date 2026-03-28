@@ -455,7 +455,7 @@ export default function UserChatPage() {
                 style={{ animationDelay: `${i * 0.1}s` }}>{z}</span>
             ))}
           </div>
-          <span className="text-[9px] font-bold uppercase tracking-widest text-slate-300">CosmicInsight</span>
+          <span className="text-[9px] font-bold uppercase tracking-widest text-slate-300">AstroWalla</span>
         </div>
       </header>
 
@@ -499,7 +499,7 @@ export default function UserChatPage() {
               </div>
               <div>
                 <p className="font-cinzel font-bold text-slate-700 text-base mb-1">Your session has begun</p>
-                <p className="text-slate-400 text-sm">Send your first message to begin the cosmic journey ✨</p>
+                <p className="text-slate-400 text-sm">Send your first message to begin the astrological journey ✨</p>
               </div>
             </div>
           )}

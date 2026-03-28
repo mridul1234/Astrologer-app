@@ -123,7 +123,7 @@ export default function AdminDashboard() {
           </div>
         </div>
         <Link href="/" className="px-5 py-2.5 rounded-xl bg-white border border-[#f5c842]/60 text-stone-800 font-extrabold text-sm hover:bg-[#f5c842] hover:shadow-md hover:shadow-amber-200/50 transition-all duration-200 max-w-max">
-          Exit to CosmicInsight
+          Exit to AstroWalla
         </Link>
       </header>
 
@@ -298,7 +298,7 @@ export default function AdminDashboard() {
                 
                 <div className="col-span-2 sm:col-span-1">
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Login ID (Email/Phone)</label>
-                  <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400" placeholder="astro@cosmic.chat" />
+                  <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400" placeholder="astro@astrowallaat" />
                 </div>
 
                 <div className="col-span-2 sm:col-span-1">

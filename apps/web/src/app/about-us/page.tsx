@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "About Us – CosmicInsight" };
+export const metadata = { title: "About Us – AstroWalla" };
 
 const team = [
   { name: "Arjun Sharma", role: "Founder & CEO", initials: "AS", years: 15, expertise: "Vedic Astrology & Numerology" },
@@ -10,7 +10,7 @@ const team = [
 ];
 
 const milestones = [
-  { year: "2020", event: "CosmicInsight founded with 5 expert astrologers" },
+  { year: "2020", event: "AstroWalla founded with 5 expert astrologers" },
   { year: "2021", event: "Reached 50,000 users and launched mobile-first platform" },
   { year: "2022", event: "Expanded to 200+ verified astrologers across India" },
   { year: "2023", event: "Introduced live chat consultations and Kundli feature" },
@@ -29,8 +29,8 @@ export default function AboutUsPage() {
               <span className="text-amber-800 text-lg">☽</span>
             </div>
             <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">CosmicInsight</div>
-              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
+              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">AstroWalla</div>
+              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astrastrowalla</div>
             </div>
           </Link>
           <Link href="/dashboard" className="text-sm font-semibold text-stone-500 hover:text-[#d97706] transition-colors">← Back</Link>
@@ -47,7 +47,7 @@ export default function AboutUsPage() {
             Bridging Ancient Wisdom<br />with Modern Technology
           </h1>
           <p className="text-stone-600 text-lg font-medium max-w-2xl mx-auto leading-relaxed">
-            CosmicInsight was born from a simple belief — every person deserves access to authentic, verified astrology guidance. We connect seekers with India's finest astrologers, anytime, anywhere.
+            AstroWalla was born from a simple belief — every person deserves access to authentic, verified astrology guidance. We connect seekers with India's finest astrologers, anytime, anywhere.
           </p>
           <div className="flex justify-center gap-8 mt-10">
             {[["5L+", "Happy Users"], ["200+", "Expert Astrologers"], ["1M+", "Consultations"], ["4.8★", "Avg Rating"]].map(([val, label]) => (
@@ -78,7 +78,7 @@ export default function AboutUsPage() {
         {/* Team */}
         <div className="mb-16">
           <h2 className="text-2xl font-extrabold text-stone-900 mb-2">Meet the Team</h2>
-          <p className="text-stone-500 text-sm font-medium mb-8">The people who make CosmicInsight possible</p>
+          <p className="text-stone-500 text-sm font-medium mb-8">The people who make AstroWalla possible</p>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             {team.map((m) => (
               <div key={m.name} className="bg-white rounded-2xl border border-stone-100 shadow-sm p-6 text-center hover:shadow-md hover:border-[#f5c842]/30 transition-all">
@@ -113,7 +113,7 @@ export default function AboutUsPage() {
       </main>
 
       <footer className="max-w-5xl mx-auto px-6 py-8 border-t border-[#f0e6c8] text-center text-xs text-stone-400 font-medium">
-        © 2026 CosmicInsight. All Rights Reserved.
+        © 2026 AstroWalla. All Rights Reserved.
       </footer>
     </div>
   );

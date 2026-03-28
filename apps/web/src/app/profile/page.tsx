@@ -130,7 +130,7 @@ export default function UserProfilePage() {
               <div className="w-10 h-10 bg-[#ffce4b] rounded-full flex items-center justify-center">
                 <span className="text-xl">✨</span>
               </div>
-              <span className="text-xl font-extrabold text-stone-900 tracking-tight">CosmicInsight</span>
+              <span className="text-xl font-extrabold text-stone-900 tracking-tight">AstroWalla</span>
             </Link>
           </div>
         </nav>
@@ -151,8 +151,8 @@ export default function UserProfilePage() {
               <span className="text-amber-800 text-lg">☽</span>
             </div>
             <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">CosmicInsight</div>
-              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
+              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">Astrastrowalla</div>
+              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astrastrowalla</div>
             </div>
           </Link>
           <Link href="/dashboard" className="text-sm font-semibold text-stone-500 hover:text-[#d97706] transition-colors flex items-center gap-1">

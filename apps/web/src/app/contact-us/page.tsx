@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Contact Us – CosmicInsight" };
+export const metadata = { title: "Contact Us – AstroWalla" };
 
 export default function ContactUsPage() {
   return (
@@ -12,7 +12,7 @@ export default function ContactUsPage() {
               <span className="text-amber-800 text-lg">☽</span>
             </div>
             <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">CosmicInsight</div>
+              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">AstroWalla</div>
               <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
             </div>
           </Link>
@@ -38,9 +38,9 @@ export default function ContactUsPage() {
             {
               icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>,
               title: "Email Support",
-              value: "support@cosmicinsight.in",
+              value: "support@astrowalla.in",
               sub: "Response within 24 hours",
-              href: "mailto:support@cosmicinsight.in",
+              href: "mailto:support@astrowalla.in",
             },
             {
               icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92z"/></svg>,
@@ -94,7 +94,7 @@ export default function ContactUsPage() {
               <div className="inline-block px-8 py-3 rounded-xl bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold text-sm opacity-60 cursor-not-allowed">
                 Send Message (Coming Soon)
               </div>
-              <p className="text-xs text-stone-400 mt-3">For urgent queries please email us directly at support@cosmicinsight.in</p>
+              <p className="text-xs text-stone-400 mt-3">For urgent queries please email us directly at support@astrowalla.in</p>
             </div>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function ContactUsPage() {
         <div className="mt-10 bg-white rounded-3xl border border-stone-100 shadow-sm p-8 text-center">
           <h3 className="font-extrabold text-stone-900 text-base mb-2">Head Office</h3>
           <p className="text-stone-600 text-sm font-medium">
-            CosmicInsight Technologies Pvt. Ltd.<br />
+            AstroWalla Technologies Pvt. Ltd.<br />
             Level 5, Prestige Tech Park, Outer Ring Road,<br />
             Bengaluru, Karnataka — 560 103, India
           </p>
@@ -111,7 +111,7 @@ export default function ContactUsPage() {
       </main>
 
       <footer className="max-w-5xl mx-auto px-6 py-8 border-t border-[#f0e6c8] text-center text-xs text-stone-400 font-medium">
-        © 2026 CosmicInsight. All Rights Reserved.
+        © 2026 AstroWalla. All Rights Reserved.
       </footer>
     </div>
   );

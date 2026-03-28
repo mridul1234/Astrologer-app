@@ -107,7 +107,7 @@ export default function AstrologerSettingsPage() {
         <div className="flex items-center gap-3">
           <button onClick={() => router.push("/astrologer")} className="text-purple-400/60 hover:text-white transition-colors mr-1">←</button>
           <span className="text-xl">🔮</span>
-          <span className="font-cinzel text-lg font-bold" style={{ color: "#f5c842" }}>CosmicChat</span>
+          <span className="font-cinzel text-lg font-bold" style={{ color: "#f5c842" }}>AstroWalla</span>
           <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: "rgba(245,200,66,0.1)", border: "1px solid rgba(245,200,66,0.2)", color: "#f5c842" }}>Astrologer</span>
         </div>
         <Link href="/astrologer" className="text-sm text-purple-300/60 hover:text-white transition-colors">← Dashboard</Link>

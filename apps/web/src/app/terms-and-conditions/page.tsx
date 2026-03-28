@@ -1,27 +1,27 @@
 import Link from "next/link";
 
-export const metadata = { title: "Terms & Conditions – CosmicInsight" };
+export const metadata = { title: "Terms & Conditions – AstroWalla" };
 
 const clauses = [
   {
     title: "1. Acceptance of Terms",
-    content: "By accessing or using CosmicInsight, you agree to be bound by these Terms and Conditions and all applicable Indian laws. If you do not agree with any of these terms, you may not use the platform. We reserve the right to update these terms at any time with reasonable notice.",
+    content: "By accessing or using AstroWalla, you agree to be bound by these Terms and Conditions and all applicable Indian laws. If you do not agree with any of these terms, you may not use the platform. We reserve the right to update these terms at any time with reasonable notice.",
   },
   {
     title: "2. Eligibility",
-    content: "You must be at least 18 years of age to use CosmicInsight. By using this platform, you confirm that you are 18 or older and have the legal capacity to enter into a binding agreement. The platform is intended for users located in India.",
+    content: "You must be at least 18 years of age to use AstroWalla. By using this platform, you confirm that you are 18 or older and have the legal capacity to enter into a binding agreement. The platform is intended for users located in India.",
   },
   {
     title: "3. Nature of Services",
-    content: "CosmicInsight provides a marketplace platform connecting users with independent astrologers. The consultations are for entertainment and guidance purposes only. CosmicInsight does not endorse or guarantee the accuracy of any astrological predictions made by astrologers on the platform.",
+    content: "AstroWalla provides a marketplace platform connecting users with independent astrologers. The consultations are for entertainment and guidance purposes only. AstroWalla does not endorse or guarantee the accuracy of any astrological predictions made by astrologers on the platform.",
   },
   {
     title: "4. Wallet & Payments",
-    content: "The CosmicInsight Wallet is a prepaid balance used exclusively within the platform. Wallet top-ups are processed via Razorpay and are non-transferable. Sessions are billed per minute at the rate displayed on each astrologer's profile. All prices are in Indian Rupees (INR) and inclusive of applicable taxes.",
+    content: "The AstroWalla Wallet is a prepaid balance used exclusively within the platform. Wallet top-ups are processed via Razorpay and are non-transferable. Sessions are billed per minute at the rate displayed on each astrologer's profile. All prices are in Indian Rupees (INR) and inclusive of applicable taxes.",
   },
   {
     title: "5. Refund Policy",
-    content: "Wallet balances are non-refundable except in cases of technical errors or double charges verified by our team. Session charges once deducted are final unless there was a technical fault on our side. Refund requests must be submitted within 7 days of the disputed transaction via support@cosmicinsight.in.",
+    content: "Wallet balances are non-refundable except in cases of technical errors or double charges verified by our team. Session charges once deducted are final unless there was a technical fault on our side. Refund requests must be submitted within 7 days of the disputed transaction via support@astrowalla.in.",
   },
   {
     title: "6. User Conduct",
@@ -29,15 +29,15 @@ const clauses = [
   },
   {
     title: "7. Astrologer Relationship",
-    content: "Astrologers on CosmicInsight are independent service providers, not employees or agents of CosmicInsight Technologies Pvt. Ltd. CosmicInsight acts as an intermediary facilitating the connection. CosmicInsight is not liable for the accuracy, quality, or outcomes of any astrological consultation.",
+    content: "Astrologers on AstroWalla are independent service providers, not employees or agents of AstroWalla Technologies Pvt. Ltd. AstroWalla acts as an intermediary facilitating the connection. AstroWalla is not liable for the accuracy, quality, or outcomes of any astrological consultation.",
   },
   {
     title: "8. Intellectual Property",
-    content: "All content on the CosmicInsight platform including logos, text, design, and software is owned by or licensed to CosmicInsight Technologies Pvt. Ltd. You may not reproduce, distribute, or create derivative works without written permission.",
+    content: "All content on the AstroWalla platform including logos, text, design, and software is owned by or licensed to AstroWalla Technologies Pvt. Ltd. You may not reproduce, distribute, or create derivative works without written permission.",
   },
   {
     title: "9. Limitation of Liability",
-    content: "CosmicInsight shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform. Our total liability to you shall not exceed the wallet balance held in your account at the time of the claim.",
+    content: "AstroWalla shall not be liable for any indirect, incidental, or consequential damages arising from your use of the platform. Our total liability to you shall not exceed the wallet balance held in your account at the time of the claim.",
   },
   {
     title: "10. Governing Law",
@@ -55,7 +55,7 @@ export default function TermsPage() {
               <span className="text-amber-800 text-lg">☽</span>
             </div>
             <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">CosmicInsight</div>
+              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">AstroWalla</div>
               <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
             </div>
           </Link>
@@ -75,7 +75,7 @@ export default function TermsPage() {
 
       <main className="max-w-5xl mx-auto px-6 py-12">
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-10 text-sm text-amber-800 font-medium">
-          Please read these terms carefully before using CosmicInsight. By using the platform you agree to these terms in full.
+          Please read these terms carefully before using AstroWalla. By using the platform you agree to these terms in full.
         </div>
 
         <div className="bg-white rounded-3xl border border-stone-100 shadow-sm divide-y divide-stone-50">
@@ -91,13 +91,13 @@ export default function TermsPage() {
           <h2 className="text-base font-extrabold text-stone-900 mb-2">Questions About These Terms?</h2>
           <p className="text-sm text-stone-600 font-medium">
             Contact us at{" "}
-            <a href="mailto:legal@cosmicinsight.in" className="text-[#d97706] font-bold hover:underline">legal@cosmicinsight.in</a>
+            <a href="mailto:legal@astrowalla.in" className="text-[#d97706] font-bold hover:underline">legal@astrowalla.in</a>
           </p>
         </div>
       </main>
 
       <footer className="max-w-5xl mx-auto px-6 py-8 border-t border-[#f0e6c8] text-center text-xs text-stone-400 font-medium">
-        © 2026 CosmicInsight. All Rights Reserved.
+        © 2026 AstroWalla. All Rights Reserved.
       </footer>
     </div>
   );

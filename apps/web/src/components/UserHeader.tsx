@@ -50,8 +50,8 @@ export default function UserHeader() {
             </svg>
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">CosmicInsight</span>
-            <span className="text-[9px] uppercase tracking-[0.18em] text-[#d97706] font-bold mt-[3px]">Divine Astro Insight</span>
+            <span className="text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
+            <span className="text-[9px] uppercase tracking-[0.18em] text-[#d97706] font-bold mt-[3px]">Your Celestial Guide</span>
           </div>
         </Link>
 

@@ -105,7 +105,7 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
-              <span className="font-cinzel font-black text-white text-[17px] tracking-wide">CosmicInsight</span>
+              <span className="font-cinzel font-black text-white text-[17px] tracking-wide">AstroWalla</span>
             </Link>
 
             <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-white/60">
@@ -217,7 +217,7 @@ export default function Home() {
         <div className="text-center mb-14">
           <p className="text-orange-500 text-xs font-bold uppercase tracking-[0.2em] mb-3">Simple Process</p>
           <h2 className="font-cinzel text-4xl font-black text-slate-900 mb-3">Start in 3 Steps</h2>
-          <p className="text-slate-500 text-base max-w-md mx-auto">From sign-up to cosmic insights in under 2 minutes.</p>
+          <p className="text-slate-500 text-base max-w-md mx-auto">From sign-up to astrological insights in under 2 minutes.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {[
@@ -243,7 +243,7 @@ export default function Home() {
       <section style={{ background: "#1a1040" }} className="px-5 py-24">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: "#FFB347" }}>Why CosmicInsight</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: "#FFB347" }}>Why AstroWalla</p>
             <h2 className="font-cinzel text-4xl font-black mb-3 text-white">Built for Real Results</h2>
             <p className="text-base max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.5)" }}>Everything you need for an authentic, trustworthy astrology experience.</p>
           </div>
@@ -398,7 +398,7 @@ export default function Home() {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
-                <span className="font-cinzel font-black text-white">CosmicInsight</span>
+                <span className="font-cinzel font-black text-white">AstroWalla</span>
               </div>
               <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.4)" }}>India's most trusted platform for real-time Vedic astrology consultations.</p>
               <div className="flex gap-2.5">
@@ -434,7 +434,7 @@ export default function Home() {
             ))}
           </div>
           <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            <p className="text-xs" style={{ color:"rgba(255,255,255,0.25)" }}>© {new Date().getFullYear()} CosmicInsight. All rights reserved.</p>
+            <p className="text-xs" style={{ color:"rgba(255,255,255,0.25)" }}>© {new Date().getFullYear()} AstroWalla. All rights reserved.</p>
             <p className="font-cinzel text-xs" style={{ color:"rgba(255,255,255,0.25)" }}>✦ Guided by the Stars ✦</p>
             <div className="flex items-center gap-1.5 text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"/>All systems operational

@@ -41,7 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // --- 2. USER LOGIN (Mock OTP via Phone) ---
         if (credentials?.phone) {
           const phone = credentials.phone as string;
-          const email = `${phone}@cosmic.chat`; // Translate phone to an internal email
+          const email = `${phone}@astrowalla.com`; // Translate phone to an internal email
           
           let user = await prisma.user.findUnique({
             where: { email },

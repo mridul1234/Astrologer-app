@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Refund & Cancellation – CosmicInsight" };
+export const metadata = { title: "Refund & Cancellation – AstroWalla" };
 
 const scenarios = [
   { case: "Technical failure during session", outcome: "Full refund of session cost", eligible: true },
@@ -22,7 +22,7 @@ export default function RefundPage() {
               <span className="text-amber-800 text-lg">☽</span>
             </div>
             <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">CosmicInsight</div>
+              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">AstroWalla</div>
               <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
             </div>
           </Link>
@@ -89,10 +89,10 @@ export default function RefundPage() {
           <h2 className="text-base font-extrabold text-stone-900 mb-5">How to Request a Refund</h2>
           <div className="space-y-4">
             {[
-              { step: "1", text: "Email us at support@cosmicinsight.in with subject line: \"Refund Request — [Transaction ID]\"" },
+              { step: "1", text: "Email us at support@astrowalla.in with subject line: \"Refund Request — [Transaction ID]\"" },
               { step: "2", text: "Include your registered phone number, the transaction date, and a brief description of the issue" },
               { step: "3", text: "Our team will acknowledge your request within 24 hours and investigate the matter" },
-              { step: "4", text: "If approved, the refund is credited to your CosmicInsight Wallet within 3–5 business days" },
+              { step: "4", text: "If approved, the refund is credited to your AstroWalla Wallet within 3–5 business days" },
             ].map(({ step, text }) => (
               <div key={step} className="flex items-start gap-4">
                 <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#f5c842] to-[#ffb347] flex items-center justify-center text-stone-900 font-extrabold text-xs shrink-0 shadow-sm">
@@ -110,7 +110,7 @@ export default function RefundPage() {
       </main>
 
       <footer className="max-w-5xl mx-auto px-6 py-8 border-t border-[#f0e6c8] text-center text-xs text-stone-400 font-medium">
-        © 2026 CosmicInsight. All Rights Reserved.
+        © 2026 AstroWalla. All Rights Reserved.
       </footer>
     </div>
   );

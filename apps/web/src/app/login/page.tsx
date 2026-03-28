@@ -151,7 +151,7 @@ export default function LoginPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#faf8f5" }}>
         <div className="text-center pt-10">
           <VedicLoader size="xl" text="Aligning the Stars…" />
-          <p className="text-slate-500 font-medium text-sm mt-4">Preparing your cosmic dashboard</p>
+          <p className="text-slate-500 font-medium text-sm mt-4">Preparing your AstroWalla dashboard</p>
         </div>
       </div>
     );
@@ -168,9 +168,9 @@ export default function LoginPage() {
         <div className="relative max-w-md mx-auto px-5 py-10 text-center">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-5 hover:opacity-90 transition-opacity">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-lg" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
-            <span className="font-cinzel font-black text-white text-xl tracking-wide">CosmicInsight</span>
+            <span className="font-cinzel font-black text-white text-xl tracking-wide">AstroWalla</span>
           </Link>
-          <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>Your cosmic journey starts here</p>
+          <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>Your AstroWalla journey starts here</p>
         </div>
         {/* Wave divider */}
         <svg viewBox="0 0 1440 40" preserveAspectRatio="none" style={{ width:"100%", height:"40px", display:"block", marginTop:"-1px" }}>
@@ -326,7 +326,7 @@ export default function LoginPage() {
 
         {/* Bottom decoration */}
         <div className="text-center mt-8 text-slate-400 text-[10px] uppercase tracking-widest font-bold">
-          ✦ Protected by CosmicInsight Security ✦
+          ✦ Protected by AstroWalla Security ✦
         </div>
         </div>
       </div>

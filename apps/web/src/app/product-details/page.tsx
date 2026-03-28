@@ -1,12 +1,12 @@
 import Link from "next/link";
 
-export const metadata = { title: "Product Details – CosmicInsight" };
+export const metadata = { title: "Product Details – AstroWalla" };
 
 const features = [
   { icon: "💬", title: "Live Chat Consultations", desc: "Connect with astrologers instantly via real-time text chat. Sessions are billed per minute — you only pay for what you use. End any time." },
   { icon: "🔮", title: "Free Kundli Generation", desc: "Get your complete Vedic birth chart (Kundli) instantly with planetary positions, house analysis, Dasha periods, and more — completely free." },
-  { icon: "✅", title: "Verified Astrologers", desc: "Every astrologer on CosmicInsight goes through a rigorous 3-step verification: credential check, accuracy test, and live quality assessment." },
-  { icon: "💰", title: "Prepaid Wallet System", desc: "Add money to your CosmicInsight wallet and use it seamlessly across sessions. Secure payments via Razorpay with instant refunds." },
+  { icon: "✅", title: "Verified Astrologers", desc: "Every astrologer on AstroWalla goes through a rigorous 3-step verification: credential check, accuracy test, and live quality assessment." },
+  { icon: "💰", title: "Prepaid Wallet System", desc: "Add money to your AstroWalla wallet and use it seamlessly across sessions. Secure payments via Razorpay with instant refunds." },
   { icon: "⏱️", title: "Real-Time Session Billing", desc: "Pay only for the exact time you spend — billed by the minute. Sessions start and end with a single tap. Full session history available." },
   { icon: "🔒", title: "100% Private & Secure", desc: "All conversations are end-to-end encrypted. Your personal information is never shared with anyone — not even the astrologer you speak with." },
 ];
@@ -28,8 +28,8 @@ export default function ProductDetailsPage() {
               <span className="text-amber-800 text-lg">☽</span>
             </div>
             <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">CosmicInsight</div>
-              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astro Insight</div>
+              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">AstroWalla</div>
+              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astrastrowalla</div>
             </div>
           </Link>
           <Link href="/dashboard" className="text-sm font-semibold text-stone-500 hover:text-[#d97706] transition-colors">← Back</Link>
@@ -41,7 +41,7 @@ export default function ProductDetailsPage() {
           <div className="inline-flex items-center gap-2 bg-[#f5c842]/20 border border-[#f5c842]/40 rounded-full px-4 py-1.5 text-[#d97706] text-xs font-bold uppercase tracking-widest mb-5">
             ✦ Platform Features
           </div>
-          <h1 className="text-4xl font-extrabold text-stone-900 mb-3">Everything CosmicInsight Offers</h1>
+          <h1 className="text-4xl font-extrabold text-stone-900 mb-3">Everything AstroWalla Offers</h1>
           <p className="text-stone-600 text-base font-medium max-w-xl mx-auto">
             A complete astrology experience — from instant consultations to in-depth Kundli readings, all in one place.
           </p>
@@ -51,7 +51,7 @@ export default function ProductDetailsPage() {
       <main className="max-w-5xl mx-auto px-6 py-14">
         {/* Features grid */}
         <h2 className="text-2xl font-extrabold text-stone-900 mb-2">Core Features</h2>
-        <p className="text-stone-500 text-sm font-medium mb-8">What makes CosmicInsight the best choice for astrology guidance</p>
+        <p className="text-stone-500 text-sm font-medium mb-8">What makes AstroWalla the best choice for astrology guidance</p>
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5 mb-16">
           {features.map(({ icon, title, desc }) => (
             <div key={title} className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6 hover:shadow-md hover:border-[#f5c842]/30 transition-all group">
@@ -83,7 +83,7 @@ export default function ProductDetailsPage() {
           <div className="grid sm:grid-cols-4 gap-4">
             {[
               { step: "01", title: "Login", desc: "Access your account or create a new one with just your phone number — no email required." },
-              { step: "02", title: "Add Wallet Balance", desc: "Recharge your CosmicInsight wallet with any amount starting from ₹50." },
+              { step: "02", title: "Add Wallet Balance", desc: "Recharge your AstroWalla wallet with any amount starting from ₹50." },
               { step: "03", title: "Choose an Astrologer", desc: "Browse verified astrologers filtered by speciality, rating, and language." },
               { step: "04", title: "Start Chatting", desc: "Begin your live chat session and get guidance. End whenever you want." },
             ].map(({ step, title, desc }) => (
@@ -98,7 +98,7 @@ export default function ProductDetailsPage() {
       </main>
 
       <footer className="max-w-5xl mx-auto px-6 py-8 border-t border-[#f0e6c8] text-center text-xs text-stone-400 font-medium">
-        © 2026 CosmicInsight. All Rights Reserved.
+        © 2026 AstroWalla. All Rights Reserved.
       </footer>
     </div>
   );

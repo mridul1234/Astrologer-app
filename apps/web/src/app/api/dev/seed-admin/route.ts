@@ -17,7 +17,7 @@ export async function GET() {
     const admin = await prisma.user.create({
       data: {
         name: "Supreme Commander",
-        email: "admin@cosmic.chat",
+        email: "admin@astrowalla.com",
         password: hashed,
         role: "ADMIN",
         walletBalance: 0,
@@ -28,7 +28,7 @@ export async function GET() {
       success: true, 
       message: "Master Admin created!",
       credentials: {
-        email: "admin@cosmic.chat",
+        email: "admin@astrowalla.com",
         password: "masteradmin123"
       }
     });
