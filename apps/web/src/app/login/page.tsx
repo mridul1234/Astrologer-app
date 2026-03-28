@@ -60,6 +60,9 @@ export default function LoginPage() {
       setStep("otp");
       setResendTimer(30);
       setTimeout(() => otpRefs.current[0]?.focus(), 100);
+      
+      // Eagerly prefetch dashboard data to warm up Vercel Edge cache
+      fetch("/api/astrologers").catch(() => {});
     }
   }
 

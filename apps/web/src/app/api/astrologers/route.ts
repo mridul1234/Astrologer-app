@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
 
+export const revalidate = 30; // Cache for 30s at Vercel Edge
+
 export async function GET() {
   const astrologers = await prisma.astrologer.findMany({
     include: { 

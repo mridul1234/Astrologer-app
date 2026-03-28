@@ -4,25 +4,23 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function UserHeader() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [balance, setBalance] = useState(0);
-  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   
+  const { data: profile, isLoading } = useSWR("/api/user/profile", fetcher);
+  const balance = profile?.walletBalance !== undefined ? Number(profile.walletBalance) : 0;
+  const isLoadingBalance = isLoading;
+
   const userPhone = session?.user?.email?.split("@")[0] ?? "User";
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("/api/user/profile")
-      .then((r) => r.json())
-      .then((p) => { 
-        if (p?.walletBalance !== undefined) setBalance(p.walletBalance); 
-        setIsLoadingBalance(false);
-      })
-      .catch(() => { setIsLoadingBalance(false); });
 
     function handleClickOutside(event: MouseEvent) {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {

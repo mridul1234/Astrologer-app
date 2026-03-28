@@ -7,6 +7,9 @@ import UserFooter from "@/components/UserFooter";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import VedicLoader from "@/components/VedicLoader";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Astrologer {
   id: string;
@@ -28,10 +31,18 @@ interface Astrologer {
 export default function UserDashboard() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
-  const [loadingAstrologers, setLoadingAstrologers] = useState(true);
-  const [balance, setBalance] = useState(0);
-  const [balanceLoaded, setBalanceLoaded] = useState(false);
+  const { data: apiAstrologers, isLoading: loadingAstrologers } = useSWR("/api/astrologers", fetcher, { 
+    refreshInterval: 30000,
+    revalidateOnFocus: true 
+  });
+  
+  const { data: profile } = useSWR("/api/user/profile", fetcher);
+  
+  const astrologers = apiAstrologers ? [...apiAstrologers].sort((a: Astrologer, b: Astrologer) => b.reviewCount - a.reviewCount) : [];
+  
+  const balance = profile?.walletBalance !== undefined ? Number(profile.walletBalance) : 0;
+  const balanceLoaded = profile !== undefined;
+
   const [starting, setStarting] = useState<string | null>(null);
   
   // New UI states
@@ -44,37 +55,6 @@ export default function UserDashboard() {
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("/api/astrologers")
-      .then((r) => r.json())
-      .then((data) => {
-        // Sort by review count
-        const sorted = data.sort((a: Astrologer, b: Astrologer) => b.reviewCount - a.reviewCount);
-        setAstrologers(sorted);
-        setLoadingAstrologers(false);
-      })
-      .catch(() => setLoadingAstrologers(false));
-
-    fetch("/api/user/profile")
-      .then((r) => r.json())
-      .then((p) => {
-        if (p?.walletBalance !== undefined) {
-          setBalance(Number(p.walletBalance));
-          setBalanceLoaded(true);
-        }
-      })
-      .catch((err) => console.error("Profile fetch error:", err));
-
-    // Auto-refresh astrologer availability every 30 seconds
-    const pollInterval = setInterval(() => {
-      fetch("/api/astrologers")
-        .then((r) => r.json())
-        .then((data) => {
-          const sorted = data.sort((a: Astrologer, b: Astrologer) => b.reviewCount - a.reviewCount);
-          setAstrologers(sorted);
-        })
-        .catch(() => {});
-    }, 30000);
-
     // Click outside for dropdown
     function handleClickOutside(event: MouseEvent) {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -84,7 +64,6 @@ export default function UserDashboard() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      clearInterval(pollInterval);
     };
   }, []);
 
