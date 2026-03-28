@@ -238,7 +238,7 @@ export default function AstrologerSettingsPage() {
                 <div>
                   <label className="block text-sm font-medium text-purple-200/70 mb-2">Display Name</label>
                   <input id="astro-name-input" type="text" value={profile.name} onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
-                    className="cosmic-input w-full px-4 py-3.5 rounded-xl text-base" placeholder="Your name" />
+                    className="astrowalla-input w-full px-4 py-3.5 rounded-xl text-base" placeholder="Your name" />
                 </div>
 
                 {/* Bio */}
@@ -246,7 +246,7 @@ export default function AstrologerSettingsPage() {
                   <label className="block text-sm font-medium text-purple-200/70 mb-2">Bio / About You</label>
                   <textarea id="astro-bio-input" rows={4} value={profile.bio}
                     onChange={(e) => setProfile((p) => ({ ...p, bio: e.target.value }))}
-                    className="cosmic-input w-full px-4 py-3.5 rounded-xl text-sm resize-none leading-relaxed"
+                    className="astrowalla-input w-full px-4 py-3.5 rounded-xl text-sm resize-none leading-relaxed"
                     placeholder="Tell seekers about your experience, approach, and specialties…" />
                   <p className="text-purple-400/40 text-xs mt-1">{profile.bio.length}/300 characters</p>
                 </div>
@@ -299,7 +299,7 @@ export default function AstrologerSettingsPage() {
                       <input id="rate-input" type="number" min={5} max={500}
                         value={profile.ratePerMin}
                         onChange={(e) => setProfile((p) => ({ ...p, ratePerMin: Number(e.target.value) }))}
-                        className="cosmic-input w-full pl-8 pr-4 py-3.5 rounded-xl text-base font-cinzel font-bold" />
+                        className="astrowalla-input w-full pl-8 pr-4 py-3.5 rounded-xl text-base font-cinzel font-bold" />
                     </div>
                     <div className="text-purple-300/50 text-sm">per minute</div>
                   </div>
@@ -535,12 +535,12 @@ function PayoutModal({ amount, onClose }: { amount: number; onClose: () => void 
               <div>
                 <label className="block text-sm font-medium text-purple-200/70 mb-2">Bank Account Number</label>
                 <input id="bank-account-input" type="text" value={bankAccount} onChange={(e) => setBankAccount(e.target.value)}
-                  className="cosmic-input w-full px-4 py-3.5 rounded-xl text-base" placeholder="XXXX XXXX XXXX" />
+                  className="astrowalla-input w-full px-4 py-3.5 rounded-xl text-base" placeholder="XXXX XXXX XXXX" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-purple-200/70 mb-2">IFSC Code</label>
                 <input id="ifsc-input" type="text" value={ifsc} onChange={(e) => setIfsc(e.target.value.toUpperCase())}
-                  className="cosmic-input w-full px-4 py-3.5 rounded-xl text-base uppercase" placeholder="SBIN0001234" />
+                  className="astrowalla-input w-full px-4 py-3.5 rounded-xl text-base uppercase" placeholder="SBIN0001234" />
               </div>
             </div>
             <button id="submit-payout-btn" onClick={handleRequest} disabled={loading || !bankAccount || !ifsc}

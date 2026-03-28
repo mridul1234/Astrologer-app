@@ -211,7 +211,7 @@ export default function LoginPage() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
                       required
-                      className="cosmic-input flex-1 px-5 py-4 rounded-2xl text-lg font-bold shadow-sm"
+                      className="astrowalla-input flex-1 px-5 py-4 rounded-2xl text-lg font-bold shadow-sm"
                       placeholder="98765 43210"
                       autoFocus
                     />

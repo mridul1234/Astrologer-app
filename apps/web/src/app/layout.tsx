@@ -11,8 +11,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "AstroWalla — Connect with Expert Astrologers",
-  description: "Get personalized cosmic guidance through real-time chat with verified expert astrologers. Unlock insights about love, career, and life.",
-  keywords: "astrologer, astrology chat, horoscope, cosmic guidance, vedic astrology",
+  description: "Get personalized astrological guidance through real-time chat with verified expert astrologers. Unlock insights about love, career, and life.",
+  keywords: "astrologer, astrology chat, horoscope, astrological guidance, vedic astrology",
 };
 
 export default function RootLayout({

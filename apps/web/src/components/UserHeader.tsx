@@ -9,6 +9,7 @@ export default function UserHeader() {
   const router = useRouter();
   const { data: session } = useSession();
   const [balance, setBalance] = useState(0);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   
   const userPhone = session?.user?.email?.split("@")[0] ?? "User";
@@ -17,8 +18,11 @@ export default function UserHeader() {
   useEffect(() => {
     fetch("/api/user/profile")
       .then((r) => r.json())
-      .then((p) => { if (p?.walletBalance !== undefined) setBalance(p.walletBalance); })
-      .catch(() => {});
+      .then((p) => { 
+        if (p?.walletBalance !== undefined) setBalance(p.walletBalance); 
+        setIsLoadingBalance(false);
+      })
+      .catch(() => { setIsLoadingBalance(false); });
 
     function handleClickOutside(event: MouseEvent) {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -87,7 +91,11 @@ export default function UserHeader() {
             </div>
             <div className="flex flex-col items-start leading-none">
               <span className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">Wallet</span>
-              <span className="text-[14px] font-extrabold text-stone-800">₹{balance.toFixed(0)}</span>
+              {isLoadingBalance ? (
+                <div className="h-4 w-10 mt-0.5 bg-stone-200 animate-pulse rounded"></div>
+              ) : (
+                <span className="text-[14px] font-extrabold text-stone-800">₹{balance.toFixed(0)}</span>
+              )}
             </div>
             <span className="text-[10px] font-extrabold text-[#FF9933] uppercase tracking-widest border-l border-[#f0e0b0] pl-2.5 ml-1 group-hover:text-[#d97706] transition-colors">Recharge</span>
           </button>

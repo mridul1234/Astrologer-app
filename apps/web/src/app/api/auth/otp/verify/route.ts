@@ -73,27 +73,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // OTP is valid — upsert user in DB
-    const email = `${phone}@astrowalla.com`;
-    let user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user) {
-      const hashed = await bcrypt.hash("otp_verified_user", 10);
-      user = await prisma.user.create({
-        data: {
-          name: phone,
-          email,
-          password: hashed,
-          role: "USER",
-          walletBalance: 500, // Welcome ₹500 credit
-        },
-      });
-    }
-
+    // OTP is valid — user creation is handled by NextAuth signIn callback
     return NextResponse.json({
       success: true,
       phone,
-      role: user.role,
     });
   } catch (err) {
     console.error("OTP verify route error:", err);

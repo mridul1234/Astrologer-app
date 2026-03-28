@@ -227,8 +227,36 @@ export default function UserDashboard() {
 
         {/* Astrologer Cards Grid */}
         {loadingAstrologers ? (
-          <div className="flex flex-col items-center justify-center py-32">
-            <VedicLoader size="lg" text="Aligning the Stars..." />
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-3xl p-5 relative flex gap-4 border border-stone-100 shadow-[0_4px_15px_rgba(0,0,0,0.04)] animate-pulse">
+                {/* Left Column Avatar */}
+                <div className="flex flex-col items-center shrink-0 w-24">
+                  <div className="w-20 h-20 rounded-full bg-stone-200 mb-2"></div>
+                  <div className="h-3 w-12 bg-stone-200 rounded mt-1"></div>
+                  <div className="h-2 w-10 bg-stone-200 rounded mt-2"></div>
+                </div>
+                {/* Right Column Details */}
+                <div className="flex-1 flex flex-col pt-1">
+                  <div className="flex items-start justify-between">
+                    <div className="h-5 w-24 bg-stone-200 rounded"></div>
+                    <div className="h-5 w-5 bg-stone-200 rounded-full"></div>
+                  </div>
+                  <div className="flex gap-1 mt-2">
+                    <div className="h-4 w-12 bg-amber-50 rounded"></div>
+                    <div className="h-4 w-16 bg-amber-50 rounded"></div>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <div className="h-3 w-32 bg-stone-200 rounded"></div>
+                    <div className="h-3 w-28 bg-stone-200 rounded"></div>
+                  </div>
+                  <div className="mt-auto pt-6 flex flex-col gap-3">
+                    <div className="h-5 w-20 bg-stone-200 rounded"></div>
+                    <div className="h-10 w-full bg-stone-100 rounded-xl"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : displayedAstrologers.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-[32px] border border-stone-100 shadow-sm">

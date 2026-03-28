@@ -65,7 +65,7 @@ export default function AboutUsPage() {
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           {[
             { title: "Our Mission", body: "To make authentic Vedic astrology accessible to every Indian household. We rigorously verify every astrologer on our platform — their credentials, experience, and accuracy — so you always get genuine, reliable guidance." },
-            { title: "Our Vision", body: "To become India's most trusted astrology platform, blending 5,000 years of Vedic wisdom with cutting-edge technology. We envision a world where cosmic guidance empowers better life decisions for millions." },
+            { title: "Our Vision", body: "To become India's most trusted astrology platform, blending 5,000 years of Vedic wisdom with cutting-edge technology. We envision a world where astrological guidance empowers better life decisions for millions." },
           ].map(({ title, body }) => (
             <div key={title} className="bg-white rounded-3xl border border-stone-100 shadow-sm p-8 hover:shadow-md transition-shadow">
               <div className="w-10 h-1 bg-gradient-to-r from-[#f5c842] to-[#ffb347] rounded-full mb-5" />
