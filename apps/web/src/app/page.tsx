@@ -394,8 +394,8 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer style={{ borderTop: "1px solid rgba(255,255,255,0.08)", background: "#130e30" }}>
         <div className="max-w-6xl mx-auto px-5 py-14">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
-            <div className="col-span-2 md:col-span-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div className="sm:col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
                 <span className="font-cinzel font-black text-white">AstroWalla</span>
@@ -417,23 +417,43 @@ export default function Home() {
               </div>
             </div>
             {[
-              { title: "Services", links: ["Chat with Astrologer","Kundali Analysis","Love & Marriage","Career Guidance","Vastu Shastra","Tarot Reading"] },
-              { title: "Company", links: ["About Us","Become an Astrologer","Careers","Blog","Press"] },
-              { title: "Support", links: ["Help Center","Privacy Policy","Terms of Service","Refund Policy","Contact Us"] },
+              { title: "Services", links: [
+                { label: "Chat with Astrologer", href: "/dashboard" },
+                { label: "Kundali Analysis", href: "/kundli" },
+                { label: "Love & Marriage", href: "/login" },
+                { label: "Career Guidance", href: "/login" },
+                { label: "Vastu Shastra", href: "/login" },
+                { label: "Tarot Reading", href: "/login" },
+              ]},
+              { title: "Company", links: [
+                { label: "About Us", href: "/about-us" },
+                { label: "Become an Astrologer", href: "/astrologer/login" },
+                { label: "Contact Us", href: "/contact-us" },
+                { label: "Product Details", href: "/product-details" },
+              ]},
+              { title: "Support", links: [
+                { label: "Privacy Policy", href: "/privacy-policy" },
+                { label: "Terms of Service", href: "/terms-and-conditions" },
+                { label: "Refund Policy", href: "/refund-and-cancellation" },
+                { label: "User Guidelines", href: "/user-guidelines" },
+                { label: "Contact Us", href: "/contact-us" },
+              ]},
             ].map(col=>(
               <div key={col.title}>
                 <p className="font-semibold text-white mb-4 text-sm">{col.title}</p>
-                {col.links.map(l=>(
-                  <p key={l} className="text-sm mb-2.5 cursor-pointer transition-colors" style={{ color:"rgba(255,255,255,0.35)" }}
-                    onMouseOver={e=>{(e.currentTarget as HTMLParagraphElement).style.color="rgba(255,255,255,0.8)";}}
-                    onMouseOut={e=>{(e.currentTarget as HTMLParagraphElement).style.color="rgba(255,255,255,0.35)";}}>
-                    {l}
-                  </p>
+                {col.links.map(item=>(
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="block text-sm mb-2.5 transition-colors hover:text-white"
+                    style={{ color:"rgba(255,255,255,0.35)" }}>
+                    {item.label}
+                  </Link>
                 ))}
               </div>
             ))}
           </div>
-          <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
             <p className="text-xs" style={{ color:"rgba(255,255,255,0.25)" }}>© {new Date().getFullYear()} AstroWalla. All rights reserved.</p>
             <p className="font-cinzel text-xs" style={{ color:"rgba(255,255,255,0.25)" }}>✦ Guided by the Stars ✦</p>
             <div className="flex items-center gap-1.5 text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>

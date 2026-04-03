@@ -168,10 +168,10 @@ export default function LoginPage() {
         {[[8,20],[18,75],[28,45],[38,88],[52,12],[62,60],[72,33]].map(([t,l],i)=>(
           <div key={i} className="absolute rounded-full bg-white pointer-events-none" style={{ top:`${t}%`,left:`${l}%`,width:i%2===0?2:1.5,height:i%2===0?2:1.5,opacity:0.15+i*0.03 }}/>
         ))}
-        <div className="relative max-w-md mx-auto px-5 py-10 text-center">
-          <Link href="/" className="inline-flex items-center gap-2.5 mb-5 hover:opacity-90 transition-opacity">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-lg" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
-            <span className="font-cinzel font-black text-white text-xl tracking-wide">AstroWalla</span>
+        <div className="relative max-w-md mx-auto px-4 py-8 sm:py-10 text-center">
+          <Link href="/" className="inline-flex items-center gap-2.5 mb-4 hover:opacity-90 transition-opacity">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-lg" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
+            <span className="font-cinzel font-black text-white text-lg tracking-wide">AstroWalla</span>
           </Link>
           <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>Your AstroWalla journey starts here</p>
         </div>
@@ -182,15 +182,15 @@ export default function LoginPage() {
       </div>
 
       {/* ── Form Area ── */}
-      <div className="flex-1 flex items-start justify-center px-4 py-10">
+      <div className="flex-1 flex items-start justify-center px-3 py-6 sm:px-4 sm:py-10">
         <div className="w-full max-w-md">
-        <div className="glass-card rounded-[2rem] px-8 py-10">
+        <div className="glass-card rounded-[1.5rem] sm:rounded-[2rem] px-5 py-8 sm:px-8 sm:py-10">
           {step === "phone" && (
             <>
-              <div className="text-center mb-10">
-                <div className="w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center font-black text-white text-2xl" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
-                <h1 className="font-cinzel text-3xl font-bold text-slate-800 tracking-wide">Welcome Back</h1>
-                <p className="text-slate-500 font-medium mt-3 text-sm">
+              <div className="text-center mb-8">
+                <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center font-black text-white text-2xl" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
+                <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-slate-800 tracking-wide">Welcome Back</h1>
+                <p className="text-slate-500 font-medium mt-2 text-sm">
                   Enter your mobile number to receive a one-time passcode
                 </p>
               </div>
@@ -249,10 +249,10 @@ export default function LoginPage() {
 
           {step === "otp" && (
             <>
-              <div className="text-center mb-10">
-                <div className="w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center font-black text-white text-2xl" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>✦</div>
-                <h1 className="font-cinzel text-3xl font-bold text-slate-800 tracking-wide">Verify OTP</h1>
-                <p className="text-slate-500 font-medium mt-3 text-sm">
+              <div className="text-center mb-8">
+                <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center font-black text-white text-2xl" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>✦</div>
+                <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-slate-800 tracking-wide">Verify OTP</h1>
+                <p className="text-slate-500 font-medium mt-2 text-sm">
                   We sent a 4-digit code to{" "}
                   <span className="text-slate-800 font-bold">+91 {phone}</span>
                 </p>
@@ -267,7 +267,7 @@ export default function LoginPage() {
 
               <form onSubmit={handleVerifyOtp} className="space-y-8">
                 {/* OTP inputs */}
-                <div className="flex justify-center gap-3">
+                <div className="flex justify-center gap-2 sm:gap-3">
                   {otp.map((digit, i) => (
                     <input
                       key={i}
@@ -281,6 +281,7 @@ export default function LoginPage() {
                       onKeyDown={(e) => handleOtpKeyDown(i, e)}
                       onPaste={i === 0 ? handleOtpPaste : undefined}
                       className="otp-input shadow-sm"
+                      style={{ width: "clamp(48px, 18vw, 56px)", height: "clamp(52px, 16vw, 64px)", fontSize: "clamp(1.2rem, 5vw, 1.6rem)" }}
                     />
                   ))}
                 </div>

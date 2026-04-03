@@ -140,22 +140,20 @@ export default function UserDashboard() {
       <UserHeader />
 
       {/* ─── MAIN CONTENT ─── */}
-      <main className="flex-1 max-w-[1400px] w-full mx-auto px-6 py-5">
+      <main className="flex-1 max-w-[1400px] w-full mx-auto px-3 sm:px-6 py-4 sm:py-5">
         
         {/* ── Section Header ── */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[#f5c842] text-xl">✦</span>
-              <h1 className="text-[28px] font-extrabold text-stone-900 tracking-tight">Chat With Astrologer</h1>
-              <span className="text-[#f5c842] text-xl">✦</span>
-            </div>
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[#f5c842] text-lg">✦</span>
+            <h1 className="text-[22px] sm:text-[28px] font-extrabold text-stone-900 tracking-tight">Chat With Astrologer</h1>
+            <span className="text-[#f5c842] text-lg">✦</span>
           </div>
-          <p className="text-stone-500 text-sm font-medium ml-8">Connect with verified astrologers and get guidance for your life&apos;s journey</p>
+          <p className="text-stone-500 text-sm font-medium ml-6 sm:ml-8">Connect with verified astrologers and get guidance for your life&apos;s journey</p>
         </div>
 
         {/* ── Search + Filter Bar ── */}
-        <div className="bg-white rounded-2xl border border-[#f0e6c8] shadow-sm p-3 flex flex-col sm:flex-row items-center gap-3 mb-8">
+        <div className="bg-white rounded-2xl border border-[#f0e6c8] shadow-sm p-2.5 sm:p-3 flex flex-col gap-2.5 mb-6">
 
           {/* Search Input */}
           <div className="relative flex-1 w-full">

@@ -37,10 +37,10 @@ export default function UserHeader() {
     <nav className="sticky top-0 z-50 w-full" style={{ background: "white", borderBottom: "1px solid #f0e6c8", boxShadow: "0 2px 16px rgba(245,200,66,0.08)" }}>
       {/* Navy brand identity bar — same as landing page & login */}
       <div style={{ height: "4px", background: "linear-gradient(90deg, #1a1040 0%, #2d1b69 40%, #FF9933 70%, #f5c842 100%)" }} />
-      <div className="max-w-[1400px] mx-auto px-6 h-[70px] flex items-center justify-between gap-6">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 sm:h-[70px] flex items-center justify-between gap-3 sm:gap-6">
         {/* ── Logo ── */}
-        <Link href="/dashboard" className="flex items-center gap-3 shrink-0 group">
-          <div className="w-[52px] h-[52px] bg-[#ffce4b] rounded-full flex items-center justify-center border-2 border-[#f0c842]/60 shadow-md p-1 overflow-hidden">
+        <Link href="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
+          <div className="w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] bg-[#ffce4b] rounded-full flex items-center justify-center border-2 border-[#f0c842]/60 shadow-md p-1 overflow-hidden">
             <svg viewBox="0 0 100 100" className="w-full h-full text-amber-800 opacity-80 animate-[spin_40s_linear_infinite]">
               <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2"/>
               <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
@@ -52,8 +52,8 @@ export default function UserHeader() {
             </svg>
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
-            <span className="text-[9px] uppercase tracking-[0.18em] text-[#d97706] font-bold mt-[3px]">Your Celestial Guide</span>
+            <span className="text-[17px] sm:text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
+            <span className="hidden sm:block text-[9px] uppercase tracking-[0.18em] text-[#d97706] font-bold mt-[3px]">Your Celestial Guide</span>
           </div>
         </Link>
 
@@ -79,23 +79,23 @@ export default function UserHeader() {
           {/* Wallet Pill */}
           <button
             onClick={() => router.push("/wallet")}
-            className="flex items-center gap-2.5 h-10 pl-3 pr-4 rounded-full border border-[#e9d9b0] bg-[#fffdf8] hover:bg-[#fff8e7] hover:border-[#f5c842] hover:shadow-md transition-all group"
+            className="flex items-center gap-1.5 sm:gap-2.5 h-9 sm:h-10 pl-2.5 sm:pl-3 pr-2.5 sm:pr-4 rounded-full border border-[#e9d9b0] bg-[#fffdf8] hover:bg-[#fff8e7] hover:border-[#f5c842] hover:shadow-md transition-all group"
           >
             {/* Wallet Icon */}
-            <div className="w-7 h-7 rounded-full bg-[#f5c842] flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
-              <svg className="w-3.5 h-3.5 text-amber-800" fill="currentColor" viewBox="0 0 20 20">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#f5c842] flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
+              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-800" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 4a2 2 0 012-2h12a2 2 0 012 2v1H2V4zm0 3h16v9a2 2 0 01-2 2H4a2 2 0 01-2-2V7zm11 2a1 1 0 100 2h1a1 1 0 100-2h-1z"/>
               </svg>
             </div>
             <div className="flex flex-col items-start leading-none">
-              <span className="text-[10px] uppercase tracking-widest text-stone-400 font-semibold">Wallet</span>
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-stone-400 font-semibold">Wallet</span>
               {isLoadingBalance ? (
-                <div className="h-4 w-10 mt-0.5 bg-stone-200 animate-pulse rounded"></div>
+                <div className="h-3.5 w-8 mt-0.5 bg-stone-200 animate-pulse rounded"></div>
               ) : (
-                <span className="text-[14px] font-extrabold text-stone-800">₹{balance.toFixed(0)}</span>
+                <span className="text-[13px] sm:text-[14px] font-extrabold text-stone-800">₹{balance.toFixed(0)}</span>
               )}
             </div>
-            <span className="text-[10px] font-extrabold text-[#FF9933] uppercase tracking-widest border-l border-[#f0e0b0] pl-2.5 ml-1 group-hover:text-[#d97706] transition-colors">Recharge</span>
+            <span className="hidden sm:block text-[10px] font-extrabold text-[#FF9933] uppercase tracking-widest border-l border-[#f0e0b0] pl-2.5 ml-1 group-hover:text-[#d97706] transition-colors">Recharge</span>
           </button>
 
           {/* Profile Avatar + Dropdown */}
