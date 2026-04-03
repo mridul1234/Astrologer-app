@@ -418,12 +418,8 @@ export default function Home() {
             </div>
             {[
               { title: "Services", links: [
-                { label: "Chat with Astrologer", href: "/dashboard" },
-                { label: "Kundali Analysis", href: "/kundli" },
-                { label: "Love & Marriage", href: "/login" },
-                { label: "Career Guidance", href: "/login" },
-                { label: "Vastu Shastra", href: "/login" },
-                { label: "Tarot Reading", href: "/login" },
+                { label: "Chat with Astrologer", href: "/login" },
+                { label: "Free Kundli", href: "/login" },
               ]},
               { title: "Company", links: [
                 { label: "About Us", href: "/about-us" },
