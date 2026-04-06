@@ -1,90 +1,66 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-// ─── Data ──────────────────────────────────────────────────────────────────
-const FEATURES = [
-  {
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>,
-    title: "Vedic Astrology",
-    desc: "Ancient Jyotish wisdom — Kundali, Dasha, Nakshatras — decoded by certified practitioners.",
-  },
-  {
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
-    title: "Live Chat Sessions",
-    desc: "Real-time private consultations with your astrologer. No appointments, just instant answers.",
-  },
-  {
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>,
-    title: "Secure Wallet",
-    desc: "Pay-as-you-go with our encrypted wallet. Add funds in seconds, never charged for waiting.",
-  },
-  {
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>,
-    title: "Verified Experts",
-    desc: "Every astrologer passes a 3-round vetting — written test, background check, trial reading.",
-  },
-  {
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
-    title: "Honest Reviews",
-    desc: "Every rating from a verified, real session. Zero paid reviews. Total transparency.",
-  },
-  {
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-6 h-6"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>,
-    title: "24 / 7 Available",
-    desc: "The cosmos never sleeps. Connect with an astrologer any hour of the day or night.",
-  },
+// ─── Types ──────────────────────────────────────────────────────────────────
+interface Astrologer {
+  id: string;
+  speciality: string | null;
+  ratePerMin: number;
+  isOnline: boolean;
+  isBusy: boolean;
+  user: { name: string };
+  averageRating: number;
+  reviewCount: number;
+  orderCount: number;
+  experienceYears?: number;
+  languages?: string;
+}
+
+// ─── Static Data ─────────────────────────────────────────────────────────────
+const SERVICES = [
+  { icon: "💬", title: "Chat Consultation", desc: "Live, private chat with verified astrologers anytime." },
+  { icon: "🔮", title: "Free Kundli", desc: "Personalized Vedic birth chart — accurate & instant." },
+  { icon: "❤️", title: "Love & Relationships", desc: "Clarity on marriage, compatibility & love life." },
+  { icon: "💼", title: "Career Guidance", desc: "Career switches, business timing & financial growth." },
+  { icon: "🏥", title: "Health Astrology", desc: "Planetary impact on health & wellbeing insights." },
+  { icon: "🌟", title: "Daily Horoscope", desc: "Personalised daily cosmic guidance for your sign." },
 ];
 
 const TESTIMONIALS = [
-  { name: "Priya S.", city: "Mumbai", sign: "Scorpio", text: "My astrologer's guidance on my career switch was unnervingly accurate. I landed my dream job exactly when predicted.", rating: 5 },
-  { name: "Rahul M.", city: "Bangalore", sign: "Aries", text: "I was skeptical at first. After my relationship reading, I got clarity I hadn't found in years of therapy.", rating: 5 },
-  { name: "Ananya K.", city: "Delhi", sign: "Cancer", text: "The Kundali analysis was so personal — it felt like she already knew my entire life. Referred 6 friends.", rating: 5 },
-  { name: "Vikram T.", city: "Pune", sign: "Capricorn", text: "Connected at midnight during a business panic. Every date the astrologer predicted came true.", rating: 5 },
-  { name: "Sneha R.", city: "Chennai", sign: "Virgo", text: "Booked a 10-minute session, stayed 45 minutes. The health insights were spot on. First time user blown away.", rating: 5 },
-  { name: "Arjun P.", city: "Hyderabad", sign: "Aquarius", text: "Best ₹200 I ever spent. Predicted my promotion to the exact week. A regular user now.", rating: 5 },
+  { name: "Priya S.", city: "Mumbai", sign: "♏ Scorpio", text: "The career guidance was unnervingly accurate. I landed my dream job exactly when predicted.", rating: 5 },
+  { name: "Rahul M.", city: "Bangalore", sign: "♈ Aries", text: "After my relationship reading, I got clarity I hadn't found in years of therapy. Truly remarkable.", rating: 5 },
+  { name: "Ananya K.", city: "Delhi", sign: "♋ Cancer", text: "The Kundali analysis felt so personal — like she already knew my entire life. Referred 6 friends!", rating: 5 },
+  { name: "Vikram T.", city: "Pune", sign: "♑ Capricorn", text: "Connected at midnight during a business panic. Every date the astrologer predicted came true.", rating: 5 },
+  { name: "Sneha R.", city: "Chennai", sign: "♍ Virgo", text: "Booked a 10-minute session, stayed 45 minutes. The health insights were spot on.", rating: 5 },
+  { name: "Arjun P.", city: "Hyderabad", sign: "♒ Aquarius", text: "Best ₹200 I ever spent. Predicted my promotion to the exact week. A regular user now!", rating: 5 },
 ];
 
 const FAQS = [
   { q: "How does the chat session work?", a: "After adding funds, pick any available astrologer and click 'Chat Now'. You're connected in real-time within seconds. The session is charged per minute — only when the astrologer has joined and you're actively chatting." },
-  { q: "What is the minimum recharge amount?", a: "You can add as little as ₹50 to your wallet. Sessions are charged per minute at the astrologer's listed rate, so even a small top-up gets you several minutes of guidance." },
+  { q: "What is the minimum recharge amount?", a: "You can add as little as ₹10 to your wallet. Sessions are charged per minute at the astrologer's listed rate, so even a small top-up gets you several minutes of guidance." },
   { q: "Are the astrologers verified?", a: "Yes. Every astrologer passes 3 stages: a written Vedic astrology assessment, background check, and a trial reading evaluated by our senior panel. Only the top 15% are onboarded." },
-  { q: "What if the astrologer doesn't respond?", a: "You are never charged if the astrologer doesn't join within 10 minutes. The session auto-cancels and your full balance is preserved. You can connect with another astrologer immediately." },
+  { q: "What if the astrologer doesn't respond?", a: "You are never charged if the astrologer doesn't join. The session auto-cancels and your full balance is preserved." },
   { q: "Is my conversation private?", a: "Absolutely. All sessions are end-to-end encrypted and never shared or sold. You can request data deletion at any time." },
-  { q: "Can I get a refund?", a: "If a technical issue prevents a session from starting, we issue a full refund within 24 hours. Once a session begins and the astrologer has joined, charges apply per the billing policy." },
+  { q: "Can I get a refund?", a: "If a technical issue prevents a session from starting, we issue a full refund. Once a session begins and the astrologer has joined, charges apply per the billing policy." },
 ];
 
-const ASTROLOGERS = [
-  { name: "Pandit Ravi Shankar", spec: "Vedic & Kundali", exp: "18 yrs", rate: "₹45/min", rating: "4.9", reviews: "2,341", lang: "Hindi, English", color: "from-orange-500 to-amber-400" },
-  { name: "Astro Kavitha Devi", spec: "Relationship & Tarot", exp: "12 yrs", rate: "₹35/min", rating: "4.8", reviews: "1,876", lang: "Tamil, English", color: "from-rose-400 to-orange-400" },
-  { name: "Guru Anand Joshi", spec: "Career & Finance", exp: "22 yrs", rate: "₹60/min", rating: "5.0", reviews: "4,102", lang: "Hindi, Gujarati", color: "from-amber-500 to-yellow-400" },
-];
-
-function Stars({ n }: { n: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: n }).map((_, i) => (
-        <svg key={i} className="w-4 h-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-        </svg>
-      ))}
-    </div>
-  );
-}
-
+// ─── Sub-components ──────────────────────────────────────────────────────────
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className={`rounded-2xl border transition-all duration-200 ${open ? "border-orange-200 bg-orange-50/50 shadow-sm shadow-orange-100" : "border-stone-200 bg-white hover:border-stone-300"}`}>
-      <button onClick={() => setOpen(!open)} className="w-full flex items-start justify-between px-6 py-5 text-left gap-4">
+    <div
+      className={`rounded-2xl border transition-all duration-200 ${open ? "border-[#f5c842]/60 bg-[#fffbee]" : "border-stone-200 bg-white hover:border-[#f5c842]/30"}`}
+    >
+      <button onClick={() => setOpen(!open)} className="w-full flex items-start justify-between px-5 py-4 text-left gap-4">
         <span className="font-semibold text-slate-800 text-[15px] leading-snug">{q}</span>
-        <span className={`shrink-0 mt-0.5 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold transition-all ${open ? "bg-orange-500 text-white" : "border border-stone-300 text-stone-400"}`}>
+        <span className={`shrink-0 mt-0.5 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold transition-all ${open ? "bg-[#f5c842] text-stone-900" : "border border-stone-300 text-stone-400"}`}>
           {open ? "−" : "+"}
         </span>
       </button>
       {open && (
-        <div className="px-6 pb-5">
+        <div className="px-5 pb-4">
           <p className="text-slate-500 text-sm leading-relaxed">{a}</p>
         </div>
       )}
@@ -92,256 +68,413 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+function StarRating({ rating }: { rating: number }) {
+  const full = Math.floor(rating);
+  const empty = 5 - full;
+  return (
+    <div className="flex gap-0.5">
+      {"★".repeat(full).split("").map((s, i) => <span key={i} className="text-[#f5c842] text-sm">{s}</span>)}
+      {"☆".repeat(empty).split("").map((s, i) => <span key={i} className="text-stone-300 text-sm">{s}</span>)}
+    </div>
+  );
+}
+
+// ─── Astrologer Card (AstroGuruji style) ─────────────────────────────────────
+function AstrologerCard({ a }: { a: Astrologer }) {
+  const initials = a.user.name.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
+  const exp = a.experienceYears ?? ((a.id.charCodeAt(0) + a.id.charCodeAt(a.id.length - 1)) % 15 + 1);
+  const originalRate = Math.floor(a.ratePerMin * 1.5);
+  const langs = a.languages ?? "Hindi, English";
+
+  return (
+    <div className="bg-white rounded-2xl border border-stone-100 shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(245,200,66,0.18)] hover:-translate-y-1 transition-all duration-300 flex-shrink-0 w-[220px] sm:w-auto overflow-hidden">
+      {/* Online indicator strip */}
+      <div className={`h-1 w-full ${a.isOnline && !a.isBusy ? "bg-emerald-400" : a.isBusy ? "bg-orange-400" : "bg-stone-200"}`} />
+
+      <div className="p-4">
+        {/* Avatar + verified */}
+        <div className="flex items-center gap-3 mb-3">
+          <div className="relative shrink-0">
+            <div className="w-14 h-14 rounded-full border-[2.5px] border-[#f5c842] bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center font-extrabold text-amber-800 text-lg shadow-sm">
+              {initials}
+            </div>
+            {/* Verified badge */}
+            <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center">
+              <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 12l2 2 4-4M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+              </svg>
+            </div>
+          </div>
+          <div className="min-w-0">
+            <div className="font-extrabold text-stone-900 text-[13px] uppercase tracking-wide truncate">{a.user.name}</div>
+            <div className="text-[11px] text-stone-500 truncate">{a.speciality ?? "Vedic Astrology"}</div>
+            <div className="text-[11px] text-stone-400 truncate">{langs}</div>
+          </div>
+        </div>
+
+        {/* Rating + orders */}
+        <div className="flex items-center gap-2 mb-1">
+          <StarRating rating={a.averageRating || 4} />
+          <span className="text-[10px] text-stone-400 font-medium">{a.orderCount} orders</span>
+        </div>
+
+        {/* Experience */}
+        <div className="text-[11px] text-stone-500 mb-3">Experience: <span className="font-semibold text-stone-700">{exp} Years</span></div>
+
+        {/* Price row */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-1.5">
+            {a.ratePerMin > 0 && (
+              <span className="text-xs text-red-400 line-through font-medium">₹{originalRate}</span>
+            )}
+            <span className="font-extrabold text-[#16a34a] text-sm">
+              {a.ratePerMin === 0 ? "FREE" : `₹${a.ratePerMin}`}
+              {a.ratePerMin > 0 && <span className="text-[10px] text-stone-400 font-normal">/min</span>}
+            </span>
+          </div>
+          {a.isBusy && (
+            <span className="text-[9px] font-bold text-orange-500 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-full">BUSY</span>
+          )}
+        </div>
+
+        {/* CTA */}
+        <Link
+          href="/login?callbackUrl=/dashboard"
+          className="block w-full py-2.5 rounded-xl text-center font-bold text-sm border-2 border-[#16a34a] text-[#16a34a] hover:bg-[#16a34a] hover:text-white transition-all duration-200"
+        >
+          💬 {a.ratePerMin === 0 ? "Free Chat" : "Chat Now"}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// Skeleton card while loading
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-2xl border border-stone-100 shadow-sm flex-shrink-0 w-[220px] sm:w-auto overflow-hidden animate-pulse">
+      <div className="h-1 bg-stone-100 w-full" />
+      <div className="p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-14 h-14 rounded-full bg-stone-200 shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3 bg-stone-200 rounded w-3/4" />
+            <div className="h-2 bg-stone-100 rounded w-1/2" />
+          </div>
+        </div>
+        <div className="h-2 bg-stone-100 rounded mb-2 w-2/3" />
+        <div className="h-2 bg-stone-100 rounded mb-3 w-1/2" />
+        <div className="h-9 bg-stone-100 rounded-xl w-full" />
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Page ───────────────────────────────────────────────────────────────
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
+  const [loadingAstrologers, setLoadingAstrologers] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/astrologers")
+      .then(r => r.json())
+      .then((data: Astrologer[]) => {
+        const sorted = [...data].sort((a, b) => b.reviewCount - a.reviewCount);
+        setAstrologers(sorted);
+      })
+      .catch(() => setAstrologers([]))
+      .finally(() => setLoadingAstrologers(false));
+  }, []);
 
   return (
     <div className="min-h-screen" style={{ fontFamily: "'Inter', sans-serif", background: "#faf8f5" }}>
 
-      {/* ── HERO (dark navy section) ── */}
-      <div style={{ background: "linear-gradient(160deg, #1a1040 0%, #2d1b69 40%, #1e1245 70%, #160d35 100%)" }}>
-        {/* Navbar — dark */}
-        <nav className="sticky top-0 z-50" style={{ background: "rgba(20,12,50,0.8)", backdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-          <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
-              <span className="font-cinzel font-black text-white text-[17px] tracking-wide">AstroWalla</span>
-            </Link>
+      {/* ══════════════════════════════════════════
+          NAVBAR
+      ══════════════════════════════════════════ */}
+      <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8]" style={{ boxShadow: "0 2px 16px rgba(245,200,66,0.1)" }}>
+        {/* Brand gradient strip */}
+        <div style={{ height: "3px", background: "linear-gradient(90deg, #1a1040 0%, #2d1b69 40%, #FF9933 70%, #f5c842 100%)" }} />
+        <div className="max-w-6xl mx-auto px-4 h-[60px] flex items-center justify-between gap-3">
+          {/* Hamburger */}
+          <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-lg hover:bg-stone-100 transition-colors">
+            <svg className="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+          </button>
 
-            <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-white/60">
-              <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-              <a href="#astrologers" className="hover:text-white transition-colors">Astrologers</a>
-              <a href="#testimonials" className="hover:text-white transition-colors">Reviews</a>
-              <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 group absolute left-1/2 -translate-x-1/2">
+            <div className="w-9 h-9 rounded-full bg-[#f5c842] flex items-center justify-center border-2 border-[#f0c842]/60 shadow-md overflow-hidden p-0.5">
+              <svg viewBox="0 0 100 100" className="w-full h-full text-amber-800 opacity-80 animate-[spin_40s_linear_infinite]">
+                <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2"/>
+                <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
+                <path d="M50 4 L50 96 M4 50 L96 50 M18 18 L82 82 M18 82 L82 18" stroke="currentColor" strokeWidth="0.8"/>
+                <text x="50" y="20" fontSize="10" textAnchor="middle" fill="currentColor">♈</text>
+                <text x="80" y="54" fontSize="10" textAnchor="middle" fill="currentColor">♋</text>
+                <text x="50" y="88" fontSize="10" textAnchor="middle" fill="currentColor">♎</text>
+                <text x="20" y="54" fontSize="10" textAnchor="middle" fill="currentColor">♑</text>
+              </svg>
             </div>
+            <div>
+              <div className="font-extrabold text-[17px] text-stone-900 tracking-tight leading-none group-hover:text-[#d97706] transition-colors">AstroWalla</div>
+              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Your Celestial Guide</div>
+            </div>
+          </Link>
 
-            <div className="flex items-center gap-3">
-              <Link href="/login" className="hidden sm:block text-sm font-medium text-white/60 hover:text-white transition-colors px-2 py-1.5">Sign In</Link>
-              <Link href="/login" id="nav-cta"
-                className="px-5 py-2 rounded-full font-bold text-sm text-white transition-all hover:opacity-90 hover:scale-105"
-                style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>
-                Get Started
-              </Link>
-              <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2">
-                <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-              </button>
-            </div>
+          {/* Right CTA */}
+          <Link href="/login"
+            className="px-4 py-2 rounded-full font-bold text-sm text-white transition-all hover:opacity-90 hover:scale-105 shrink-0"
+            style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)", boxShadow: "0 4px 12px rgba(255,153,51,0.3)" }}>
+            Get Started
+          </Link>
+        </div>
+
+        {/* Mobile dropdown menu */}
+        {menuOpen && (
+          <div className="bg-white border-t border-[#f0e6c8] px-5 py-3 flex flex-col gap-1 shadow-lg">
+            {[
+              ["🏠 Home", "/"],
+              ["🔮 Top Astrologers", "#astrologers"],
+              ["🛎️ Our Services", "#services"],
+              ["⭐ Testimonials", "#testimonials"],
+              ["❓ FAQ", "#faq"],
+              ["📖 Free Kundli", "/kundli"],
+              ["👤 Sign In", "/login"],
+            ].map(([l, h]) => (
+              <a key={l} href={h} onClick={() => setMenuOpen(false)}
+                className="py-2.5 px-2 text-sm font-medium text-stone-600 hover:text-[#d97706] hover:bg-[#fffbee] rounded-lg transition-colors">
+                {l}
+              </a>
+            ))}
           </div>
-          {menuOpen && (
-            <div className="md:hidden px-5 py-3 flex flex-col gap-1" style={{ borderTop: "1px solid rgba(255,255,255,0.08)", background: "rgba(20,12,50,0.95)" }}>
-              {[["How It Works", "#how-it-works"], ["Astrologers", "#astrologers"], ["Reviews", "#testimonials"], ["FAQ", "#faq"]].map(([l, h]) => (
-                <a key={l} href={h} onClick={() => setMenuOpen(false)} className="py-2.5 text-sm font-medium text-white/60 hover:text-white">{l}</a>
-              ))}
-            </div>
-          )}
-        </nav>
+        )}
+      </nav>
 
-        {/* Hero Content */}
-        <section className="relative overflow-hidden px-5 pt-24 pb-32 text-center">
-          {/* Decorative glows */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(255,153,51,0.12) 0%, transparent 60%)" }} />
-          <div className="absolute top-20 left-1/4 w-64 h-64 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)" }} />
-          <div className="absolute top-10 right-1/4 w-48 h-48 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(245,200,66,0.1) 0%, transparent 70%)" }} />
+      {/* ══════════════════════════════════════════
+          HERO BANNER
+      ══════════════════════════════════════════ */}
+      <section className="relative overflow-hidden" style={{ background: "linear-gradient(160deg, #2d1b08 0%, #5c3010 30%, #8b5a1a 60%, #c4830a 85%, #d4a017 100%)", minHeight: "340px" }}>
+        {/* Bokeh light effects */}
+        <div className="absolute top-4 right-8 w-40 h-40 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(245,200,66,0.35) 0%, transparent 70%)" }} />
+        <div className="absolute bottom-8 left-4 w-32 h-32 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(255,153,51,0.25) 0%, transparent 70%)" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(245,200,66,0.12) 0%, transparent 70%)" }} />
 
-          {/* Subtle star dots */}
-          {[[8,15],[25,70],[15,42],[35,88],[48,8],[55,60],[22,91],[42,33],[60,76],[12,55]].map(([t,l],i)=>(
-            <div key={i} className="absolute rounded-full bg-white pointer-events-none" style={{ top:`${t}%`,left:`${l}%`,width:i%3===0?3:2,height:i%3===0?3:2,opacity:0.2+i*0.04 }}/>
-          ))}
+        {/* Star dots */}
+        {[[8,15],[25,70],[15,42],[35,88],[48,8],[60,76],[12,55],[72,20],[88,65],[5,90]].map(([t,l],i)=>(
+          <div key={i} className="absolute rounded-full bg-white pointer-events-none" style={{ top:`${t}%`, left:`${l}%`, width: i%3===0?3:2, height: i%3===0?3:2, opacity: 0.3+i*0.04 }}/>
+        ))}
 
-          {/* OM watermark */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ opacity: 0.04 }}>
-            <span className="font-cinzel font-black text-amber-300" style={{ fontSize: "clamp(200px,40vw,480px)" }}>ॐ</span>
-          </div>
-
-          <div className="relative max-w-4xl mx-auto">
-            {/* Eyebrow badge */}
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full mb-8 text-xs font-bold uppercase tracking-widest border"
-              style={{ background: "rgba(255,153,51,0.12)", borderColor: "rgba(255,153,51,0.3)", color: "#FFB347" }}>
-              <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><polygon points="10 1 12.63 7.18 19.51 7.64 14.5 11.97 16.18 18.64 10 14.9 3.82 18.64 5.5 11.97 .49 7.64 7.37 7.18"/></svg>
-              India's Most Trusted Astrology Platform
+        <div className="relative max-w-6xl mx-auto px-5 py-10 flex flex-col md:flex-row items-center gap-8">
+          {/* Text side */}
+          <div className="flex-1 text-center md:text-left">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5 text-[10px] font-bold uppercase tracking-widest border"
+              style={{ background: "rgba(245,200,66,0.15)", borderColor: "rgba(245,200,66,0.35)", color: "#f5c842" }}>
+              ✦ India's Most Trusted Astrology Platform
             </div>
 
-            <h1 className="font-cinzel font-black leading-tight mb-6" style={{ fontSize: "clamp(42px,7vw,90px)", color: "#FFFFFF" }}>
-              The Stars Have<br/>
-              <span style={{ background: "linear-gradient(90deg,#FF9933,#f5c842,#FF9933)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                Your Answers
-              </span>
+            {/* Hindi headline */}
+            <h1 className="font-extrabold leading-tight text-white mb-2" style={{ fontSize: "clamp(28px,6vw,56px)", textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+              एक नया ज्योतिषी
             </h1>
-
-            <p className="text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-10 font-normal" style={{ color: "rgba(255,255,255,0.65)" }}>
+            <h1 className="font-extrabold leading-tight mb-4" style={{ fontSize: "clamp(28px,6vw,56px)", background: "linear-gradient(90deg, #f5c842, #FF9933)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              अनुभव
+            </h1>
+            <p className="text-white/75 text-base md:text-lg mb-8 max-w-md mx-auto md:mx-0">
               Talk to India's finest Vedic astrologers — live, private, and available right now.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-16">
-              <Link href="/login" id="hero-cta-primary"
-                className="px-9 py-4 rounded-full font-bold text-base text-white transition-all hover:opacity-90 hover:scale-105 hover:shadow-2xl w-full sm:w-auto"
-                style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)", boxShadow: "0 8px 32px rgba(255,153,51,0.4)" }}>
-                Start Your Journey →
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+              <Link href="/login"
+                className="px-8 py-3.5 rounded-full font-bold text-base text-stone-900 transition-all hover:scale-105"
+                style={{ background: "linear-gradient(135deg,#f5c842,#FF9933)", boxShadow: "0 8px 24px rgba(245,200,66,0.45)" }}>
+                Start Free Consultation →
               </Link>
-              <Link href="/login" id="hero-cta-secondary"
-                className="px-7 py-4 rounded-full font-semibold text-base transition-all w-full sm:w-auto"
-                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.75)" }}
-                onMouseOver={e => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.15)"; }}
-                onMouseOut={e => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.08)"; }}>
-                Sign In
-              </Link>
+              <a href="#astrologers"
+                className="px-6 py-3.5 rounded-full font-semibold text-base text-white/80 border border-white/20 hover:bg-white/10 transition-all hover:text-white text-center">
+                Browse Astrologers
+              </a>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
-              {[
-                { val: "50,000+", label: "Happy Seekers" },
-                { val: "200+", label: "Expert Astrologers" },
-                { val: "4.9★", label: "Average Rating" },
-                { val: "24/7", label: "Available" },
-              ].map((s) => (
-                <div key={s.label} className="rounded-2xl px-4 py-4 text-center" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <div className="font-cinzel font-black text-2xl mb-0.5" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{s.val}</div>
-                  <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.45)" }}>{s.label}</div>
+            {/* Stats row */}
+            <div className="flex gap-6 mt-8 justify-center md:justify-start">
+              {[["50K+","Happy Seekers"],["200+","Astrologers"],["4.9★","Avg Rating"]].map(([v,l])=>(
+                <div key={l} className="text-center">
+                  <div className="text-[#f5c842] font-extrabold text-lg leading-tight">{v}</div>
+                  <div className="text-white/50 text-[10px] font-medium uppercase tracking-wide">{l}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Curved wave divider */}
-          <div className="absolute -bottom-1 left-0 right-0 pointer-events-none">
-            <svg viewBox="0 0 1440 80" preserveAspectRatio="none" style={{ width: "100%", height: "80px", display: "block" }}>
-              <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#F4ECD8"/>
-            </svg>
-          </div>
-        </section>
-      </div>
-
-      {/* ── HOW IT WORKS ── */}
-      <section id="how-it-works" className="px-5 py-24 max-w-6xl mx-auto">
-        <div className="text-center mb-14">
-          <p className="text-orange-500 text-xs font-bold uppercase tracking-[0.2em] mb-3">Simple Process</p>
-          <h2 className="font-cinzel text-4xl font-black text-slate-900 mb-3">Start in 3 Steps</h2>
-          <p className="text-slate-500 text-base max-w-md mx-auto">From sign-up to astrological insights in under 2 minutes.</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { num: "01", title: "Create Account", desc: "Enter your number, verify with OTP. No passwords, no forms. Ready in 30 seconds.", icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>, bg: "from-orange-500 to-amber-400" },
-            { num: "02", title: "Add Balance", desc: "Top up via UPI, card, or Net Banking. Start from as low as ₹50.", icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>, bg: "from-amber-500 to-yellow-400" },
-            { num: "03", title: "Chat & Get Guided", desc: "Browse verified astrologers, pick your guide, start your private real-time session.", icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, bg: "from-orange-500 to-rose-400" },
-          ].map((step) => (
-            <div key={step.num} className="relative bg-white rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden border border-stone-100 hover:-translate-y-1">
-              <div className="absolute -top-3 -right-2 font-cinzel font-black text-[80px] text-orange-100 leading-none select-none pointer-events-none">{step.num}</div>
-              <div className={`relative w-13 h-13 w-14 h-14 rounded-2xl bg-gradient-to-br ${step.bg} flex items-center justify-center text-white shadow-lg mb-6`}
-                style={{ boxShadow: "0 4px 16px rgba(255,153,51,0.35)" }}>
-                {step.icon}
+          {/* Illustration side — cosmic orb */}
+          <div className="shrink-0 hidden md:flex w-64 h-64 items-center justify-center relative">
+            <div className="w-56 h-56 rounded-full border-2 border-[#f5c842]/30 flex items-center justify-center"
+              style={{ background: "radial-gradient(circle, rgba(245,200,66,0.15) 0%, rgba(139,70,20,0.3) 100%)" }}>
+              <div className="w-40 h-40 rounded-full border border-[#f5c842]/20 flex items-center justify-center"
+                style={{ background: "radial-gradient(circle, rgba(245,200,66,0.2) 0%, transparent 80%)" }}>
+                <span className="text-7xl opacity-80 select-none" style={{ filter: "drop-shadow(0 0 20px rgba(245,200,66,0.6))" }}>🔯</span>
               </div>
-              <div className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Step {step.num}</div>
-              <h3 className="font-cinzel font-bold text-slate-900 text-lg mb-2">{step.title}</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
             </div>
-          ))}
+            {/* Orbiting elements */}
+            {["♈","♋","♎","♑"].map((sign, i) => (
+              <div key={sign} className="absolute text-[#f5c842] font-bold text-xl"
+                style={{
+                  top: `${50 + 42 * Math.sin(i * Math.PI / 2)}%`,
+                  left: `${50 + 42 * Math.cos(i * Math.PI / 2)}%`,
+                  transform: "translate(-50%, -50%)",
+                  textShadow: "0 0 10px rgba(245,200,66,0.5)"
+                }}>
+                {sign}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Wave divider */}
+        <div className="absolute -bottom-1 left-0 right-0 pointer-events-none">
+          <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style={{ width: "100%", height: "60px", display: "block" }}>
+            <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#FFF8EE"/>
+          </svg>
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section style={{ background: "#1a1040" }} className="px-5 py-24">
+      {/* ══════════════════════════════════════════
+          TOP ASTROLOGERS
+      ══════════════════════════════════════════ */}
+      <section id="astrologers" style={{ background: "#FFF8EE" }} className="py-12 px-0">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: "#FFB347" }}>Why AstroWalla</p>
-            <h2 className="font-cinzel text-4xl font-black mb-3 text-white">Built for Real Results</h2>
-            <p className="text-base max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.5)" }}>Everything you need for an authentic, trustworthy astrology experience.</p>
+          {/* Section header */}
+          <div className="text-center px-5 mb-8">
+            <h2 className="text-[26px] sm:text-3xl font-extrabold text-stone-900 mb-2">
+              Top <span style={{ color: "#d97706" }}>Astrologers</span>
+            </h2>
+            <p className="text-stone-500 text-sm font-medium">Connect with our verified and experienced astrologers</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="rounded-2xl p-7 group hover:-translate-y-1 transition-all duration-300 cursor-default"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(4px)" }}
-                onMouseOver={e => { (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,153,51,0.3)"; }}
-                onMouseOut={e => { (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.05)"; (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.08)"; }}>
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-5" style={{ background: "rgba(255,153,51,0.15)", color: "#FF9933" }}>
-                  {f.icon}
-                </div>
-                <h3 className="font-semibold text-white text-base mb-2">{f.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{f.desc}</p>
+
+          {/* Horizontal scroll on mobile, grid on desktop */}
+          {loadingAstrologers ? (
+            <div className="flex gap-4 overflow-x-auto px-5 pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-5 sm:overflow-visible" style={{ scrollbarWidth: "none" }}>
+              {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : astrologers.length === 0 ? (
+            <div className="text-center py-16 px-5">
+              <div className="text-4xl mb-3">🪷</div>
+              <p className="text-stone-500 font-medium">Our astrologers will be available shortly.</p>
+              <Link href="/login" className="mt-4 inline-block px-6 py-2.5 rounded-full text-sm font-bold text-white"
+                style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>
+                Sign In to View All →
+              </Link>
+            </div>
+          ) : (
+            <div className="flex gap-4 overflow-x-auto px-5 pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-5 sm:overflow-visible" style={{ scrollbarWidth: "none" }}>
+              {astrologers.map(a => <AstrologerCard key={a.id} a={a} />)}
+            </div>
+          )}
+
+          {/* View all */}
+          <div className="text-center mt-6 px-5">
+            <Link href="/login?callbackUrl=/dashboard"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold border border-[#f0e6c8] bg-white text-stone-600 hover:border-[#f5c842] hover:text-[#d97706] hover:shadow-md transition-all">
+              View All Astrologers
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+          OUR SERVICES
+      ══════════════════════════════════════════ */}
+      <section id="services" style={{ background: "#FFF8EE" }} className="py-12 px-5">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-[26px] sm:text-3xl font-extrabold text-stone-900 mb-2">
+              Our <span style={{ color: "#d97706" }}>Services</span>
+            </h2>
+            <p className="text-stone-500 text-sm font-medium max-w-md mx-auto">
+              Explore A Wide Range Of Astrology Services Designed To Offer Clarity, Guidance, And Meaningful Insights For Your Life.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {SERVICES.map((s) => (
+              <Link key={s.title} href="/login?callbackUrl=/dashboard"
+                className="bg-white rounded-2xl p-5 border border-[#f0e6c8] hover:border-[#f5c842]/60 hover:shadow-[0_8px_24px_rgba(245,200,66,0.15)] hover:-translate-y-1 transition-all duration-300 text-center group cursor-pointer">
+                <div className="text-3xl mb-3">{s.icon}</div>
+                <div className="font-bold text-stone-900 text-sm mb-1 group-hover:text-[#d97706] transition-colors">{s.title}</div>
+                <div className="text-stone-500 text-[11px] leading-relaxed">{s.desc}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+          HOW IT WORKS
+      ══════════════════════════════════════════ */}
+      <section id="how-it-works" className="py-14 px-5" style={{ background: "#1a1040" }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: "#f5c842" }}>Simple Process</p>
+            <h2 className="text-[26px] sm:text-3xl font-extrabold text-white mb-2">Start in 3 Simple Steps</h2>
+            <p className="text-sm max-w-sm mx-auto" style={{ color: "rgba(255,255,255,0.5)" }}>From sign-up to astrological insights in under 2 minutes.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              { num: "01", emoji: "📱", title: "Create Account", desc: "Enter your phone number, verify with OTP. No passwords, no forms. Ready in 30 seconds.", color: "from-orange-500 to-amber-400" },
+              { num: "02", emoji: "💰", title: "Add Balance", desc: "Top up via UPI, card, or Net Banking. Start from as low as ₹10.", color: "from-amber-500 to-yellow-400" },
+              { num: "03", emoji: "💬", title: "Chat & Get Guided", desc: "Browse verified astrologers, pick your guide, start your private real-time session.", color: "from-orange-500 to-rose-400" },
+            ].map((step) => (
+              <div key={step.num} className="relative rounded-2xl p-6 overflow-hidden"
+                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                {/* Big number watermark */}
+                <div className="absolute -top-2 -right-1 font-extrabold text-[70px] leading-none select-none pointer-events-none"
+                  style={{ color: "rgba(245,200,66,0.08)" }}>{step.num}</div>
+                <div className="text-4xl mb-4">{step.emoji}</div>
+                <div className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#f5c842" }}>Step {step.num}</div>
+                <h3 className="font-extrabold text-white text-base mb-2">{step.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── ASTROLOGERS ── */}
-      <section id="astrologers" className="px-5 py-24 max-w-6xl mx-auto">
-        <div className="text-center mb-14">
-          <p className="text-orange-500 text-xs font-bold uppercase tracking-[0.2em] mb-3">Meet Our Guides</p>
-          <h2 className="font-cinzel text-4xl font-black text-slate-900 mb-3">Featured Astrologers</h2>
-          <p className="text-slate-500 text-base max-w-md mx-auto">Handpicked, verified, and trusted by thousands of seekers.</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {ASTROLOGERS.map((a) => {
-            const initials = a.name.split(" ").slice(0,2).map(w=>w[0]).join("");
-            return (
-              <div key={a.name} className="bg-white rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-stone-100">
-                {/* Gradient top strip */}
-                <div className={`h-2 w-full bg-gradient-to-r ${a.color}`} />
-                <div className="p-7">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="relative shrink-0">
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${a.color} flex items-center justify-center font-cinzel font-black text-white text-xl shadow-md`}>{initials}</div>
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-white" style={{ boxShadow: "0 0 8px rgba(52,211,153,0.5)" }}/>
-                    </div>
-                    <div>
-                      <div className="font-semibold text-slate-900 text-[15px] leading-tight">{a.name}</div>
-                      <div className="text-xs text-orange-500 font-semibold mt-0.5 uppercase tracking-wider">{a.spec}</div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2 mb-5">
-                    {[{ l:"Exp",v:a.exp },{ l:"Rate",v:a.rate },{ l:"Rating",v:a.rating },{ l:"Reviews",v:a.reviews }].map(item=>(
-                      <div key={item.l} className="text-center rounded-xl bg-stone-50 border border-stone-100 px-1.5 py-2">
-                        <div className="text-[8px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">{item.l}</div>
-                        <div className="text-[11px] font-bold text-slate-700">{item.v}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="text-[11px] text-slate-400 mb-5 flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>
-                    {a.lang}
-                  </div>
-                  <Link href="/login"
-                    className="block w-full py-3 rounded-2xl text-white text-center font-bold text-sm transition-all hover:opacity-90 hover:shadow-lg"
-                    style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)", boxShadow: "0 4px 16px rgba(255,153,51,0.25)" }}>
-                    Chat Now
-                  </Link>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="text-center mt-10">
-          <Link href="/login" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-orange-500 transition-colors border border-stone-200 hover:border-orange-200 px-6 py-3 rounded-full bg-white hover:shadow-sm">
-            View all astrologers
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </Link>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section id="testimonials" style={{ background: "#1a1040" }} className="px-5 py-24">
+      {/* ══════════════════════════════════════════
+          TESTIMONIALS
+      ══════════════════════════════════════════ */}
+      <section id="testimonials" style={{ background: "#FFF8EE" }} className="py-14 px-5">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: "#FFB347" }}>Real Stories</p>
-            <h2 className="font-cinzel text-4xl font-black text-white mb-3">What Seekers Say</h2>
-            <p className="text-base" style={{ color: "rgba(255,255,255,0.5)" }}>From 50,000+ verified consultations</p>
+          <div className="text-center mb-10">
+            <h2 className="text-[26px] sm:text-3xl font-extrabold text-stone-900 mb-2">
+              What Our <span style={{ color: "#d97706" }}>Seekers Say</span>
+            </h2>
+            <p className="text-stone-500 text-sm">From 50,000+ verified consultations across India</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="rounded-2xl p-6 flex flex-col hover:-translate-y-1 transition-all duration-300"
-                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <Stars n={t.rating} />
-                <p className="text-sm leading-relaxed mt-4 mb-6 flex-1" style={{ color: "rgba(255,255,255,0.65)" }}>"{t.text}"</p>
-                <div className="flex items-center gap-3 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm text-white shadow-md flex-shrink-0"
-                    style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>{t.name[0]}</div>
-                  <div>
-                    <div className="font-semibold text-white text-sm">{t.name}</div>
-                    <div className="text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>{t.sign} · {t.city}</div>
+              <div key={t.name} className="bg-white rounded-2xl p-5 border border-[#f0e6c8] hover:border-[#f5c842]/40 hover:shadow-md transition-all duration-200">
+                <div className="flex gap-0.5 mb-3">
+                  {"★".repeat(t.rating).split("").map((s, i) => <span key={i} className="text-[#f5c842]">{s}</span>)}
+                </div>
+                <p className="text-stone-600 text-sm leading-relaxed mb-4">"{t.text}"</p>
+                <div className="flex items-center gap-3 pt-3 border-t border-[#f0e6c8]">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#f5c842] to-[#FF9933] flex items-center justify-center text-white font-extrabold text-sm shrink-0">
+                    {t.name[0]}
                   </div>
-                  <div className="ml-auto text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
-                    <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+                  <div>
+                    <div className="text-stone-900 font-bold text-sm">{t.name}</div>
+                    <div className="text-stone-400 text-[11px]">{t.sign} · {t.city}</div>
+                  </div>
+                  <div className="ml-auto flex items-center gap-1 text-emerald-500 text-[10px] font-bold">
+                    <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                    </svg>
                     Verified
                   </div>
                 </div>
@@ -351,113 +484,93 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section id="faq" className="px-5 py-24 max-w-2xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-orange-500 text-xs font-bold uppercase tracking-[0.2em] mb-3">Got Questions?</p>
-          <h2 className="font-cinzel text-4xl font-black text-slate-900 mb-3">Frequently Asked</h2>
-          <p className="text-slate-500 text-base">Everything you need before your first session.</p>
+      {/* ══════════════════════════════════════════
+          FAQ
+      ══════════════════════════════════════════ */}
+      <section id="faq" className="py-14 px-5 max-w-2xl mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-[26px] sm:text-3xl font-extrabold text-stone-900 mb-2">
+            Frequently <span style={{ color: "#d97706" }}>Asked</span>
+          </h2>
+          <p className="text-stone-500 text-sm">Everything you need to know before your first session.</p>
         </div>
         <div className="space-y-3">
           {FAQS.map((item) => <FAQItem key={item.q} q={item.q} a={item.a} />)}
         </div>
       </section>
 
-      {/* ── CTA BANNER ── */}
-      <section className="px-5 pb-24 max-w-4xl mx-auto">
-        <div className="relative rounded-3xl overflow-hidden text-center px-10 py-16"
-          style={{ background: "linear-gradient(135deg, #1a1040 0%, #2d1b69 50%, #1a1040 100%)", border: "1px solid rgba(255,153,51,0.2)" }}>
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(255,153,51,0.15) 0%, transparent 60%)" }}/>
+      {/* ══════════════════════════════════════════
+          CTA BANNER
+      ══════════════════════════════════════════ */}
+      <section className="px-5 pb-16 max-w-4xl mx-auto">
+        <div className="relative rounded-3xl overflow-hidden text-center px-8 py-14"
+          style={{ background: "linear-gradient(135deg, #1a1040 0%, #2d1b69 50%, #1a1040 100%)", border: "1px solid rgba(245,200,66,0.2)" }}>
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(245,200,66,0.15) 0%, transparent 60%)" }}/>
           <div className="relative">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-4" style={{ color: "#FFB347" }}>Begin Your Journey</p>
-            <h2 className="font-cinzel text-4xl font-black text-white mb-4">Your Destiny Awaits</h2>
-            <p className="text-base mb-10 max-w-md mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: "#f5c842" }}>Begin Your Journey</p>
+            <h2 className="font-extrabold text-3xl sm:text-4xl text-white mb-3">Your Destiny Awaits</h2>
+            <p className="text-base mb-8 max-w-md mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
               50,000 seekers already found their answers. The stars are ready — are you?
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/login" id="bottom-cta"
-                className="px-9 py-4 rounded-full font-bold text-base text-white hover:opacity-90 hover:scale-105 transition-all"
-                style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)", boxShadow: "0 8px 32px rgba(255,153,51,0.4)" }}>
-                Get Started Free
+                className="px-8 py-3.5 rounded-full font-bold text-base text-stone-900 hover:scale-105 transition-all"
+                style={{ background: "linear-gradient(135deg,#f5c842,#FF9933)", boxShadow: "0 8px 32px rgba(245,200,66,0.4)" }}>
+                Get Started Free →
               </Link>
-              <Link href="/login"
-                className="px-7 py-4 rounded-full font-semibold text-base transition-all"
+              <a href="#astrologers"
+                className="px-6 py-3.5 rounded-full font-semibold text-base transition-all text-center"
                 style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.7)" }}>
                 Browse Astrologers
-              </Link>
+              </a>
             </div>
-            <p className="mt-6 text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>No subscription · Pay per minute · Cancel anytime</p>
+            <p className="mt-5 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>No subscription · Pay per minute · Cancel anytime</p>
           </div>
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.08)", background: "#130e30" }}>
-        <div className="max-w-6xl mx-auto px-5 py-14">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+      {/* ══════════════════════════════════════════
+          FOOTER
+      ══════════════════════════════════════════ */}
+      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", background: "#130e30" }}>
+        <div className="max-w-6xl mx-auto px-5 py-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
             <div className="sm:col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
-                <span className="font-cinzel font-black text-white">AstroWalla</span>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-stone-900 text-sm" style={{ background: "linear-gradient(135deg,#f5c842,#FF9933)" }}>ॐ</div>
+                <span className="font-extrabold text-white text-lg tracking-tight">AstroWalla</span>
               </div>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.4)" }}>India's most trusted platform for real-time Vedic astrology consultations.</p>
-              <div className="flex gap-2.5">
-                {[
-                  <svg key="fb" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>,
-                  <svg key="tw" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>,
-                  <svg key="ig" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>,
-                  <svg key="yt" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
-                ].map((icon,i)=>(
-                  <div key={i} className="w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-colors" style={{ border:"1px solid rgba(255,255,255,0.1)", color:"rgba(255,255,255,0.35)" }}
-                    onMouseOver={e=>{(e.currentTarget as HTMLDivElement).style.color="#FF9933";(e.currentTarget as HTMLDivElement).style.borderColor="rgba(255,153,51,0.4)";}}
-                    onMouseOut={e=>{(e.currentTarget as HTMLDivElement).style.color="rgba(255,255,255,0.35)";(e.currentTarget as HTMLDivElement).style.borderColor="rgba(255,255,255,0.1)";}}>
-                    {icon}
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>
+                India's most trusted platform for real-time Vedic astrology consultations.
+              </p>
+              <div className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.3)" }}>support@astrowalla.in</div>
             </div>
             {[
-              { title: "Services", links: [
-                { label: "Chat with Astrologer", href: "/login" },
-                { label: "Free Kundli", href: "/login" },
-              ]},
-              { title: "Company", links: [
-                { label: "About Us", href: "/about-us" },
-                { label: "Become an Astrologer", href: "/astrologer/login" },
-                { label: "Contact Us", href: "/contact-us" },
-                { label: "Product Details", href: "/product-details" },
-              ]},
-              { title: "Support", links: [
-                { label: "Privacy Policy", href: "/privacy-policy" },
-                { label: "Terms of Service", href: "/terms-and-conditions" },
-                { label: "Refund Policy", href: "/refund-and-cancellation" },
-                { label: "User Guidelines", href: "/user-guidelines" },
-                { label: "Contact Us", href: "/contact-us" },
-              ]},
-            ].map(col=>(
+              { title: "Services", links: [["Chat with Astrologer","/login"],["Free Kundli","/kundli"]] },
+              { title: "Company", links: [["About Us","/about-us"],["Become an Astrologer","/astrologer/login"],["Contact Us","/contact-us"]] },
+              { title: "Legal", links: [["Privacy Policy","/privacy-policy"],["Terms of Service","/terms-and-conditions"],["Refund Policy","/refund-and-cancellation"],["User Guidelines","/user-guidelines"]] },
+            ].map(col => (
               <div key={col.title}>
                 <p className="font-semibold text-white mb-4 text-sm">{col.title}</p>
-                {col.links.map(item=>(
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="block text-sm mb-2.5 transition-colors hover:text-white"
-                    style={{ color:"rgba(255,255,255,0.35)" }}>
-                    {item.label}
+                {(col.links as [string,string][]).map(([label, href]) => (
+                  <Link key={label} href={href} className="block text-sm mb-2.5 transition-colors hover:text-[#f5c842]"
+                    style={{ color: "rgba(255,255,255,0.35)" }}>
+                    {label}
                   </Link>
                 ))}
               </div>
             ))}
           </div>
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            <p className="text-xs" style={{ color:"rgba(255,255,255,0.25)" }}>© {new Date().getFullYear()} AstroWalla. All rights reserved.</p>
-            <p className="font-cinzel text-xs" style={{ color:"rgba(255,255,255,0.25)" }}>✦ Guided by the Stars ✦</p>
-            <div className="flex items-center gap-1.5 text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"/>All systems operational
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            <p className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>© {new Date().getFullYear()} AstroWalla. All rights reserved.</p>
+            <p className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>✦ Guided by the Stars ✦</p>
+            <div className="flex items-center gap-1.5 text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"/>All systems operational
             </div>
           </div>
         </div>
       </footer>
+
     </div>
   );
 }
