@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import VedicLoader from "@/components/VedicLoader";
 import useSWR from "swr";
 
@@ -124,6 +125,7 @@ export default function WalletPage() {
           ))}
         </div>
       </main>
+      <MobileBottomNav />
       <UserFooter />
     </div>
   );

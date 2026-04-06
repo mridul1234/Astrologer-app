@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import VedicLoader from "@/components/VedicLoader";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 type Tab = "overview" | "sessions" | "transactions" | "settings";
 
@@ -337,6 +338,7 @@ export default function UserProfilePage() {
           </div>
         )}
       </main>
+      <MobileBottomNav />
     </div>
   );
 }

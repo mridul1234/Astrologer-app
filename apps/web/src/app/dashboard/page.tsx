@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import VedicLoader from "@/components/VedicLoader";
@@ -358,6 +359,7 @@ export default function UserDashboard() {
         )}
       </main>
 
+      <MobileBottomNav />
       <UserFooter />
 
     </div>

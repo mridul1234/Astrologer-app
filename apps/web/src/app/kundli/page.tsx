@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 // ─────────────────────────────────────────────
 //  Constants
@@ -391,6 +392,7 @@ export default function KundliPage() {
           </div>
         )}
       </div>
+      <MobileBottomNav />
       <UserFooter />
     </div>
   );
