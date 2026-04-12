@@ -252,6 +252,7 @@ export default function UserDashboard() {
               return (
                 <div
                   key={a.id}
+                  onClick={() => router.push(`/astrologer/${a.id}`)}
                   className="bg-white rounded-3xl p-5 relative flex gap-4 border border-stone-100 shadow-[0_4px_15px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_40px_rgba(245,200,66,0.18)] hover:-translate-y-1.5 hover:border-[#f5c842]/40 transition-all duration-300 cursor-pointer group"
                 >
 
@@ -324,6 +325,7 @@ export default function UserDashboard() {
                         <div className="flex items-center justify-between gap-2">
                           <button
                             disabled
+                            onClick={(e) => e.stopPropagation()}
                             className="flex-1 px-5 py-2 rounded-xl text-sm font-bold border-2 border-orange-300 text-orange-400 bg-orange-50 cursor-not-allowed opacity-80"
                           >
                             🔴 Busy
@@ -335,7 +337,10 @@ export default function UserDashboard() {
                         </div>
                       ) : (
                         <button
-                          onClick={() => startChat(a.id, a.ratePerMin)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startChat(a.id, a.ratePerMin);
+                          }}
                           disabled={!!starting}
                           className="w-full px-5 py-2 rounded-xl text-sm font-bold border-2 border-[#16a34a] text-[#16a34a] bg-transparent hover:bg-[#16a34a] hover:text-white hover:shadow-lg hover:shadow-green-200/60 hover:scale-105 active:scale-100 transition-all duration-200 disabled:opacity-50"
                         >
