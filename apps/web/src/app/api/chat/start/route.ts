@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Astrologer not found" }, { status: 404 });
   }
 
-  // Need at least 1 minute worth of balance
-  if (user.walletBalance < astrologer.ratePerMin) {
+  // Allow entry if user has free minutes OR sufficient wallet balance
+  if (user.freeMinutesLeft <= 0 && user.walletBalance < astrologer.ratePerMin) {
     return NextResponse.json(
       { error: "Insufficient balance. Please top up your wallet." },
       { status: 402 }
@@ -55,5 +55,6 @@ export async function POST(req: NextRequest) {
       id: astrologer.id,
       ratePerMin: astrologer.ratePerMin,
     },
+    freeMinutesLeft: user.freeMinutesLeft,
   });
 }

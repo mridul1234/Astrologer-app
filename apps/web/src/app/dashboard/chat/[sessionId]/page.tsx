@@ -46,6 +46,8 @@ export default function UserChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [balance, setBalance] = useState(0);
+  const [freeMinutesLeft, setFreeMinutesLeft] = useState(0);
+  const [isFreeMinute, setIsFreeMinute] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [ended, setEnded] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -130,6 +132,10 @@ export default function UserChatPage() {
         const profile = await profileRes.json();
         const uid = profile?.id;
         if (uid) setMyUserId(uid);
+        if (profile?.freeMinutesLeft !== undefined) {
+          setFreeMinutesLeft(profile.freeMinutesLeft);
+          setIsFreeMinute(profile.freeMinutesLeft > 0);
+        }
 
         if (sessionData.messages?.length > 0) {
           setAstrologerJoined(true);
@@ -167,7 +173,11 @@ export default function UserChatPage() {
           setIsTyping(t);
           if (t) { if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current); typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000); }
         });
-        socket.on("balance_update", ({ balance: b }: { balance: number }) => setBalance(b));
+        socket.on("balance_update", ({ balance: b, freeMinutesLeft: fml, isFreeMinute: ifm }: { balance: number; freeMinutesLeft?: number; isFreeMinute?: boolean }) => {
+          setBalance(b);
+          if (fml !== undefined) setFreeMinutesLeft(fml);
+          if (ifm !== undefined) setIsFreeMinute(ifm);
+        });
         socket.on("session_ended", () => { setEnded(true); if (timerRef.current) clearInterval(timerRef.current); });
         socket.on("astrologer_joined", () => setAstrologerJoined(true));
         socket.on("session_cancelled", () => {
@@ -432,10 +442,22 @@ export default function UserChatPage() {
               <div className="text-[8px] uppercase tracking-widest font-bold text-amber-400">Time</div>
               <div className="font-cinzel font-bold text-xs text-amber-600">{formatDuration(duration)}</div>
             </div>
-            <div className={`px-3 py-1.5 rounded-xl text-center border transition-colors ${balance < rate * 2 ? "bg-red-50 border-red-200" : "bg-emerald-50 border-emerald-100"}`}
-              style={balance < rate * 2 ? { animation: "glowPulse 1.5s ease-in-out infinite" } : {}}>
-              <div className={`text-[8px] uppercase tracking-widest font-bold ${balance < rate * 2 ? "text-red-400" : "text-emerald-500"}`}>₹ Bal</div>
-              <div className={`font-cinzel font-bold text-xs ${balance < rate * 2 ? "text-red-500" : "text-emerald-600"}`}>₹{balance.toFixed(0)}</div>
+            <div className={`px-3 py-1.5 rounded-xl text-center border transition-colors ${
+              isFreeMinute && freeMinutesLeft > 0
+                ? "bg-emerald-50 border-emerald-200"
+                : balance < rate * 2 ? "bg-red-50 border-red-200" : "bg-emerald-50 border-emerald-100"
+            }`}
+              style={(!isFreeMinute && balance < rate * 2) ? { animation: "glowPulse 1.5s ease-in-out infinite" } : {}}>
+              <div className={`text-[8px] uppercase tracking-widest font-bold ${
+                isFreeMinute && freeMinutesLeft > 0 ? "text-emerald-500" : balance < rate * 2 ? "text-red-400" : "text-emerald-500"
+              }`}>
+                {isFreeMinute && freeMinutesLeft > 0 ? "Free" : "₹ Bal"}
+              </div>
+              <div className={`font-cinzel font-bold text-xs ${
+                isFreeMinute && freeMinutesLeft > 0 ? "text-emerald-600" : balance < rate * 2 ? "text-red-500" : "text-emerald-600"
+              }`}>
+                {isFreeMinute && freeMinutesLeft > 0 ? `${freeMinutesLeft}m` : `₹${balance.toFixed(0)}`}
+              </div>
             </div>
             {!ended && (
               <button id="end-chat-btn" onClick={handleEndSession}
@@ -459,8 +481,20 @@ export default function UserChatPage() {
         </div>
       </header>
 
-      {/* Low balance war */}
-      {astrologerJoined && !ended && rate > 0 && balance > 0 && balance < rate * 2 && (
+      {/* Free trial banner */}
+      {astrologerJoined && !ended && isFreeMinute && freeMinutesLeft > 0 && (
+        <div className="mx-4 mt-3 shrink-0 bg-emerald-50 border border-emerald-300 text-emerald-700 px-4 py-2.5 rounded-2xl flex items-center gap-3 font-bold shadow-sm"
+          style={{ animation: "glowPulse 2s ease-in-out infinite" }}>
+          <span className="text-xl">🎁</span>
+          <div className="text-sm">
+            <div className="uppercase tracking-widest text-[9px] mb-0.5">Free Trial Active</div>
+            {freeMinutesLeft} free minute{freeMinutesLeft !== 1 ? "s" : ""} remaining — enjoy!
+          </div>
+        </div>
+      )}
+
+      {/* Low balance warning (only show after free minutes exhausted) */}
+      {astrologerJoined && !ended && !isFreeMinute && rate > 0 && balance > 0 && balance < rate * 2 && (
         <div className="mx-4 mt-3 shrink-0 bg-amber-50 border border-amber-300 text-amber-700 px-4 py-2.5 rounded-2xl flex items-center gap-3 font-bold shadow-sm"
           style={{ animation: "glowPulse 1.5s ease-in-out infinite" }}>
           <span className="text-xl">⚠️</span>

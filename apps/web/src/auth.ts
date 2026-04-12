@@ -59,7 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 email,
                 password: hashed,
                 role: "USER",
-                walletBalance: 500, // Free ₹500
+                freeMinutesLeft: 2, // 2 free trial minutes for new users
               },
             });
           }

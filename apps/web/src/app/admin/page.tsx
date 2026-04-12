@@ -110,6 +110,24 @@ export default function AdminDashboard() {
     }
   }
 
+  async function handleDeleteAstrologer(id: string, name: string | null) {
+    if (!confirm(`Are you sure you want to completely remove astrologer ${name || "Unknown"} from the platform? This cannot be undone.`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/astrologers?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setAstrologers(prev => prev.filter(a => a.id !== id));
+        alert(`Astrologer ${name || "Unknown"} removed successfully.`);
+      } else {
+        const data = await res.json();
+        alert(`Failed to remove: ${data.error}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while deleting the astrologer.");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#fdfaf5] font-sans text-stone-800 p-6 md:p-10">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -246,11 +264,12 @@ export default function AdminDashboard() {
                        <th className="px-6 py-4 font-bold">Name & Email</th>
                        <th className="px-6 py-4 font-bold">Speciality</th>
                        <th className="px-6 py-4 font-bold text-center">Rate</th>
+                       <th className="px-6 py-4 font-bold text-right">Actions</th>
                      </tr>
                    </thead>
                    <tbody className="divide-y divide-stone-50">
                      {astrologers.length === 0 ? (
-                       <tr><td colSpan={3} className="px-6 py-12 text-center text-stone-400 font-medium border-b border-stone-50">No astrologers found.</td></tr>
+                       <tr><td colSpan={4} className="px-6 py-12 text-center text-stone-400 font-medium border-b border-stone-50">No astrologers found.</td></tr>
                      ) : (
                        astrologers.map((a) => (
                          <tr key={a.id} className="hover:bg-amber-50/30 transition-colors group">
@@ -265,6 +284,14 @@ export default function AdminDashboard() {
                              <div className="inline-flex items-center px-2.5 py-1 rounded-lg bg-stone-50 border border-stone-200 font-mono font-bold text-[#d97706] text-xs">
                                ₹{a.astrologerProfile?.ratePerMin || 0}/min
                              </div>
+                           </td>
+                           <td className="px-6 py-4 text-right">
+                             <button 
+                               onClick={() => handleDeleteAstrologer(a.id, a.name)}
+                               className="px-3 py-1.5 rounded-lg text-xs font-bold text-red-500 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all"
+                             >
+                               Remove
+                             </button>
                            </td>
                          </tr>
                        ))

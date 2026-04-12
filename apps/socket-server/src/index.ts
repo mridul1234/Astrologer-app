@@ -144,45 +144,102 @@ io.on("connection", (socket) => {
             const currentMeta = activeSessions.get(sessionId);
             if (!currentMeta) return;
 
-            const updated = await prisma.user.update({
+            // Re-fetch user to get latest freeMinutesLeft and walletBalance
+            const user = await prisma.user.findUnique({
               where: { id: currentMeta.userId },
-              data: { walletBalance: { decrement: currentMeta.ratePerMin } },
+              select: { walletBalance: true, freeMinutesLeft: true },
             });
+            if (!user) return;
 
-            await prisma.user.update({
-              where: { id: currentMeta.astrologerUserId },
-              data: { walletBalance: { increment: currentMeta.ratePerMin } },
-            });
+            if (user.freeMinutesLeft > 0) {
+              // ── FREE TRIAL MINUTE ──
+              // Decrement user's free minutes; still credit astrologer (platform absorbs cost)
+              const [, ] = await Promise.all([
+                prisma.user.update({
+                  where: { id: currentMeta.userId },
+                  data: { freeMinutesLeft: { decrement: 1 } },
+                }),
+                prisma.user.update({
+                  where: { id: currentMeta.astrologerUserId },
+                  data: { walletBalance: { increment: currentMeta.ratePerMin } },
+                }),
+              ]);
 
-            await prisma.$transaction([
-              prisma.chatSession.update({
-                where: { id: sessionId },
-                data: { totalCost: { increment: currentMeta.ratePerMin } },
-              }),
-              prisma.transaction.create({
-                data: {
-                  userId: currentMeta.userId,
-                  amount: currentMeta.ratePerMin,
-                  type: "DEBIT",
-                  reason: `Chat - session ${sessionId}`,
-                },
-              }),
-              prisma.transaction.create({
-                data: {
-                  userId: currentMeta.astrologerUserId,
-                  amount: currentMeta.ratePerMin,
-                  type: "CREDIT",
-                  reason: `Chat Earnings - session ${sessionId}`,
-                },
-              }),
-            ]);
+              // Log transactions for records
+              await prisma.$transaction([
+                prisma.transaction.create({
+                  data: {
+                    userId: currentMeta.userId,
+                    amount: 0,
+                    type: "DEBIT",
+                    reason: `Free trial minute - session ${sessionId}`,
+                  },
+                }),
+                prisma.transaction.create({
+                  data: {
+                    userId: currentMeta.astrologerUserId,
+                    amount: currentMeta.ratePerMin,
+                    type: "CREDIT",
+                    reason: `Chat Earnings (Free Trial) - session ${sessionId}`,
+                  },
+                }),
+              ]);
 
-            io.to(sessionId).emit("balance_update", {
-              balance: updated.walletBalance,
-            });
+              const remainingFree = user.freeMinutesLeft - 1;
+              io.to(sessionId).emit("balance_update", {
+                balance: user.walletBalance,
+                freeMinutesLeft: remainingFree,
+                isFreeMinute: true,
+              });
 
-            if (updated.walletBalance <= 0) {
-              await endSession(sessionId, "insufficient_balance");
+              // Free minutes exhausted and no wallet balance → end session
+              if (remainingFree <= 0 && user.walletBalance < currentMeta.ratePerMin) {
+                await endSession(sessionId, "insufficient_balance");
+              }
+            } else {
+              // ── PAID MINUTE ──
+              const updated = await prisma.user.update({
+                where: { id: currentMeta.userId },
+                data: { walletBalance: { decrement: currentMeta.ratePerMin } },
+              });
+
+              await prisma.user.update({
+                where: { id: currentMeta.astrologerUserId },
+                data: { walletBalance: { increment: currentMeta.ratePerMin } },
+              });
+
+              await prisma.$transaction([
+                prisma.chatSession.update({
+                  where: { id: sessionId },
+                  data: { totalCost: { increment: currentMeta.ratePerMin } },
+                }),
+                prisma.transaction.create({
+                  data: {
+                    userId: currentMeta.userId,
+                    amount: currentMeta.ratePerMin,
+                    type: "DEBIT",
+                    reason: `Chat - session ${sessionId}`,
+                  },
+                }),
+                prisma.transaction.create({
+                  data: {
+                    userId: currentMeta.astrologerUserId,
+                    amount: currentMeta.ratePerMin,
+                    type: "CREDIT",
+                    reason: `Chat Earnings - session ${sessionId}`,
+                  },
+                }),
+              ]);
+
+              io.to(sessionId).emit("balance_update", {
+                balance: updated.walletBalance,
+                freeMinutesLeft: 0,
+                isFreeMinute: false,
+              });
+
+              if (updated.walletBalance <= 0) {
+                await endSession(sessionId, "insufficient_balance");
+              }
             }
           } catch (err) {
             console.error("[Billing] Error:", err);

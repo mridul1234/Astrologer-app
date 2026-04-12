@@ -103,3 +103,30 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  const session = await auth();
+  
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  }
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("id");
+
+    if (!userId) {
+      return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+    }
+
+    // Delete the user, which will cascade to Astrologer profile, Reviews, etc.
+    await prisma.user.delete({
+      where: { id: userId, role: "ASTROLOGER" }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to delete astrologer:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}

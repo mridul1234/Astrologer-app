@@ -16,6 +16,7 @@ export async function GET() {
       name: true,
       email: true,
       walletBalance: true,
+      freeMinutesLeft: true,
       createdAt: true,
       transactions: {
         orderBy: { createdAt: "desc" },
