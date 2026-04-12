@@ -93,13 +93,14 @@ model Message {
 }
 
 model Transaction {
-  id        String          @id @default(cuid())
-  userId    String
-  user      User            @relation(fields: [userId], references: [id])
-  amount    Float
-  type      TransactionType
-  reason    String?
-  createdAt DateTime        @default(now())
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  amount      Float
+  type        TransactionType
+  reason      String?
+  referenceId String?         @unique
+  createdAt   DateTime        @default(now())
 }
 
 model Review {
