@@ -33,19 +33,48 @@ interface Astrologer {
   } | null;
 }
 
+interface WithdrawalRequest {
+  id: string;
+  amount: number;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  createdAt: string;
+  astrologer: {
+    user: { name: string; email: string };
+  };
+}
+
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<"ANALYTICS" | "USERS" | "ASTROLOGERS" | "CREATE">("ANALYTICS");
+  const [activeTab, setActiveTab] = useState<"ANALYTICS" | "USERS" | "ASTROLOGERS" | "CREATE" | "WITHDRAWALS" | "SETTINGS">("ANALYTICS");
   
   // Data States
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
+  const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
+  const [commissionRate, setCommissionRate] = useState("20");
 
   // Create Astrologer Form States
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [speciality, setSpeciality] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [ratePerMin, setRatePerMin] = useState("15");
+  const [experienceYears, setExperienceYears] = useState("0");
+  const [languages, setLanguages] = useState("Hindi, English");
+  const [profileImage, setProfileImage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<{ text: string; type: "error" | "success" } | null>(null);
+
+  // Add Review Modal State
+  const [reviewAstrologerId, setReviewAstrologerId] = useState<string | null>(null);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewRating, setReviewRating] = useState("5");
+  const [reviewComment, setReviewComment] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [speciality, setSpeciality] = useState("");
@@ -73,6 +102,13 @@ export default function AdminDashboard() {
         fetch("/api/admin/users").then(r => r.json()).then(d => setUsers(d.users || [])).catch(console.error);
       } else if (activeTab === "ASTROLOGERS") {
         fetch("/api/admin/astrologers").then(r => r.json()).then(d => setAstrologers(d.astrologers || [])).catch(console.error);
+      } else if (activeTab === "WITHDRAWALS") {
+        fetch("/api/admin/withdrawals").then(r => r.json()).then(d => setWithdrawals(d.withdrawals || [])).catch(console.error);
+      } else if (activeTab === "SETTINGS") {
+        fetch("/api/admin/settings").then(r => r.json()).then(d => {
+          const comm = d.settings?.find((s: any) => s.key === "PLATFORM_COMMISSION");
+          if (comm) setCommissionRate(comm.value);
+        }).catch(console.error);
       }
     }
   }, [activeTab, status, session]);
@@ -128,6 +164,41 @@ export default function AdminDashboard() {
     }
   }
 
+  async function handleProcessWithdrawal(id: string, action: "APPROVE" | "REJECT") {
+    if (!confirm(`Are you sure you want to ${action} this withdrawal request?`)) return;
+    try {
+      const res = await fetch("/api/admin/withdrawals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action }),
+      });
+      if (res.ok) {
+        setWithdrawals(prev => prev.map(w => w.id === id ? { ...w, status: action + "D" as any } : w));
+        alert(`Withdrawal ${action}D successfully.`);
+      } else {
+        const data = await res.json();
+        alert(`Failed: ${data.error}`);
+      }
+    } catch (e) {
+      alert("Error occurred.");
+    }
+  }
+
+  async function handleUpdateCommission(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "PLATFORM_COMMISSION", value: commissionRate }),
+      });
+      if (res.ok) alert("Commission updated successfully.");
+      else alert("Failed to update commission.");
+    } catch (e) {
+      alert("Error occurred.");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#fdfaf5] font-sans text-stone-800 p-6 md:p-10">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -151,6 +222,8 @@ export default function AdminDashboard() {
           { id: "ANALYTICS", label: "📊 Overview" },
           { id: "ASTROLOGERS", label: "✨ Astrologers" },
           { id: "USERS", label: "👥 Users" },
+          { id: "WITHDRAWALS", label: "💸 Withdrawals" },
+          { id: "SETTINGS", label: "⚙️ Settings" },
           { id: "CREATE", label: "➕ Add Astrologer" }
         ].map((tab) => (
           <button
@@ -285,7 +358,13 @@ export default function AdminDashboard() {
                                ₹{a.astrologerProfile?.ratePerMin || 0}/min
                              </div>
                            </td>
-                           <td className="px-6 py-4 text-right">
+                           <td className="px-6 py-4 text-right flex justify-end gap-2">
+                             <button 
+                               onClick={() => setReviewAstrologerId(a.astrologerProfile?.id || null)}
+                               className="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-600 hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-all"
+                             >
+                               Add Review
+                             </button>
                              <button 
                                onClick={() => handleDeleteAstrologer(a.id, a.name)}
                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-red-500 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all"
@@ -299,6 +378,89 @@ export default function AdminDashboard() {
                    </tbody>
                  </table>
                </div>
+            </div>
+          </div>
+        )}
+
+        {/* WITHDRAWALS TAB */}
+        {activeTab === "WITHDRAWALS" && (
+          <div className="animate-in fade-in duration-300">
+            <h2 className="text-xl font-extrabold text-stone-900 mb-6">Astrologer Withdrawals</h2>
+            <div className="bg-white border border-stone-100 shadow-sm rounded-3xl overflow-hidden">
+               <div className="overflow-x-auto">
+                 <table className="w-full text-left text-sm">
+                   <thead className="bg-stone-50 text-stone-500 text-[11px] uppercase tracking-widest border-b border-stone-100">
+                     <tr>
+                       <th className="px-6 py-4 font-bold">Astrologer</th>
+                       <th className="px-6 py-4 font-bold">Requested On</th>
+                       <th className="px-6 py-4 font-bold text-center">Amount</th>
+                       <th className="px-6 py-4 font-bold text-center">Status</th>
+                       <th className="px-6 py-4 font-bold text-right">Actions</th>
+                     </tr>
+                   </thead>
+                   <tbody className="divide-y divide-stone-50">
+                     {withdrawals.length === 0 ? (
+                       <tr><td colSpan={5} className="px-6 py-12 text-center text-stone-400 font-medium border-b border-stone-50">No withdrawal requests found.</td></tr>
+                     ) : (
+                       withdrawals.map((w) => (
+                         <tr key={w.id} className="hover:bg-amber-50/30 transition-colors group">
+                           <td className="px-6 py-4">
+                             <div className="font-bold text-stone-800">{w.astrologer?.user?.name}</div>
+                             <div className="text-stone-400 text-xs mt-0.5">{w.astrologer?.user?.email}</div>
+                           </td>
+                           <td className="px-6 py-4 text-stone-500 font-medium text-xs">
+                             {new Date(w.createdAt).toLocaleString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                           </td>
+                           <td className="px-6 py-4 text-center">
+                             <span className="font-extrabold text-stone-800">₹{w.amount}</span>
+                           </td>
+                           <td className="px-6 py-4 text-center">
+                             <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest ${
+                               w.status === "PENDING" ? "bg-amber-100 text-amber-700" :
+                               w.status === "APPROVED" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                             }`}>
+                               {w.status}
+                             </span>
+                           </td>
+                           <td className="px-6 py-4 text-right">
+                             {w.status === "PENDING" && (
+                               <div className="flex justify-end gap-2">
+                                 <button onClick={() => handleProcessWithdrawal(w.id, "REJECT")} className="px-3 py-1.5 rounded-lg text-xs font-bold text-red-500 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all">Reject</button>
+                                 <button onClick={() => handleProcessWithdrawal(w.id, "APPROVE")} className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-all">Approve</button>
+                               </div>
+                             )}
+                           </td>
+                         </tr>
+                       ))
+                     )}
+                   </tbody>
+                 </table>
+               </div>
+            </div>
+          </div>
+        )}
+
+        {/* SETTINGS TAB */}
+        {activeTab === "SETTINGS" && (
+          <div className="animate-in fade-in duration-300 max-w-lg">
+            <h2 className="text-xl font-extrabold text-stone-900 mb-6">Platform Settings</h2>
+            
+            <div className="bg-white border border-stone-100 shadow-sm rounded-3xl p-6 relative overflow-hidden">
+              <form onSubmit={handleUpdateCommission} className="relative z-10 space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Platform Commission (%)</label>
+                  <div className="relative">
+                    <input required type="number" min="0" max="100" value={commissionRate} onChange={e => setCommissionRate(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 pr-10 text-xl font-bold text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400" />
+                    <span className="absolute right-4 top-3.5 text-stone-400 font-bold">%</span>
+                  </div>
+                  <p className="text-xs text-stone-500 mt-2">Deducted from astrologers' earnings per minute.</p>
+                </div>
+                <div className="pt-4">
+                  <button type="submit" className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-3.5 rounded-xl hover:shadow-lg hover:shadow-amber-200/60 active:scale-[0.98] transition-all duration-200">
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

@@ -61,8 +61,9 @@ model Astrologer {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  chatSessions ChatSession[] @relation("AstrologerSessions")
-  reviews      Review[]      @relation("AstrologerReviews")
+  chatSessions       ChatSession[]       @relation("AstrologerSessions")
+  reviews            Review[]            @relation("AstrologerReviews")
+  withdrawalRequests WithdrawalRequest[]
 }
 
 model ChatSession {
@@ -73,7 +74,8 @@ model ChatSession {
   astrologer    Astrologer    @relation("AstrologerSessions", fields: [astrologerId], references: [id])
   startedAt     DateTime      @default(now())
   endedAt       DateTime?
-  totalCost     Float         @default(0)
+  totalCost     Float         @default(0) // Gross amount charged to User
+  astrologerEarnings Float    @default(0) // Net amount credited to Astrologer
   status        SessionStatus @default(ACTIVE)
 
   messages Message[]
@@ -104,12 +106,35 @@ model Review {
   id           String      @id @default(cuid())
   rating       Int         // 1 to 5
   comment      String?
-  userId       String
-  user         User        @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
+  userId       String?
+  user         User?       @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
   astrologerId String
   astrologer   Astrologer  @relation("AstrologerReviews", fields: [astrologerId], references: [id], onDelete: Cascade)
-  sessionId    String      @unique
-  session      ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId    String?     @unique
+  session      ChatSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  reviewerName String?
   createdAt    DateTime    @default(now())
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model WithdrawalRequest {
+  id           String           @id @default(cuid())
+  astrologerId String
+  astrologer   Astrologer       @relation(fields: [astrologerId], references: [id], onDelete: Cascade)
+  amount       Float
+  status       WithdrawalStatus @default(PENDING)
+  createdAt    DateTime         @default(now())
+  processedAt  DateTime?
 }
 

@@ -130,11 +130,19 @@ io.on("connection", (socket) => {
 
       // Start billing timer only when BOTH are in the room
       if (astrologerInRoom && userInRoom && !billingTimers.has(sessionId)) {
+        // Fetch platform commission
+        const commissionSetting = await prisma.systemSetting.findUnique({ where: { key: "PLATFORM_COMMISSION" } });
+        const commissionPerc = commissionSetting ? Number(commissionSetting.value) : 20; // Default 20%
+        
+        const grossRate = session.astrologer.ratePerMin;
+        const netRate = grossRate * (1 - (commissionPerc / 100));
+
         const meta = {
           userId: session.userId,
           astrologerId: session.astrologerId,
           astrologerUserId: session.astrologer.userId,
-          ratePerMin: session.astrologer.ratePerMin,
+          ratePerMin: grossRate,
+          netRatePerMin: netRate,
         };
         activeSessions.set(sessionId, meta);
 
@@ -153,7 +161,7 @@ io.on("connection", (socket) => {
 
             if (user.freeMinutesLeft > 0) {
               // ── FREE TRIAL MINUTE ──
-              // Decrement user's free minutes; still credit astrologer (platform absorbs cost)
+              // Decrement user's free minutes; credit astrologer net amount (platform absorbs cost)
               const [, ] = await Promise.all([
                 prisma.user.update({
                   where: { id: currentMeta.userId },
@@ -161,12 +169,19 @@ io.on("connection", (socket) => {
                 }),
                 prisma.user.update({
                   where: { id: currentMeta.astrologerUserId },
-                  data: { walletBalance: { increment: currentMeta.ratePerMin } },
+                  data: { walletBalance: { increment: currentMeta.netRatePerMin } },
                 }),
               ]);
 
               // Log transactions for records
               await prisma.$transaction([
+                prisma.chatSession.update({
+                  where: { id: sessionId },
+                  data: { 
+                    totalCost: { increment: 0 },
+                    astrologerEarnings: { increment: currentMeta.netRatePerMin }
+                  },
+                }),
                 prisma.transaction.create({
                   data: {
                     userId: currentMeta.userId,
@@ -178,9 +193,9 @@ io.on("connection", (socket) => {
                 prisma.transaction.create({
                   data: {
                     userId: currentMeta.astrologerUserId,
-                    amount: currentMeta.ratePerMin,
+                    amount: currentMeta.netRatePerMin,
                     type: "CREDIT",
-                    reason: `Chat Earnings (Free Trial) - session ${sessionId}`,
+                    reason: `Chat Earnings (Free Trial, Net) - session ${sessionId}`,
                   },
                 }),
               ]);
@@ -205,13 +220,16 @@ io.on("connection", (socket) => {
 
               await prisma.user.update({
                 where: { id: currentMeta.astrologerUserId },
-                data: { walletBalance: { increment: currentMeta.ratePerMin } },
+                data: { walletBalance: { increment: currentMeta.netRatePerMin } },
               });
 
               await prisma.$transaction([
                 prisma.chatSession.update({
                   where: { id: sessionId },
-                  data: { totalCost: { increment: currentMeta.ratePerMin } },
+                  data: { 
+                    totalCost: { increment: currentMeta.ratePerMin },
+                    astrologerEarnings: { increment: currentMeta.netRatePerMin }
+                  },
                 }),
                 prisma.transaction.create({
                   data: {
@@ -224,9 +242,9 @@ io.on("connection", (socket) => {
                 prisma.transaction.create({
                   data: {
                     userId: currentMeta.astrologerUserId,
-                    amount: currentMeta.ratePerMin,
+                    amount: currentMeta.netRatePerMin,
                     type: "CREDIT",
-                    reason: `Chat Earnings - session ${sessionId}`,
+                    reason: `Chat Earnings (Net) - session ${sessionId}`,
                   },
                 }),
               ]);

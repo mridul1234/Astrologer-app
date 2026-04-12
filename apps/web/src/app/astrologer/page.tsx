@@ -43,10 +43,14 @@ export default function AstrologerPortal() {
   const [loading, setLoading] = useState(true);
   const [astrologerName, setAstrologerName] = useState("Astrologer");
   const [totalEarnings, setTotalEarnings] = useState(0);
+  const [todaysEarnings, setTodaysEarnings] = useState(0);
+  const [balance, setBalance] = useState(0);
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
+  const [withdrawAmount, setWithdrawAmount] = useState("");
   const [avgRating, setAvgRating] = useState(0);
   
   // Tabs
-  const [activeTab, setActiveTab] = useState<"dashboard" | "reviews" | "settings">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "reviews" | "wallet" | "settings">("dashboard");
 
   // Settings Form State
   const [isUpdating, setIsUpdating] = useState(false);
@@ -107,6 +111,8 @@ export default function AstrologerPortal() {
       
       if (data.user?.name) setAstrologerName(data.user.name);
       setTotalEarnings(data.totalEarnings || 0);
+      setTodaysEarnings(data.todaysEarnings || 0);
+      setBalance(data.balance || 0);
       setAvgRating(data.avgRating || 0);
       setReviews(data.reviews || []);
       
@@ -150,6 +156,43 @@ export default function AstrologerPortal() {
     const interval = setInterval(fetchProfileData, 5000);
     return () => clearInterval(interval);
   }, [fetchProfileData]);
+
+  const fetchWithdrawals = useCallback(async () => {
+    try {
+      const res = await fetch("/api/astrologer/withdrawals");
+      if (res.ok) {
+        const d = await res.json();
+        setWithdrawals(d.withdrawals || []);
+      }
+    } catch(e) {}
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "wallet") fetchWithdrawals();
+  }, [activeTab, fetchWithdrawals]);
+
+  const handleWithdraw = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!withdrawAmount) return;
+    try {
+      const res = await fetch("/api/astrologer/withdrawals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: Number(withdrawAmount) }),
+      });
+      if (res.ok) {
+        alert("Withdrawal requested successfully!");
+        setWithdrawAmount("");
+        fetchWithdrawals();
+        fetchProfileData();
+      } else {
+        const d = await res.json();
+        alert(d.error || "Failed to request withdrawal.");
+      }
+    } catch (e) {
+      alert("Error occurred.");
+    }
+  };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -282,7 +325,7 @@ export default function AstrologerPortal() {
       {/* ─── MAIN TABS ─── */}
       <div className="max-w-6xl mx-auto px-4 mt-10">
         <div className="flex space-x-2 border-b border-slate-200 mb-8 overflow-x-auto pb-1 scrollbar-hide">
-          {["dashboard", "reviews", "settings"].map((tab) => (
+          {["dashboard", "reviews", "wallet", "settings"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
@@ -292,7 +335,7 @@ export default function AstrologerPortal() {
                   : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
                 }`}
             >
-              {tab === "dashboard" ? "Dashboard & Queue" : tab === "reviews" ? "Feedback & Reviews" : "Profile Settings"}
+              {tab === "dashboard" ? "Dashboard & Queue" : tab === "reviews" ? "Feedback & Reviews" : tab === "wallet" ? "Wallet & Withdraw" : "Profile Settings"}
             </button>
           ))}
         </div>
@@ -301,11 +344,12 @@ export default function AstrologerPortal() {
         {activeTab === "dashboard" && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Stats row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
               {[
-                { icon: "💰", label: "Total Earnings", value: `₹${totalEarnings.toLocaleString()}`, sub: "All time", color: "#d97706" },
-                { icon: "💬", label: "Total Consults", value: sessions.length, sub: "Lifetime sessions", color: "#8b5cf6" },
-                { icon: "⭐", label: "Avg Rating", value: avgRating > 0 ? avgRating.toFixed(1) : "—", sub: `${reviews.length} reviews`, color: "#f5c842" },
+                { icon: "📅", label: "Today's Net", value: `₹${todaysEarnings.toLocaleString()}`, sub: "Earned Today", color: "#10b981" },
+                { icon: "💰", label: "Total Net", value: `₹${totalEarnings.toLocaleString()}`, sub: "All time", color: "#d97706" },
+                { icon: "💬", label: "Consults", value: sessions.length, sub: "Lifetime sessions", color: "#8b5cf6" },
+                { icon: "⭐", label: "Rating", value: avgRating > 0 ? avgRating.toFixed(1) : "—", sub: `${reviews.length} reviews`, color: "#f5c842" },
               ].map((s, i) => (
                 <div key={i} className="bg-white border border-slate-100 shadow-sm rounded-2xl p-6 text-center hover:shadow-md transition-all hover:-translate-y-1">
                   <div className="text-3xl mb-3 drop-shadow-sm">{s.icon}</div>
@@ -422,7 +466,7 @@ export default function AstrologerPortal() {
                   <div key={r.id} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-start mb-3">
-                        <div className="font-bold text-slate-800">{r.user?.name || "Anonymous User"}</div>
+                        <div className="font-bold text-slate-800">{r.reviewerName || r.user?.name || "Anonymous User"}</div>
                         <div className="text-xs text-slate-400 font-semibold">{formatDate(r.createdAt)}</div>
                       </div>
                       <div className="mb-3 flex text-sm">{renderStars(r.rating)}</div>
@@ -432,6 +476,74 @@ export default function AstrologerPortal() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ─── WALLET & WITHDRAW TAB ─── */}
+        {activeTab === "wallet" && (
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-6">
+            <h2 className="font-cinzel text-xl font-bold text-slate-800 border-b border-slate-200 pb-3">Wallet & Withdrawals</h2>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Balance Card */}
+              <div className="bg-white border border-stone-200 shadow-sm p-8 rounded-3xl relative overflow-hidden h-fit">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-100 to-transparent pointer-events-none rounded-bl-full" />
+                <div className="text-[10px] font-black uppercase tracking-widest text-stone-500 mb-2">Available to Withdraw</div>
+                <div className="text-5xl font-extrabold text-emerald-600 mb-6 drop-shadow-sm">₹{balance.toLocaleString()}</div>
+                
+                <form onSubmit={handleWithdraw} className="space-y-4 relative z-10 p-5 bg-[#faf8f5] rounded-2xl border border-stone-100">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-[#d97706] mb-2">Request Withdrawal</label>
+                    <input type="number" min="500" max={balance} required value={withdrawAmount} onChange={e => setWithdrawAmount(e.target.value)} placeholder="Min ₹500" className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm font-bold text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all font-mono" />
+                  </div>
+                  <button type="submit" disabled={balance < 500} className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-3 text-sm uppercase tracking-widest rounded-xl hover:shadow-md hover:shadow-amber-200/50 transition-all disabled:opacity-50">
+                    Withdraw
+                  </button>
+                </form>
+              </div>
+
+              {/* History Table */}
+              <div className="md:col-span-2 bg-white border border-stone-200 shadow-sm rounded-3xl overflow-hidden">
+                <div className="px-6 py-5 border-b border-stone-100 bg-stone-50">
+                  <h3 className="font-extrabold text-stone-800 text-sm uppercase tracking-widest">Withdrawal History</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-white text-stone-400 text-[10px] uppercase tracking-widest border-b border-stone-100">
+                      <tr>
+                        <th className="px-6 py-4 font-bold">Date & Time</th>
+                        <th className="px-6 py-4 font-bold">Amount</th>
+                        <th className="px-6 py-4 font-bold">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-50">
+                      {withdrawals.length === 0 ? (
+                        <tr><td colSpan={3} className="px-6 py-12 text-center text-stone-400 font-medium">No previous requests.</td></tr>
+                      ) : (
+                        withdrawals.map(w => (
+                          <tr key={w.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-6 py-4 text-stone-600 font-medium text-xs">
+                              {new Date(w.createdAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                            </td>
+                            <td className="px-6 py-4 font-extrabold text-stone-800">
+                              ₹{w.amount}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${
+                                w.status === "PENDING" ? "bg-amber-100 text-amber-700" :
+                                w.status === "APPROVED" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                              }`}>
+                                {w.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

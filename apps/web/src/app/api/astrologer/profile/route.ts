@@ -33,15 +33,26 @@ export async function GET() {
     return NextResponse.json({ error: "Astrologer not found" }, { status: 404 });
   }
 
+  // Calculate Net Total Earnings based on astrologerEarnings (net of platform commission)
   const totalEarnings = astrologer.chatSessions
     .filter((s) => s.status === "ENDED")
-    .reduce((acc, s) => acc + s.totalCost, 0);
+    .reduce((acc, s) => acc + s.astrologerEarnings, 0);
+
+  // Calculate Today's Net Earnings
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const todaysEarnings = astrologer.chatSessions
+    .filter((s) => s.status === "ENDED" && s.startedAt >= startOfToday)
+    .reduce((acc, s) => acc + s.astrologerEarnings, 0);
 
   const avgRating = astrologer.reviews.length > 0 
     ? astrologer.reviews.reduce((acc, r) => acc + r.rating, 0) / astrologer.reviews.length 
     : 0;
 
-  return NextResponse.json({ ...astrologer, totalEarnings, avgRating });
+  // Add the user's walletBalance to the response so the frontend knows how much they can withdraw
+  const balance = astrologer.user.walletBalance;
+
+  return NextResponse.json({ ...astrologer, totalEarnings, todaysEarnings, avgRating, balance });
 }
 
 // PATCH /api/astrologer/profile
