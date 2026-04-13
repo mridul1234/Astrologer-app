@@ -21,6 +21,7 @@ interface Review {
   id: string;
   rating: number;
   comment: string | null;
+  reviewerName: string | null;
   createdAt: string;
   user?: { name: string } | null;
 }
