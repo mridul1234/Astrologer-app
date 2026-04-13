@@ -27,6 +27,7 @@ interface Astrologer {
   email: string | null;
   createdAt: string;
   astrologerProfile: {
+    id: string;
     ratePerMin: number;
     speciality: string;
     isOnline: boolean;
