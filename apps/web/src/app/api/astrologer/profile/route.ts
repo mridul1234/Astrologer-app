@@ -13,7 +13,7 @@ export async function GET() {
     where: { userId: session.user.id },
     include: {
       user: {
-        select: { id: true, name: true, email: true, createdAt: true },
+        select: { id: true, name: true, email: true, createdAt: true, walletBalance: true },
       },
       reviews: {
         include: { user: { select: { name: true } } },
