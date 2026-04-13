@@ -75,16 +75,6 @@ export default function AdminDashboard() {
   const [reviewRating, setReviewRating] = useState("5");
   const [reviewComment, setReviewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [speciality, setSpeciality] = useState("");
-  const [categories, setCategories] = useState<string[]>([]);
-  const [ratePerMin, setRatePerMin] = useState("15");
-  const [experienceYears, setExperienceYears] = useState("0");
-  const [languages, setLanguages] = useState("Hindi, English");
-  const [profileImage, setProfileImage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState<{ text: string; type: "error" | "success" } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {

@@ -210,7 +210,7 @@ export default function WalletPage() {
               Opening Payment...
             </>
           ) : (
-            `Pay ₹${selectedPack ?? customAmount || "—"}`
+            `Pay ₹${(selectedPack ?? customAmount) || "—"}`
           )}
         </button>
 
