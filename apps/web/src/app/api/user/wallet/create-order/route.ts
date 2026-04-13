@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import Razorpay from "razorpay";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
-
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -19,11 +14,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Minimum recharge is ₹10" }, { status: 400 });
   }
 
+  const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  });
+
   try {
+    // Receipt must be ≤40 chars for Razorpay
+    const receipt = `wp_${session.user.id.slice(-10)}_${Date.now().toString().slice(-8)}`;
+
     const order = await (razorpay.orders as any).create({
-      amount: amountNum * 100, // Razorpay expects paise
+      amount: amountNum * 100, // paise
       currency: "INR",
-      receipt: `wallet_${session.user.id}_${Date.now()}`,
+      receipt,
     });
 
     return NextResponse.json({
@@ -33,7 +36,7 @@ export async function POST(req: NextRequest) {
       keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (err: any) {
-    console.error("Razorpay order creation failed:", err);
-    return NextResponse.json({ error: "Payment gateway error" }, { status: 500 });
+    console.error("Razorpay order creation failed:", JSON.stringify(err));
+    return NextResponse.json({ error: "Payment gateway error", detail: err?.error?.description }, { status: 500 });
   }
 }
