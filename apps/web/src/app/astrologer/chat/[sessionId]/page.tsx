@@ -54,6 +54,10 @@ export default function AstrologerChatPage() {
   const [earnings, setEarnings] = useState(0);
   const [latestMsgId, setLatestMsgId] = useState<string | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [kundliProfile, setKundliProfile] = useState<{
+    fullName: string; dateOfBirth: string; timeOfBirth: string; placeOfBirth: string;
+  } | null>(null);
+  const [showKundli, setShowKundli] = useState(false);
 
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -91,6 +95,7 @@ export default function AstrologerChatPage() {
         setRate(sessionData.astrologer?.ratePerMin || 0);
         if (sessionData.status === "ENDED") setEnded(true);
         setEarnings(sessionData.totalCost || 0);
+        if (sessionData.user?.kundliProfile) setKundliProfile(sessionData.user.kundliProfile);
 
         const profileRes = await fetch("/api/astrologer/profile");
         const profile = await profileRes.json();
@@ -233,6 +238,19 @@ export default function AstrologerChatPage() {
               <div className="text-slate-800 font-bold text-[15px] tracking-tight leading-tight">{userName}</div>
               <div className="text-[10px] font-bold tracking-widest text-purple-400">✦ Seeker</div>
             </div>
+            {/* Kundli toggle button */}
+            {kundliProfile && (
+              <button
+                onClick={() => setShowKundli((v) => !v)}
+                className="ml-1 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest transition-all"
+                style={{
+                  background: showKundli ? "linear-gradient(135deg,#FF9933,#f5c842)" : "rgba(245,200,66,0.1)",
+                  color: showKundli ? "#1a1040" : "#d97706",
+                  border: "1px solid rgba(245,200,66,0.4)",
+                }}>
+                🪐 Kundli
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -258,6 +276,21 @@ export default function AstrologerChatPage() {
             )}
           </div>
         </div>
+
+        {/* Kundli Panel */}
+        {showKundli && kundliProfile && (
+          <div className="px-4 py-3 border-t border-[#f5c842]/15" style={{ background: "linear-gradient(135deg,rgba(254,243,199,0.8),rgba(255,237,204,0.9))" }}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-700">🪐 Seeker&apos;s Kundli</span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+              <div><span className="text-amber-500 font-bold">Name: </span><span className="text-stone-700 font-semibold">{kundliProfile.fullName}</span></div>
+              <div><span className="text-amber-500 font-bold">Born: </span><span className="text-stone-700 font-semibold">{new Date(kundliProfile.dateOfBirth + "T12:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span></div>
+              <div><span className="text-amber-500 font-bold">Time: </span><span className="text-stone-700 font-semibold">{kundliProfile.timeOfBirth}</span></div>
+              <div><span className="text-amber-500 font-bold">Place: </span><span className="text-stone-700 font-semibold">{kundliProfile.placeOfBirth}</span></div>
+            </div>
+          </div>
+        )}
 
         {/* Zodiac strip */}
         <div className="px-4 py-1.5 border-t border-[#f5c842]/10 flex items-center justify-between overflow-hidden">

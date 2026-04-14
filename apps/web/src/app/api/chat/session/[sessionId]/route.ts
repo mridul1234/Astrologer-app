@@ -26,7 +26,7 @@ export async function GET(
           },
         },
         user: {
-          select: { name: true, walletBalance: true },
+          select: { name: true, walletBalance: true, kundliProfile: true },
         },
       },
     });

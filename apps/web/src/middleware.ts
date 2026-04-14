@@ -30,8 +30,8 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // Astrologer trying to access user dashboard or home
-  if ((pathname.startsWith("/dashboard") || pathname === "/home") && role === "ASTROLOGER") {
+  // Astrologer trying to access user dashboard, home, or onboarding
+  if ((pathname.startsWith("/dashboard") || pathname === "/home" || pathname === "/onboarding") && role === "ASTROLOGER") {
     return NextResponse.redirect(new URL("/astrologer", req.url));
   }
 

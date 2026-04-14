@@ -18,6 +18,7 @@ export async function GET() {
       walletBalance: true,
       freeMinutesLeft: true,
       createdAt: true,
+      kundliProfile: true,
       transactions: {
         orderBy: { createdAt: "desc" },
         take: 30,

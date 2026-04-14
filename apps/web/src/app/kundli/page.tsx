@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
@@ -192,6 +192,20 @@ export default function KundliPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<KundliResult | null>(null);
+  const [hasSavedProfile, setHasSavedProfile] = useState(false);
+
+  // Pre-fill from saved kundli profile
+  useEffect(() => {
+    fetch("/api/user/kundli")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.fullName) {
+          setForm({ name: data.fullName, dob: data.dateOfBirth, tob: data.timeOfBirth || "12:00", city: data.placeOfBirth });
+          setHasSavedProfile(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   async function generate() {
     if (!form.name || !form.dob || !form.city) { setError("Please fill all fields."); return; }
@@ -249,6 +263,15 @@ export default function KundliPage() {
         {/* ─── Form ─── */}
         {!result && (
           <div className="bg-white rounded-3xl border border-[#f0e6c8] shadow-sm p-8 max-w-xl mx-auto">
+            {hasSavedProfile && (
+              <div className="mb-5 px-4 py-3 rounded-2xl flex items-center gap-3" style={{ background: "linear-gradient(135deg,#fef9ec,#fef3c7)", border: "1px solid #f5c84260" }}>
+                <span className="text-xl">✅</span>
+                <div>
+                  <p className="text-xs font-extrabold text-amber-700 uppercase tracking-widest">Saved Profile Loaded</p>
+                  <p className="text-xs text-stone-500 mt-0.5">Your birth details are pre-filled from your profile. You can update them below.</p>
+                </div>
+              </div>
+            )}
             <h2 className="text-xl font-extrabold text-stone-900 mb-6 flex items-center gap-2">
               <span className="text-[#f5c842]">✦</span> Birth Details
             </h2>

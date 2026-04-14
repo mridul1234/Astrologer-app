@@ -131,7 +131,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/home");
+    router.push("/onboarding");
   }
 
   async function handleResend() {
