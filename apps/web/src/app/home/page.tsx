@@ -89,7 +89,7 @@ export default function HomePage() {
   const [selectedZodiac, setSelectedZodiac] = useState<number | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const userName = session?.user?.email?.split("@")[0] ?? "Seeker";
+  const userName = profile?.name && profile.name.trim() !== "" ? profile.name : (session?.user?.name || session?.user?.email?.split("@")[0] || "Seeker");
   const balance = profile?.walletBalance !== undefined ? Number(profile.walletBalance).toFixed(0) : "—";
   const freeMinutes = profile?.freeMinutesLeft !== undefined ? Number(profile.freeMinutesLeft) : 0;
 

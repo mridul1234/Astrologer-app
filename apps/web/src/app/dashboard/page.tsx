@@ -52,8 +52,8 @@ export default function UserDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
 
-  // Phone number: ignore stored name (may be 'Seeker XXXX'), use email/phone only
-  const userPhone = session?.user?.email?.split("@")[0] ?? "User";
+  // Use the name saved in profile (from onboarding), or fall back to session
+  const userName = profile?.name && profile.name.trim() !== "" ? profile.name : (session?.user?.name || session?.user?.email?.split("@")[0] || "User");
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

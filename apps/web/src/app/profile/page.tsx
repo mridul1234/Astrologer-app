@@ -112,8 +112,9 @@ export default function UserProfilePage() {
   // Phone: the user logs in with phone, which may be stored as email-like. Show it cleanly.
   const phone = sessionData?.user?.email ?? profile?.email ?? "";
   const displayPhone = phone.includes("@") ? phone.split("@")[0] : phone;
-  // Use phone digits for initials (ignore stored name which may be 'Seeker XXXX')
-  const initials = displayPhone.replace(/\D/g, "").slice(0, 2) || "??";
+  // Use name if available, fallback to phone
+  const userName = profile?.name && profile.name.trim() !== "" && !profile.name.startsWith("Seeker") ? profile.name : (sessionData?.user?.name || displayPhone);
+  const initials = userName === displayPhone ? displayPhone.replace(/\D/g, "").slice(0, 2) || "??" : userName.substring(0, 2).toUpperCase();
 
   const tabStyle = (t: Tab) =>
     `px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
@@ -178,7 +179,7 @@ export default function UserProfilePage() {
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-extrabold text-stone-900 mb-1">{displayPhone}</h1>
+              <h1 className="text-2xl font-extrabold text-stone-900 mb-1">{userName}</h1>
               <p className="text-stone-400 text-sm mb-4 flex items-center gap-1.5">
                 <span>📱</span>
                 <span>{displayPhone}</span>
