@@ -35,9 +35,19 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/astrologer", req.url));
   }
 
-  // User trying to access astrologer dashboard
-  if (pathname.startsWith("/astrologer") && role === "USER") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  // User trying to access the astrologer-only dashboard
+  // IMPORTANT: /astrologer/[id] are PUBLIC profile pages that users MUST be able to visit.
+  // Only block the exact /astrologer dashboard, /astrologer/settings, /astrologer/chat for USERs.
+  if (role === "USER" && pathname.startsWith("/astrologer")) {
+    // Allow /astrologer/<id> profile pages — these have a cuid-like segment after /astrologer/
+    // But block /astrologer (dashboard), /astrologer/settings, /astrologer/chat, /astrologer/login
+    const subPath = pathname.replace("/astrologer", "");
+    const blockedSubPaths = ["", "/settings", "/chat", "/login"];
+    const isBlockedExact = blockedSubPaths.includes(subPath) || 
+                           blockedSubPaths.some(bp => bp !== "" && subPath.startsWith(bp + "/"));
+    if (isBlockedExact) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
   }
 
   return NextResponse.next();
