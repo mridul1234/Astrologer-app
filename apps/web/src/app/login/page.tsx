@@ -182,28 +182,28 @@ export default function LoginPage() {
       </div>
 
       {/* ── Form Area ── */}
-      <div className="flex-1 flex items-start justify-center px-3 py-6 sm:px-4 sm:py-10">
+      <div className="flex-1 flex items-start justify-center px-4 py-6 sm:px-4 sm:py-10">
         <div className="w-full max-w-md">
-        <div className="glass-card rounded-[1.5rem] sm:rounded-[2rem] px-5 py-8 sm:px-8 sm:py-10">
+        <div className="glass-card rounded-3xl sm:rounded-[2rem] px-5 py-8 sm:px-8 sm:py-10 mx-auto">
           {step === "phone" && (
             <>
-              <div className="text-center mb-8">
-                <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center font-black text-white text-2xl" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
-                <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-slate-800 tracking-wide">Welcome Back</h1>
-                <p className="text-slate-500 font-medium mt-2 text-sm">
+              <div className="text-center mb-6 sm:mb-8">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center font-black text-white text-xl sm:text-2xl" style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)" }}>ॐ</div>
+                <h1 className="font-cinzel text-xl sm:text-3xl font-bold text-slate-800 tracking-wide">Welcome Back</h1>
+                <p className="text-slate-500 font-medium mt-2 text-xs sm:text-sm">
                   Enter your mobile number to receive a one-time passcode
                 </p>
               </div>
 
-              <form onSubmit={handleSendOtp} className="space-y-6">
+              <form onSubmit={handleSendOtp} className="space-y-5 sm:space-y-6">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-widest text-slate-600 mb-3 ml-1">
+                  <label className="block text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-600 mb-2 sm:mb-3 ml-1">
                     Mobile Number
                   </label>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 sm:gap-3">
                     <div
-                      className="flex items-center px-4 rounded-2xl text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 shadow-inner"
-                      style={{ minWidth: "70px", justifyContent: "center" }}
+                      className="flex items-center px-3 sm:px-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 shadow-inner shrink-0"
+                      style={{ minWidth: "60px", justifyContent: "center" }}
                     >
                       🇮🇳 +91
                     </div>
@@ -214,7 +214,7 @@ export default function LoginPage() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
                       required
-                      className="astrowalla-input flex-1 px-5 py-4 rounded-2xl text-lg font-bold shadow-sm"
+                      className="astrowalla-input flex-1 w-0 min-w-0 px-4 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg font-bold shadow-sm"
                       placeholder="98765 43210"
                       autoFocus
                     />
@@ -223,7 +223,7 @@ export default function LoginPage() {
 
                 {error && (
                   <div
-                    className="text-sm font-semibold px-5 py-4 rounded-2xl shadow-sm"
+                    className="text-xs sm:text-sm font-semibold px-4 sm:px-5 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-sm"
                     style={{
                       background: "rgba(239,68,68,0.05)",
                       border: "1px solid rgba(239,68,68,0.2)",
@@ -238,7 +238,7 @@ export default function LoginPage() {
                   id="send-otp-btn"
                   type="submit"
                   disabled={loading || phone.length < 10}
-                  className="btn-gold w-full py-4 rounded-2xl text-lg font-extrabold uppercase tracking-wide shadow-lg mt-2"
+                  className="btn-gold w-full py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg font-extrabold uppercase tracking-wide shadow-lg mt-2"
                 >
                   {loading ? "Sending OTP…" : "Send OTP ✦"}
                 </button>
