@@ -188,6 +188,8 @@ export default function AdminDashboard() {
     } catch (e) {
       alert("Error occurred.");
     }
+  }
+
   async function handleAddReview(e: React.FormEvent) {
     e.preventDefault();
     if (!reviewAstrologerId) return;
