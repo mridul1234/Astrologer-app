@@ -188,6 +188,36 @@ export default function AdminDashboard() {
     } catch (e) {
       alert("Error occurred.");
     }
+  async function handleAddReview(e: React.FormEvent) {
+    e.preventDefault();
+    if (!reviewAstrologerId) return;
+    setIsSubmittingReview(true);
+    try {
+      const res = await fetch("/api/admin/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          astrologerId: reviewAstrologerId,
+          reviewerName: reviewName,
+          rating: Number(reviewRating),
+          comment: reviewComment,
+        }),
+      });
+      if (res.ok) {
+        alert("Review added successfully.");
+        setReviewAstrologerId(null);
+        setReviewName("");
+        setReviewRating("5");
+        setReviewComment("");
+      } else {
+        const data = await res.json();
+        alert(`Failed to add review: ${data.error}`);
+      }
+    } catch (err) {
+      alert("Error adding review.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
   }
 
   return (
@@ -537,6 +567,44 @@ export default function AdminDashboard() {
                     {loading ? "Registering..." : "+ Register Astrologer"}
                   </button>
                 </div>
+              </form>
+            </div>
+          </div>
+        )}
+        {/* REVIEW MODAL */}
+        {reviewAstrologerId && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl relative">
+              <button 
+                onClick={() => setReviewAstrologerId(null)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 hover:bg-stone-200"
+              >
+                ✕
+              </button>
+              <h3 className="text-xl font-extrabold text-stone-900 mb-6">Add Fake Review</h3>
+              
+              <form onSubmit={handleAddReview} className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Reviewer Name (Optional)</label>
+                  <input value={reviewName} onChange={e => setReviewName(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842]" placeholder="e.g. Rahul S." />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Rating</label>
+                  <select value={reviewRating} onChange={e => setReviewRating(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842]">
+                    <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                    <option value="4">⭐⭐⭐⭐ (4)</option>
+                    <option value="3">⭐⭐⭐ (3)</option>
+                    <option value="2">⭐⭐ (2)</option>
+                    <option value="1">⭐ (1)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Comment</label>
+                  <textarea required value={reviewComment} onChange={e => setReviewComment(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] min-h-[100px]" placeholder="Very accurate predictions..." />
+                </div>
+                <button disabled={isSubmittingReview} type="submit" className="w-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white font-extrabold py-3.5 rounded-xl hover:shadow-lg disabled:opacity-50 mt-4">
+                  {isSubmittingReview ? "Saving..." : "Post Review"}
+                </button>
               </form>
             </div>
           </div>
