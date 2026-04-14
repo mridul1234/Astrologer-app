@@ -30,8 +30,8 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // Astrologer trying to access user dashboard
-  if (pathname.startsWith("/dashboard") && role === "ASTROLOGER") {
+  // Astrologer trying to access user dashboard or home
+  if ((pathname.startsWith("/dashboard") || pathname === "/home") && role === "ASTROLOGER") {
     return NextResponse.redirect(new URL("/astrologer", req.url));
   }
 
@@ -46,7 +46,7 @@ export default auth((req) => {
     const isBlockedExact = blockedSubPaths.includes(subPath) || 
                            blockedSubPaths.some(bp => bp !== "" && subPath.startsWith(bp + "/"));
     if (isBlockedExact) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+      return NextResponse.redirect(new URL("/home", req.url));
     }
   }
 

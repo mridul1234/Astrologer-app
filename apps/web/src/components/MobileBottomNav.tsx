@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const tabs = [
   {
     label: "Home",
-    href: "/dashboard",
+    href: "/home",
     // House icon
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
@@ -89,10 +89,10 @@ const tabs = [
 export default function MobileBottomNav() {
   const pathname = usePathname();
 
-  // Determine active tab: match by href, with special case for Chat (same href as Home)
+  // Determine active tab
   const getIsActive = (href: string, label: string) => {
-    if (label === "Chat") return false; // never auto-active since same route as Home
-    if (label === "Home") return pathname === "/dashboard" || pathname.startsWith("/dashboard/chat");
+    if (label === "Home") return pathname === "/home";
+    if (label === "Chat") return pathname === "/dashboard" || pathname.startsWith("/dashboard/chat");
     return pathname === href || pathname.startsWith(href + "/");
   };
 
