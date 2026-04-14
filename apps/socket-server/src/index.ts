@@ -159,6 +159,12 @@ io.on("connection", (socket) => {
             });
             if (!user) return;
 
+            // FIRST, check if they can pay for the upcoming minute
+            if (user.freeMinutesLeft <= 0 && user.walletBalance < currentMeta.ratePerMin) {
+              await endSession(sessionId, "insufficient_balance");
+              return;
+            }
+
             if (user.freeMinutesLeft > 0) {
               // ── FREE TRIAL MINUTE ──
               // Decrement user's free minutes; credit astrologer net amount (platform absorbs cost)
@@ -207,10 +213,6 @@ io.on("connection", (socket) => {
                 isFreeMinute: true,
               });
 
-              // Free minutes exhausted and no wallet balance → end session
-              if (remainingFree <= 0 && user.walletBalance < currentMeta.ratePerMin) {
-                await endSession(sessionId, "insufficient_balance");
-              }
             } else {
               // ── PAID MINUTE ──
               const updated = await prisma.user.update({
@@ -254,10 +256,6 @@ io.on("connection", (socket) => {
                 freeMinutesLeft: 0,
                 isFreeMinute: false,
               });
-
-              if (updated.walletBalance <= 0) {
-                await endSession(sessionId, "insufficient_balance");
-              }
             }
           } catch (err) {
             console.error("[Billing] Error:", err);

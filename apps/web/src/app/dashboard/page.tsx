@@ -42,6 +42,7 @@ export default function UserDashboard() {
   const astrologers = apiAstrologers ? [...apiAstrologers].sort((a: Astrologer, b: Astrologer) => b.reviewCount - a.reviewCount) : [];
   
   const balance = profile?.walletBalance !== undefined ? Number(profile.walletBalance) : 0;
+  const freeMinutesLeft = profile?.freeMinutesLeft !== undefined ? Number(profile.freeMinutesLeft) : 0;
   const balanceLoaded = profile !== undefined;
 
   const [starting, setStarting] = useState<string | null>(null);
@@ -87,7 +88,8 @@ export default function UserDashboard() {
 
   async function startChat(astrologerId: string, rate: number) {
     // Only do front-end balance guard if we've successfully loaded the balance
-    if (balanceLoaded && balance < rate) {
+    // Allow users to start a chat if they have free minutes, even if wallet balance is low
+    if (balanceLoaded && balance < rate && freeMinutesLeft <= 0) {
       router.push("/wallet");
       return;
     }
@@ -349,7 +351,7 @@ export default function UserDashboard() {
                               <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"/>
                               Starting...
                             </span>
-                          ) : (a.ratePerMin === 0 ? "💬 Free Chat" : "💬 Chat Now")}
+                          ) : ((a.ratePerMin === 0 || freeMinutesLeft > 0) ? "💬 Free Chat" : "💬 Chat Now")}
                         </button>
                       )}
 
