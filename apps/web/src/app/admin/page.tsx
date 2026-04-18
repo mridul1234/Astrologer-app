@@ -77,6 +77,11 @@ export default function AdminDashboard() {
   const [reviewComment, setReviewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
+  // Add Fake Orders Modal State
+  const [fakeOrdersAstrologerId, setFakeOrdersAstrologerId] = useState<string | null>(null);
+  const [fakeOrdersCount, setFakeOrdersCount] = useState("50");
+  const [isSubmittingOrders, setIsSubmittingOrders] = useState(false);
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/admin/login");
@@ -219,6 +224,34 @@ export default function AdminDashboard() {
       alert("Error adding review.");
     } finally {
       setIsSubmittingReview(false);
+    }
+  }
+
+  async function handleAddFakeOrders(e: React.FormEvent) {
+    e.preventDefault();
+    if (!fakeOrdersAstrologerId) return;
+    setIsSubmittingOrders(true);
+    try {
+      const res = await fetch("/api/admin/astrologers", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: fakeOrdersAstrologerId,
+          fakeOrders: Number(fakeOrdersCount),
+        }),
+      });
+      if (res.ok) {
+        alert("Fake orders added successfully.");
+        setFakeOrdersAstrologerId(null);
+        setFakeOrdersCount("50");
+      } else {
+        const data = await res.json();
+        alert(`Failed to add fake orders: ${data.error}`);
+      }
+    } catch (err) {
+      alert("Error adding fake orders.");
+    } finally {
+      setIsSubmittingOrders(false);
     }
   }
 
@@ -382,6 +415,12 @@ export default function AdminDashboard() {
                              </div>
                            </td>
                            <td className="px-6 py-4 text-right flex justify-end gap-2">
+                             <button 
+                               onClick={() => setFakeOrdersAstrologerId(a.id)}
+                               className="px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-600 hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition-all"
+                             >
+                               + Orders
+                             </button>
                              <button 
                                onClick={() => setReviewAstrologerId(a.astrologerProfile?.id || null)}
                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-600 hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-all"
@@ -606,6 +645,34 @@ export default function AdminDashboard() {
                 </div>
                 <button disabled={isSubmittingReview} type="submit" className="w-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white font-extrabold py-3.5 rounded-xl hover:shadow-lg disabled:opacity-50 mt-4">
                   {isSubmittingReview ? "Saving..." : "Post Review"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+        
+        {/* FAKE ORDERS MODAL */}
+        {fakeOrdersAstrologerId && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-6 md:p-8 w-full max-w-sm shadow-2xl relative">
+              <button 
+                onClick={() => setFakeOrdersAstrologerId(null)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-500 hover:bg-stone-200"
+              >
+                ✕
+              </button>
+              <h3 className="text-xl font-extrabold text-stone-900 mb-2">Inject Fake Orders</h3>
+              <p className="text-xs text-stone-500 mb-6 flex items-center gap-1">
+                <span className="text-red-500">⚠</span> This strictly pads the public view counter.
+              </p>
+              
+              <form onSubmit={handleAddFakeOrders} className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Number of Orders to Add</label>
+                  <input type="number" min="1" required value={fakeOrdersCount} onChange={e => setFakeOrdersCount(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-lg font-bold text-stone-800 outline-none focus:border-[#f5c842]" />
+                </div>
+                <button disabled={isSubmittingOrders} type="submit" className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-3.5 rounded-xl hover:shadow-lg disabled:opacity-50 mt-4 shadow-amber-200/50">
+                  {isSubmittingOrders ? "Adding..." : "+ Add Orders"}
                 </button>
               </form>
             </div>

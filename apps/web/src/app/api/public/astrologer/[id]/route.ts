@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "Astrologer not found" }, { status: 404 });
     }
 
-    const orderCount = astrologer.chatSessions.length;
+    const orderCount = astrologer.chatSessions.length + astrologer.fakeOrders;
     const avgRating = astrologer.reviews.length > 0 
       ? astrologer.reviews.reduce((acc, r) => acc + r.rating, 0) / astrologer.reviews.length 
       : 0;

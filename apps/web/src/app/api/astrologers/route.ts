@@ -25,7 +25,7 @@ export async function GET() {
     const total = a.reviews.length;
     const avg = total > 0 ? a.reviews.reduce((sum, r) => sum + r.rating, 0) / total : 0;
     const activeSession = a.chatSessions[0] ?? null;
-    const orderCount = a._count.chatSessions;
+    const orderCount = a._count.chatSessions + a.fakeOrders;
     
     return { 
       id: a.id,
