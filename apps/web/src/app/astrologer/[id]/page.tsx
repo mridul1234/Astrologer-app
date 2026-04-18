@@ -188,19 +188,26 @@ export default function PublicAstrologerProfile() {
              </div>
              <div>
                <h3 className="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1">Availability</h3>
-               <p className="font-bold text-emerald-600 flex items-center gap-1.5 border border-emerald-100 bg-emerald-50 w-fit px-3 py-1 rounded-lg">
-                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                 Online Now
-               </p>
+               {profile.isOnline ? (
+                 <p className="font-bold text-emerald-600 flex items-center gap-1.5 border border-emerald-100 bg-emerald-50 w-fit px-3 py-1 rounded-lg">
+                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                   Online Now
+                 </p>
+               ) : (
+                 <p className="font-bold text-stone-500 flex items-center gap-1.5 border border-stone-200 bg-stone-100 w-fit px-3 py-1 rounded-lg">
+                   <span className="w-1.5 h-1.5 rounded-full bg-stone-400"></span>
+                   Not Available
+                 </p>
+               )}
              </div>
              <div className="pt-4 border-t border-stone-100 hidden sm:block">
                {/* Desktop CTA */}
                <button 
                   onClick={startChat}
-                  disabled={starting}
-                  className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-3.5 rounded-xl text-sm shadow-md shadow-amber-200/50 hover:-translate-y-0.5 transition-all disabled:opacity-50"
+                  disabled={starting || !profile.isOnline}
+                  className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-3.5 rounded-xl text-sm shadow-md shadow-amber-200/50 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:from-stone-200 disabled:to-stone-300 disabled:text-stone-500 disabled:shadow-none"
                >
-                 {starting ? "Starting Chat..." : `Chat Now (₹${profile.ratePerMin}/min)`}
+                 {starting ? "Starting Chat..." : !profile.isOnline ? "Not Available" : `Chat Now (₹${profile.ratePerMin}/min)`}
                </button>
              </div>
           </div>
@@ -243,13 +250,13 @@ export default function PublicAstrologerProfile() {
       <div className="fixed bottom-14 left-0 right-0 sm:hidden bg-white/80 backdrop-blur-md border-t border-stone-200 p-4 pb-6 z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
          <button 
             onClick={startChat}
-            disabled={starting}
-            className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-4 rounded-2xl shadow-lg shadow-amber-200/50 active:scale-95 transition-all text-lg disabled:opacity-50 flex items-center justify-center gap-2"
+            disabled={starting || !profile.isOnline}
+            className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-4 rounded-2xl shadow-lg shadow-amber-200/50 active:scale-95 transition-all text-lg disabled:opacity-50 flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:from-stone-200 disabled:to-stone-300 disabled:shadow-none"
          >
            {starting ? (
               <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
            ) : "💬"}
-           {starting ? "Starting..." : `Chat Now · ₹${profile.ratePerMin}/min`}
+           {starting ? "Starting..." : !profile.isOnline ? "Not Available" : `Chat Now · ₹${profile.ratePerMin}/min`}
          </button>
       </div>
 

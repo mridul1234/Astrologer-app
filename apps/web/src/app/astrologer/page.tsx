@@ -40,6 +40,7 @@ export default function AstrologerPortal() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [profile, setProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0 });
+  const [isOnline, setIsOnline] = useState(false);
   
   const [loading, setLoading] = useState(true);
   const [astrologerName, setAstrologerName] = useState("Astrologer");
@@ -129,6 +130,7 @@ export default function AstrologerPortal() {
         languages: data.languages || "",
         ratePerMin: data.ratePerMin || 0,
       });
+      setIsOnline(data.isOnline ?? false);
 
       // Update edit form if untouched
       if (!editProfile.ratePerMin) {
@@ -282,7 +284,27 @@ export default function AstrologerPortal() {
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 sm:gap-6">
+            {/* Online/Busy Toggle */}
+            <button
+              onClick={async () => {
+                const newVal = !isOnline;
+                setIsOnline(newVal);
+                await fetch("/api/astrologer/profile", {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ isOnline: newVal }),
+                });
+              }}
+              className={`px-3 sm:px-4 py-2 rounded-[14px] text-xs font-extrabold flex items-center gap-2 border-[2px] transition-all hover:-translate-y-0.5
+                ${isOnline ? "bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 shadow-[0_4px_12px_rgba(52,211,153,0.1)]" : "bg-stone-50 text-stone-500 border-stone-200 hover:bg-stone-100 shadow-sm"}
+              `}
+            >
+              <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-500 animate-pulse" : "bg-stone-400"}`}></span>
+              <span className="hidden sm:inline">{isOnline ? "Online" : "Offline / Busy"}</span>
+              <span className="sm:hidden">{isOnline ? "Online" : "Busy"}</span>
+            </button>
+
             {/* Profile Avatar + Dropdown */}
             <div className="relative" ref={profileRef}>
               <button

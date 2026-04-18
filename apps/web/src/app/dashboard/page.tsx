@@ -313,11 +313,16 @@ export default function UserDashboard() {
                           </span>
                         </div>
 
-                        {/* Status badge - Only show if Busy */}
-                        {a.isBusy && (
+                        {/* Status badge - Only show if Busy or Offline */}
+                        {a.isBusy ? (
                           <div className="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-full px-2.5 py-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shrink-0" />
                             <span className="text-[11px] font-bold text-red-600 uppercase tracking-wide">In Session</span>
+                          </div>
+                        ) : !a.isOnline && (
+                          <div className="flex items-center gap-1.5 bg-stone-100 border border-stone-200 rounded-full px-2.5 py-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-stone-400 shrink-0" />
+                            <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wide">Not Available</span>
                           </div>
                         )}
                       </div>
@@ -337,6 +342,14 @@ export default function UserDashboard() {
                             <p className="text-sm font-extrabold text-orange-500">~{getWaitMins(a.sessionStartedAt)} min</p>
                           </div>
                         </div>
+                      ) : !a.isOnline ? (
+                        <button
+                          disabled
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full px-5 py-2 rounded-xl text-sm font-bold border-2 border-stone-200 text-stone-400 bg-stone-50 cursor-not-allowed opacity-80"
+                        >
+                          Not Available
+                        </button>
                       ) : (
                         <button
                           onClick={(e) => {

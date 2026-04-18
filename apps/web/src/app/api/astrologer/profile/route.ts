@@ -80,6 +80,7 @@ export async function PATCH(req: NextRequest) {
       ...(bio !== undefined ? { bio } : {}),
       ...(speciality?.trim() ? { speciality } : {}),
       ...(ratePerMin !== undefined && ratePerMin > 0 ? { ratePerMin: Number(ratePerMin) } : {}),
+      ...(body.isOnline !== undefined ? { isOnline: Boolean(body.isOnline) } : {}),
     },
     include: {
       user: { select: { name: true, email: true } },
