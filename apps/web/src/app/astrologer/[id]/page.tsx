@@ -27,6 +27,7 @@ interface AstrologerProfile {
   orderCount: number;
   avgRating: number;
   reviews: Review[];
+  profileImage: string | null;
 }
 
 export default function PublicAstrologerProfile() {
@@ -122,8 +123,11 @@ export default function PublicAstrologerProfile() {
           
           <div className="shrink-0 relative">
             <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-[4px] border-[#f5c842] p-1 shadow-lg shadow-amber-200/50 relative z-10">
-              <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-6xl sm:text-7xl overflow-hidden object-cover bg-gradient-to-b from-[#fef3c7] to-[#fde68a]">
-                👨🏽‍🦱
+              <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-6xl sm:text-7xl overflow-hidden">
+                {profile.profileImage
+                  ? <img src={profile.profileImage} alt={profile.name} className="w-full h-full object-cover rounded-full" />
+                  : <span>👨🏽‍🦱</span>
+                }
               </div>
             </div>
             {profile.isOnline && (

@@ -42,6 +42,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       languages: astrologer.languages,
       ratePerMin: astrologer.ratePerMin,
       isOnline: astrologer.isOnline,
+      profileImage: astrologer.profileImage,
       orderCount,
       avgRating,
       reviews: astrologer.reviews.map(r => ({
