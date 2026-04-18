@@ -27,6 +27,7 @@ interface Astrologer {
   experienceYears?: number;
   languages?: string;
   categories?: string[];
+  profileImage?: string | null;
 }
 
 export default function UserDashboard() {
@@ -262,8 +263,11 @@ export default function UserDashboard() {
                   {/* Left Column: Avatar & Rating */}
                   <div className="flex flex-col items-center shrink-0 w-24">
                     <div className="w-20 h-20 rounded-full border-[3px] border-[#f5c842] p-1 mb-2 relative group-hover:border-[#d97706] group-hover:scale-105 transition-all duration-300 shadow-sm group-hover:shadow-amber-200/60 group-hover:shadow-lg">
-                      <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-3xl overflow-hidden object-cover bg-gradient-to-b from-[#fef3c7] to-[#fde68a]">
-                        👨🏽‍🦱
+                      <div className="w-full h-full rounded-full bg-slate-100 flex items-center justify-center text-3xl overflow-hidden">
+                        {a.profileImage
+                          ? <img src={a.profileImage} alt={a.user.name} className="w-full h-full object-cover rounded-full" />
+                          : <span className="text-3xl">👨🏽‍🦱</span>
+                        }
                       </div>
                     </div>
                     {/* Stars + Rating */}

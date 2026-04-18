@@ -43,6 +43,7 @@ export async function GET() {
       orderCount,
       experienceYears: a.experienceYears,
       languages: a.languages,
+      profileImage: a.profileImage,
     };
   });
 
