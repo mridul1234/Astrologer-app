@@ -624,6 +624,7 @@ export default function AstrologerPortal() {
                     />
                   </div>
                 </div>
+                <div>
                   <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Specialties / Focus</label>
                   <input 
                     type="text" 
