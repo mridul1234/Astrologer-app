@@ -11,6 +11,7 @@
   "dependencies": {
     "@astrology/db": "^1.0.0",
     "@auth/prisma-adapter": "^2.11.1",
+    "@supabase/supabase-js": "^2.103.3",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "bcryptjs": "^3.0.3",

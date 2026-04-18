@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabaseClient";
 
 interface Analytics {
   totalUsers: number;
@@ -67,6 +68,7 @@ export default function AdminDashboard() {
   const [experienceYears, setExperienceYears] = useState("0");
   const [languages, setLanguages] = useState("Hindi, English");
   const [profileImage, setProfileImage] = useState("");
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<{ text: string; type: "error" | "success" } | null>(null);
 
@@ -117,7 +119,38 @@ export default function AdminDashboard() {
     e.preventDefault();
     setLoading(true);
     setMsg(null);
+    
+    // Check if we require image file or text
+    if (!profileImage && !profileImageFile) {
+        setMsg({ text: "Please provide a profile image file.", type: "error" });
+        setLoading(false);
+        return;
+    }
 
+    let finalImageUrl = profileImage;
+
+    // 1. Upload to Supabase Storage if a File was selected
+    if (profileImageFile) {
+      const fileExt = profileImageFile.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `profiles/${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, profileImageFile);
+      
+      if (uploadError) {
+        setMsg({ text: `Image Upload Failed: ${uploadError.message}`, type: "error" });
+        setLoading(false);
+        return;
+      }
+
+      // 2. Retrieve public URL
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      finalImageUrl = data.publicUrl;
+    }
+
+    // 3. Register user profile
     const res = await fetch("/api/admin/astrologers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -126,7 +159,7 @@ export default function AdminDashboard() {
         ratePerMin: Number(ratePerMin),  
         experienceYears: Number(experienceYears), 
         languages, 
-        profileImage 
+        profileImage: finalImageUrl 
       }),
     });
 
@@ -136,7 +169,8 @@ export default function AdminDashboard() {
     if (res.ok) {
       setMsg({ text: `Successfully registered ${name}! They can now log in.`, type: "success" });
       setName(""); setEmail(""); setPassword(""); setSpeciality(""); setCategories([]); 
-      setRatePerMin("15"); setExperienceYears("0"); setLanguages("Hindi, English"); setProfileImage("");
+      setRatePerMin("15"); setExperienceYears("0"); setLanguages("Hindi, English"); 
+      setProfileImage(""); setProfileImageFile(null);
     } else {
       setMsg({ text: data.error || "Failed to register astrologer", type: "error" });
     }
@@ -598,8 +632,31 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="col-span-2">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Profile Photo URL</label>
-                  <input required type="url" value={profileImage} onChange={e => setProfileImage(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400" placeholder="https://example.com/photo.jpg" />
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Profile Photo Upload</label>
+                  
+                  {/* Option 1: File Upload */}
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={e => {
+                        if (e.target.files && e.target.files.length > 0) {
+                            setProfileImageFile(e.target.files[0]);
+                            setProfileImage(""); // Clear text input if file chosen
+                        } else {
+                            setProfileImageFile(null);
+                        }
+                    }} 
+                    className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none mb-3 focus:border-[#f5c842] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#f5c842] file:text-stone-900 hover:file:bg-[#d97706] file:cursor-pointer" 
+                  />
+                  
+                  {/* Option 2: Fallback text url */}
+                  <div className="flex items-center gap-3 w-full my-2">
+                    <div className="h-px bg-stone-200 flex-1"></div>
+                    <span className="text-[10px] uppercase font-bold text-stone-400">OR</span>
+                    <div className="h-px bg-stone-200 flex-1"></div>
+                  </div>
+                  
+                  <input type="url" disabled={!!profileImageFile} value={profileImage} onChange={e => setProfileImage(e.target.value)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400 disabled:opacity-50" placeholder="Fallback: Manual Image URL" />
                 </div>
 
 

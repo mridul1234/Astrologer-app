@@ -81,6 +81,8 @@ export async function PATCH(req: NextRequest) {
       ...(speciality?.trim() ? { speciality } : {}),
       ...(ratePerMin !== undefined && ratePerMin > 0 ? { ratePerMin: Number(ratePerMin) } : {}),
       ...(body.isOnline !== undefined ? { isOnline: Boolean(body.isOnline) } : {}),
+      ...(languages !== undefined ? { languages } : {}),
+      ...(body.profileImage !== undefined ? { profileImage: body.profileImage } : {}),
     },
     include: {
       user: { select: { name: true, email: true } },

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import VedicLoader from "../../components/VedicLoader";
+import { supabase } from "@/lib/supabaseClient";
 
 interface ChatSession {
   id: string;
@@ -31,6 +32,7 @@ interface AstrologerProfile {
   speciality: string | null;
   languages: string | null;
   ratePerMin: number;
+  profileImage?: string | null;
 }
 
 export default function AstrologerPortal() {
@@ -56,7 +58,8 @@ export default function AstrologerPortal() {
 
   // Settings Form State
   const [isUpdating, setIsUpdating] = useState(false);
-  const [editProfile, setEditProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0 });
+  const [editProfile, setEditProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0, profileImage: "" });
+  const [editProfileImageFile, setEditProfileImageFile] = useState<File | null>(null);
 
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -129,6 +132,7 @@ export default function AstrologerPortal() {
         speciality: data.speciality || "",
         languages: data.languages || "",
         ratePerMin: data.ratePerMin || 0,
+        profileImage: data.profileImage || "",
       });
       setIsOnline(data.isOnline ?? false);
 
@@ -139,6 +143,7 @@ export default function AstrologerPortal() {
            speciality: data.speciality || "",
            languages: data.languages || "",
            ratePerMin: data.ratePerMin || 0,
+           profileImage: data.profileImage || "",
          });
       }
       
@@ -200,14 +205,35 @@ export default function AstrologerPortal() {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
+    
+    let finalImageUrl = editProfile.profileImage;
+
+    // Upload to Supabase if file exists
+    if (editProfileImageFile) {
+      const fileExt = editProfileImageFile.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `profiles/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, editProfileImageFile);
+      if (uploadError) {
+        alert("Image Upload Failed: " + uploadError.message);
+        setIsUpdating(false);
+        return;
+      }
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      finalImageUrl = data.publicUrl;
+    }
+
     try {
       const res = await fetch("/api/astrologer/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editProfile),
+        body: JSON.stringify({ ...editProfile, profileImage: finalImageUrl }),
       });
       if (res.ok) {
         alert("Profile updated successfully!");
+        setEditProfileImageFile(null); // clear file
         fetchProfileData();
       } else {
         alert("Failed to update profile.");
@@ -581,6 +607,23 @@ export default function AstrologerPortal() {
               
               <form onSubmit={handleUpdateProfile} className="space-y-6">
                 <div>
+                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Profile Avatar</label>
+                  <div className="flex items-center gap-4">
+                    {editProfile.profileImage && !editProfileImageFile && (
+                       <img src={editProfile.profileImage} alt="Avatar" className="w-16 h-16 rounded-full object-cover border border-slate-200 shadow-sm" />
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={e => {
+                          if (e.target.files && e.target.files.length > 0) {
+                              setEditProfileImageFile(e.target.files[0]);
+                          }
+                      }} 
+                      className="w-full bg-slate-50 px-4 py-3 rounded-xl border border-slate-200 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#f5c842] file:text-slate-900 focus:ring-2 focus:ring-[#d97706]/50 cursor-pointer" 
+                    />
+                  </div>
+                </div>
                   <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Specialties / Focus</label>
                   <input 
                     type="text" 
