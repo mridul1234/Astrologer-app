@@ -62,7 +62,8 @@ export default function UserHeader() {
         <div className="hidden lg:flex items-center gap-1">
           {[
             { label: "Free Kundli", href: "/kundli" },
-            { label: "Chat with Astrologer", href: "/dashboard" },
+            { label: "Astrologers", href: "/dashboard" },
+            { label: "My Chats", href: "/chats" },
           ].map(({ label, href }) => (
             <Link
               key={label}
@@ -134,6 +135,7 @@ export default function UserHeader() {
                 {/* Menu Items */}
                 <div className="py-1">
                   {[
+                     { icon: "💬", label: "My Chats", onClick: () => router.push("/chats") },
                      { icon: "💰", label: "Wallet Transactions", onClick: () => router.push("/transactions") },
                      { icon: "📜", label: "Order History", onClick: () => router.push("/orders") },
                    ].map(({ icon, label, onClick }) => (

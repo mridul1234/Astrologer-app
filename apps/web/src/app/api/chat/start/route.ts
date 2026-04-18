@@ -3,7 +3,7 @@ import { prisma } from "@astrology/db";
 import { auth } from "@/auth";
 import jwt from "jsonwebtoken";
 
-// POST /api/chat/start  — starts a new chat session
+// POST /api/chat/start  — resumes or starts a chat session
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -33,13 +33,33 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const chatSession = await prisma.chatSession.create({
-    data: {
+  // --- Check for an existing session between this user + astrologer ---
+  const existingSession = await prisma.chatSession.findFirst({
+    where: {
       userId: session.user.id,
       astrologerId,
-      status: "ACTIVE",
     },
+    orderBy: { startedAt: "desc" },
   });
+
+  let chatSession;
+
+  if (existingSession) {
+    // Reactivate existing session
+    chatSession = await prisma.chatSession.update({
+      where: { id: existingSession.id },
+      data: { status: "ACTIVE", endedAt: null },
+    });
+  } else {
+    // Create a brand new session
+    chatSession = await prisma.chatSession.create({
+      data: {
+        userId: session.user.id,
+        astrologerId,
+        status: "ACTIVE",
+      },
+    });
+  }
 
   // Generate a short-lived socket token for this user
   const socketToken = jwt.sign(
@@ -56,5 +76,6 @@ export async function POST(req: NextRequest) {
       ratePerMin: astrologer.ratePerMin,
     },
     freeMinutesLeft: user.freeMinutesLeft,
+    resumed: !!existingSession,
   });
 }
