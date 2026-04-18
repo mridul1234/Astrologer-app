@@ -269,7 +269,7 @@ export default function UserChatPage() {
   // ─── Loading ───────────────────────────────────────────────────────────────
   if (status === "loading") return (
     <div className="flex h-screen items-center justify-center bg-[#faf8f5]">
-      <VedicLoader size="lg" text="Connecting to your cosmos…" />
+      <VedicLoader size="lg" text="Your kundli is being shared with the astrologer..." />
     </div>
   );
 
@@ -328,7 +328,11 @@ export default function UserChatPage() {
           </div>
 
           <h2 className="text-2xl font-cinzel font-bold text-slate-800 mb-1">Awaiting Your Guide</h2>
-          <p className="text-slate-500 text-sm mb-6">Connecting you to <strong className="text-[#FF9933]">{astrologerName}</strong>…</p>
+          <p className="text-slate-500 text-sm mb-3">Connecting you to <strong className="text-[#FF9933]">{astrologerName}</strong>…</p>
+          
+          <div className="mb-6 px-4 py-2 bg-[#FF9933]/10 border border-[#FF9933]/20 rounded-full text-[#FF9933] text-xs font-bold animate-pulse shadow-sm">
+            ✨ Your kundli is being shared with the astrologer
+          </div>
 
           <div className="w-full bg-[#faf8f5] border border-[#f5c842]/25 rounded-2xl px-6 py-4 mb-6" style={{ animation: "glowPulse 2.5s ease-in-out infinite" }}>
             <div className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1">Session expires in</div>
