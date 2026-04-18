@@ -167,17 +167,11 @@ io.on("connection", (socket) => {
 
             if (user.freeMinutesLeft > 0) {
               // ── FREE TRIAL MINUTE ──
-              // Decrement user's free minutes; credit astrologer net amount (platform absorbs cost)
-              const [, ] = await Promise.all([
-                prisma.user.update({
-                  where: { id: currentMeta.userId },
-                  data: { freeMinutesLeft: { decrement: 1 } },
-                }),
-                prisma.user.update({
-                  where: { id: currentMeta.astrologerUserId },
-                  data: { walletBalance: { increment: currentMeta.netRatePerMin } },
-                }),
-              ]);
+              // Decrement user's free minutes. Astrologer is not compensated for free minutes.
+              await prisma.user.update({
+                where: { id: currentMeta.userId },
+                data: { freeMinutesLeft: { decrement: 1 } },
+              });
 
               // Log transactions for records
               await prisma.$transaction([
@@ -185,7 +179,7 @@ io.on("connection", (socket) => {
                   where: { id: sessionId },
                   data: { 
                     totalCost: { increment: 0 },
-                    astrologerEarnings: { increment: currentMeta.netRatePerMin }
+                    astrologerEarnings: { increment: 0 }
                   },
                 }),
                 prisma.transaction.create({
@@ -199,9 +193,9 @@ io.on("connection", (socket) => {
                 prisma.transaction.create({
                   data: {
                     userId: currentMeta.astrologerUserId,
-                    amount: currentMeta.netRatePerMin,
+                    amount: 0,
                     type: "CREDIT",
-                    reason: `Chat Earnings (Free Trial, Net) - session ${sessionId}`,
+                    reason: `Chat Earnings (Free Trial) - session ${sessionId}`,
                   },
                 }),
               ]);
