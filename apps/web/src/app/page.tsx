@@ -206,16 +206,8 @@ export default function Home() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group absolute left-1/2 -translate-x-1/2">
-            <div className="w-9 h-9 rounded-full bg-[#f5c842] flex items-center justify-center border-2 border-[#f0c842]/60 shadow-md overflow-hidden p-0.5">
-              <svg viewBox="0 0 100 100" className="w-full h-full text-amber-800 opacity-80 animate-[spin_40s_linear_infinite]">
-                <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2"/>
-                <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
-                <path d="M50 4 L50 96 M4 50 L96 50 M18 18 L82 82 M18 82 L82 18" stroke="currentColor" strokeWidth="0.8"/>
-                <text x="50" y="20" fontSize="10" textAnchor="middle" fill="currentColor">♈</text>
-                <text x="80" y="54" fontSize="10" textAnchor="middle" fill="currentColor">♋</text>
-                <text x="50" y="88" fontSize="10" textAnchor="middle" fill="currentColor">♎</text>
-                <text x="20" y="54" fontSize="10" textAnchor="middle" fill="currentColor">♑</text>
-              </svg>
+            <div className="w-9 h-9 rounded-full overflow-hidden shadow-md border-2 border-[#f0c842]/60">
+              <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <div className="font-extrabold text-[17px] text-stone-900 tracking-tight leading-none group-hover:text-[#d97706] transition-colors">AstroWalla</div>
@@ -537,7 +529,9 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
             <div className="sm:col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-stone-900 text-sm" style={{ background: "linear-gradient(135deg,#f5c842,#FF9933)" }}>ॐ</div>
+                <div className="w-8 h-8 rounded-full overflow-hidden shadow-md border border-white/20 shrink-0">
+                  <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
+                </div>
                 <span className="font-extrabold text-white text-lg tracking-tight">AstroWalla</span>
               </div>
               <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>

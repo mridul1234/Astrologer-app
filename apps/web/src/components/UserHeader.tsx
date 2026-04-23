@@ -41,16 +41,8 @@ export default function UserHeader() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 sm:h-[70px] flex items-center justify-between gap-3 sm:gap-6">
         {/* ── Logo ── */}
         <Link href="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
-          <div className="w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] bg-[#ffce4b] rounded-full flex items-center justify-center border-2 border-[#f0c842]/60 shadow-md p-1 overflow-hidden">
-            <svg viewBox="0 0 100 100" className="w-full h-full text-amber-800 opacity-80 animate-[spin_40s_linear_infinite]">
-              <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2"/>
-              <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
-              <path d="M50 4 L50 96 M4 50 L96 50 M18 18 L82 82 M18 82 L82 18" stroke="currentColor" strokeWidth="0.8"/>
-              <text x="50" y="19" fontSize="9" textAnchor="middle" fill="currentColor">♈</text>
-              <text x="81" y="54" fontSize="9" textAnchor="middle" fill="currentColor">♋</text>
-              <text x="50" y="88" fontSize="9" textAnchor="middle" fill="currentColor">♎</text>
-              <text x="19" y="54" fontSize="9" textAnchor="middle" fill="currentColor">♑</text>
-            </svg>
+          <div className="w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] rounded-full overflow-hidden shadow-md border-2 border-[#f0c842]/60 shrink-0">
+            <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-[17px] sm:text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>

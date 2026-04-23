@@ -11,16 +11,8 @@ export default function UserFooter() {
           {/* Col 1: Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-14 h-14 bg-[#ffce4b] rounded-full flex items-center justify-center shadow-md border-2 border-[#f0c842]/40 shrink-0 p-1 overflow-hidden">
-                <svg viewBox="0 0 100 100" className="w-full h-full text-amber-800 opacity-80 animate-[spin_40s_linear_infinite]">
-                  <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2"/>
-                  <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="1"/>
-                  <path d="M50 4 L50 96 M4 50 L96 50 M18 18 L82 82 M18 82 L82 18" stroke="currentColor" strokeWidth="0.8"/>
-                  <text x="50" y="20" fontSize="10" textAnchor="middle" fill="currentColor">♈</text>
-                  <text x="80" y="54" fontSize="10" textAnchor="middle" fill="currentColor">♋</text>
-                  <text x="50" y="88" fontSize="10" textAnchor="middle" fill="currentColor">♎</text>
-                  <text x="20" y="54" fontSize="10" textAnchor="middle" fill="currentColor">♑</text>
-                </svg>
+              <div className="w-14 h-14 rounded-full overflow-hidden shadow-md border-2 border-[#f0c842]/40 shrink-0">
+                <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <div className="font-extrabold text-2xl text-stone-900 tracking-tight leading-none">AstroWalla</div>
