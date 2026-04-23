@@ -6,6 +6,13 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const role = req.auth?.user?.role;
 
+  // If logged-in user hits the landing page or login page, redirect to their dashboard
+  if (isLoggedIn && (pathname === "/" || pathname === "/login")) {
+    if (role === "ASTROLOGER") return NextResponse.redirect(new URL("/astrologer", req.url));
+    if (role === "ADMIN") return NextResponse.redirect(new URL("/admin", req.url));
+    return NextResponse.redirect(new URL("/home", req.url));
+  }
+
   // Public paths — always accessible (exact match)
   const publicPaths = ["/", "/login", "/admin/login", "/astrologer/login", "/api/dev/seed-admin"];
   // Public path prefixes — legal/info pages accessible without login
