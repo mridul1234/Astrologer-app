@@ -12,7 +12,7 @@ export default function UserFooter() {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-14 h-14 rounded-full overflow-hidden shadow-md border-2 border-[#f0c842]/40 shrink-0">
-                <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
+                <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-contain" />
               </div>
               <div>
                 <div className="font-extrabold text-2xl text-stone-900 tracking-tight leading-none">AstroWalla</div>

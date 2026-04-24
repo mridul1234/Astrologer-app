@@ -207,7 +207,7 @@ export default function Home() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group absolute left-1/2 -translate-x-1/2">
             <div className="w-9 h-9 rounded-full overflow-hidden shadow-md border-2 border-[#f0c842]/60">
-              <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
+              <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="font-extrabold text-[17px] text-stone-900 tracking-tight leading-none group-hover:text-[#d97706] transition-colors">AstroWalla</div>
@@ -530,7 +530,7 @@ export default function Home() {
             <div className="sm:col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-full overflow-hidden shadow-md border border-white/20 shrink-0">
-                  <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
+                  <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-extrabold text-white text-lg tracking-tight">AstroWalla</span>
               </div>

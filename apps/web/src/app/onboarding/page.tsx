@@ -82,7 +82,7 @@ export default function OnboardingPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg,#1a1040,#2d1b69)" }}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 rounded-full overflow-hidden mx-auto shadow-lg border-2 border-white/20">
-            <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
+            <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-contain" />
           </div>
           <p className="text-white/60 text-sm font-medium animate-pulse">Aligning the stars…</p>
         </div>
@@ -118,7 +118,7 @@ export default function OnboardingPage() {
       <div className="relative z-10 flex items-center justify-center pt-10 pb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden shadow-md border-2 border-white/20 shrink-0">
-              <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
+              <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-contain" />
             </div>
           <span className="font-cinzel font-black text-white text-xl tracking-wide">AstroWalla</span>
         </div>

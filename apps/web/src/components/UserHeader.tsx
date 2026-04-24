@@ -42,7 +42,7 @@ export default function UserHeader() {
         {/* ── Logo ── */}
         <Link href="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
           <div className="w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] rounded-full overflow-hidden shadow-md border-2 border-[#f0c842]/60 shrink-0">
-            <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-cover" />
+            <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-contain" />
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-[17px] sm:text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
