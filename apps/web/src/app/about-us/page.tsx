@@ -12,7 +12,7 @@ const team = [
 const milestones = [
   { year: "2020", event: "AstroWalla founded with 5 expert astrologers" },
   { year: "2021", event: "Reached 50,000 users and launched mobile-first platform" },
-  { year: "2022", event: "Expanded to 200+ verified astrologers across India" },
+  { year: "2022", event: "Expanded to a growing network of verified astrologers across India" },
   { year: "2023", event: "Introduced live chat consultations and Kundli feature" },
   { year: "2024", event: "Crossed 5 lakh happy customers and 1M+ consultations" },
   { year: "2025", event: "Launched AI-assisted astrological reports and real-time chat" },
@@ -50,7 +50,7 @@ export default function AboutUsPage() {
             AstroWalla was born from a simple belief — every person deserves access to authentic, verified astrology guidance. We connect seekers with India's finest astrologers, anytime, anywhere.
           </p>
           <div className="flex justify-center gap-8 mt-10">
-            {[["5L+", "Happy Users"], ["200+", "Expert Astrologers"], ["1M+", "Consultations"], ["4.8★", "Avg Rating"]].map(([val, label]) => (
+            {[["5L+", "Happy Users"], ["Verified", "Expert Astrologers"], ["1M+", "Consultations"], ["4.8★", "Avg Rating"]].map(([val, label]) => (
               <div key={label} className="text-center">
                 <div className="text-2xl font-extrabold text-stone-900">{val}</div>
                 <div className="text-xs font-semibold text-stone-500 mt-0.5">{label}</div>

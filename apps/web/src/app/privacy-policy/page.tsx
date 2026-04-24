@@ -51,7 +51,7 @@ const sections = [
       "Right to correction: Update inaccurate or incomplete personal data",
       "Right to deletion: Request deletion of your account and associated data",
       "Right to portability: Receive your data in a machine-readable format",
-      "To exercise any of these rights, contact us at privacy@astrowalla.in",
+      "To exercise any of these rights, contact us at help.astrowalla@gmail.com",
     ],
   },
   {
@@ -127,7 +127,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-base font-extrabold text-stone-900 mb-2">Contact Our Privacy Team</h2>
           <p className="text-sm text-stone-600 font-medium">
             For any privacy-related queries, write to us at{" "}
-            <a href="mailto:privacy@astrowalla.in" className="text-[#d97706] font-bold hover:underline">privacy@astrowalla.in</a>
+            <a href="mailto:help.astrowalla@gmail.com" className="text-[#d97706] font-bold hover:underline">help.astrowalla@gmail.com</a>
             {" "}or reach out through our{" "}
             <Link href="/contact-us" className="text-[#d97706] font-bold hover:underline">Contact page</Link>.
           </p>

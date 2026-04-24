@@ -21,7 +21,7 @@ const clauses = [
   },
   {
     title: "5. Refund Policy",
-    content: "Wallet balances are non-refundable except in cases of technical errors or double charges verified by our team. Session charges once deducted are final unless there was a technical fault on our side. Refund requests must be submitted within 7 days of the disputed transaction via support@astrowalla.in.",
+    content: "Wallet balances are non-refundable except in cases of technical errors or double charges verified by our team. Session charges once deducted are final unless there was a technical fault on our side. Refund requests must be submitted within 7 days of the disputed transaction via help.astrowalla@gmail.com.",
   },
   {
     title: "6. User Conduct",
@@ -91,7 +91,7 @@ export default function TermsPage() {
           <h2 className="text-base font-extrabold text-stone-900 mb-2">Questions About These Terms?</h2>
           <p className="text-sm text-stone-600 font-medium">
             Contact us at{" "}
-            <a href="mailto:legal@astrowalla.in" className="text-[#d97706] font-bold hover:underline">legal@astrowalla.in</a>
+            <a href="mailto:help.astrowalla@gmail.com" className="text-[#d97706] font-bold hover:underline">help.astrowalla@gmail.com</a>
           </p>
         </div>
       </main>

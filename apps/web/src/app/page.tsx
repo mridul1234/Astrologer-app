@@ -293,7 +293,7 @@ export default function Home() {
 
             {/* Stats row */}
             <div className="flex gap-6 mt-8 justify-center md:justify-start">
-              {[["50K+","Happy Seekers"],["200+","Astrologers"],["4.9★","Avg Rating"]].map(([v,l])=>(
+              {[["50K+","Happy Seekers"],["Verified","Astrologers"],["4.9★","Avg Rating"]].map(([v,l])=>(
                 <div key={l} className="text-center">
                   <div className="text-[#f5c842] font-extrabold text-lg leading-tight">{v}</div>
                   <div className="text-white/50 text-[10px] font-medium uppercase tracking-wide">{l}</div>
@@ -537,7 +537,7 @@ export default function Home() {
               <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>
                 India's most trusted platform for real-time Vedic astrology consultations.
               </p>
-              <div className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.3)" }}>support@astrowalla.in</div>
+              <div className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.3)" }}>help.astrowalla@gmail.com</div>
             </div>
             {[
               { title: "Services", links: [["Chat with Astrologer","/login"],["Free Kundli","/kundli"]] },

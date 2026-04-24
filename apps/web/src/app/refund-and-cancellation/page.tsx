@@ -89,7 +89,7 @@ export default function RefundPage() {
           <h2 className="text-base font-extrabold text-stone-900 mb-5">How to Request a Refund</h2>
           <div className="space-y-4">
             {[
-              { step: "1", text: "Email us at support@astrowalla.in with subject line: \"Refund Request — [Transaction ID]\"" },
+              { step: "1", text: "Email us at help.astrowalla@gmail.com with subject line: \"Refund Request — [Transaction ID]\"" },
               { step: "2", text: "Include your registered phone number, the transaction date, and a brief description of the issue" },
               { step: "3", text: "Our team will acknowledge your request within 24 hours and investigate the matter" },
               { step: "4", text: "If approved, the refund is credited to your AstroWalla Wallet within 3–5 business days" },

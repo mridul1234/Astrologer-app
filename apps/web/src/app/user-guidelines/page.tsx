@@ -125,7 +125,7 @@ export default function UserGuidelinesPage() {
           </div>
           <p className="text-xs text-stone-400 font-medium mt-4">
             All violations are reviewed by our Trust & Safety team. To report an issue, contact{" "}
-            <a href="mailto:support@astrowalla.in" className="text-[#d97706] font-bold hover:underline">support@astrowalla.in</a>
+            <a href="mailto:help.astrowalla@gmail.com" className="text-[#d97706] font-bold hover:underline">help.astrowalla@gmail.com</a>
           </p>
         </div>
       </main>
