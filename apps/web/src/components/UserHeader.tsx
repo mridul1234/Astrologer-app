@@ -41,9 +41,7 @@ export default function UserHeader() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 sm:h-[70px] flex items-center justify-between gap-3 sm:gap-6">
         {/* ── Logo ── */}
         <Link href="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
-          <div className="w-[44px] h-[44px] sm:w-[52px] sm:h-[52px] rounded-full overflow-hidden shadow-md border-2 border-[#f0c842]/60 shrink-0">
-            <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-contain" />
-          </div>
+          <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-11 sm:h-13 w-auto object-contain" />
           <div className="flex flex-col leading-none">
             <span className="text-[17px] sm:text-[20px] font-extrabold text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
             <span className="hidden sm:block text-[9px] uppercase tracking-[0.18em] text-[#d97706] font-bold mt-[3px]">Your Celestial Guide</span>

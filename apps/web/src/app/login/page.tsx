@@ -170,9 +170,7 @@ export default function LoginPage() {
         ))}
         <div className="relative max-w-md mx-auto px-4 py-8 sm:py-10 text-center">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-4 hover:opacity-90 transition-opacity">
-            <div className="w-9 h-9 rounded-full overflow-hidden shadow-md border-2 border-white/30 shrink-0">
-              <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-contain" />
-            </div>
+            <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-10 w-auto object-contain" />
             <span className="font-cinzel font-black text-white text-lg tracking-wide">AstroWalla</span>
           </Link>
           <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>Your AstroWalla journey starts here</p>
@@ -190,9 +188,7 @@ export default function LoginPage() {
           {step === "phone" && (
             <>
               <div className="text-center mb-6 sm:mb-8">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden mx-auto mb-4 shadow-md border-2 border-[#f0c842]/60">
-                  <img src="/logo.jpeg" alt="AstroWalla Logo" className="w-full h-full object-contain" />
-                </div>
+                <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-14 w-auto object-contain mx-auto mb-4" />
                 <h1 className="font-cinzel text-xl sm:text-3xl font-bold text-slate-800 tracking-wide">Welcome Back</h1>
                 <p className="text-slate-500 font-medium mt-2 text-xs sm:text-sm">
                   Enter your mobile number to receive a one-time passcode
