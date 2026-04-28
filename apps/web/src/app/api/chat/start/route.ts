@@ -45,10 +45,10 @@ export async function POST(req: NextRequest) {
   let chatSession;
 
   if (existingSession) {
-    // Reactivate existing session
+    // Reactivate existing session — reset startedAt so astrologer's countdown is fresh
     chatSession = await prisma.chatSession.update({
       where: { id: existingSession.id },
-      data: { status: "ACTIVE", endedAt: null },
+      data: { status: "ACTIVE", endedAt: null, startedAt: new Date() },
     });
   } else {
     // Create a brand new session

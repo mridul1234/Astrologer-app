@@ -422,8 +422,8 @@ export default function AstrologerPortal() {
                 <div className="space-y-4">
                   {activeSessionsList.map((s) => {
                     const elapsed = Math.floor((now - new Date(s.startedAt).getTime()) / 1000);
-                    const remaining = Math.max(0, 600 - elapsed);
-                    const isExpiring = remaining < 60; // Less than 1 min left!
+                    const remaining = Math.max(0, 1800 - elapsed); // 30-min window
+                    const isExpiring = remaining < 120; // Less than 2 min left!
                     
                     return (
                       <div key={s.id} className={`flex flex-col md:flex-row md:items-center justify-between px-6 py-5 rounded-2xl bg-white shadow-[0_4px_20px_rgba(52,211,153,0.15)] border-l-4 ${isExpiring ? "border-l-red-400 animate-pulse" : "border-l-emerald-400"} transition-all`}>
@@ -450,7 +450,7 @@ export default function AstrologerPortal() {
                           >
                             ✕ Reject
                           </button>
-                          <button onClick={() => joinChat(s.id)} disabled={remaining === 0} className="bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white px-8 py-3.5 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30 transition-all hover:-translate-y-1 hover:shadow-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed">
+                          <button onClick={() => joinChat(s.id)} className="bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white px-8 py-3.5 rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30 transition-all hover:-translate-y-1 hover:shadow-emerald-500/40">
                             🔮 Join Chat Now
                           </button>
                         </div>
