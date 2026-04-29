@@ -107,7 +107,7 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const session = await auth();
-  
+
   if (!session?.user || session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
@@ -120,10 +120,51 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Missing ID" }, { status: 400 });
     }
 
-    // Delete the user, which will cascade to Astrologer profile, Reviews, etc.
-    await prisma.user.delete({
-      where: { id: userId, role: "ASTROLOGER" }
+    // Verify the user exists and is an astrologer
+    const astrologer = await prisma.astrologer.findUnique({
+      where: { userId },
+      select: { id: true },
     });
+
+    if (!astrologer) {
+      return NextResponse.json({ error: "Astrologer not found" }, { status: 404 });
+    }
+
+    const astrologerId = astrologer.id;
+
+    // Fetch all chat session IDs for this astrologer
+    const chatSessions = await prisma.chatSession.findMany({
+      where: { astrologerId },
+      select: { id: true },
+    });
+    const sessionIds = chatSessions.map((s) => s.id);
+
+    // 1. Delete Messages tied to those sessions
+    if (sessionIds.length > 0) {
+      await prisma.message.deleteMany({ where: { sessionId: { in: sessionIds } } });
+    }
+
+    // 2. Delete Reviews tied to those sessions or to the astrologer directly
+    await prisma.review.deleteMany({
+      where: {
+        OR: [
+          { astrologerId },
+          ...(sessionIds.length > 0 ? [{ sessionId: { in: sessionIds } }] : []),
+        ],
+      },
+    });
+
+    // 3. Delete ChatSessions for this astrologer
+    await prisma.chatSession.deleteMany({ where: { astrologerId } });
+
+    // 4. Delete WithdrawalRequests for this astrologer
+    await prisma.withdrawalRequest.deleteMany({ where: { astrologerId } });
+
+    // 5. Delete Transactions tied to the user
+    await prisma.transaction.deleteMany({ where: { userId } });
+
+    // 6. Delete the User (cascades to AstrologerProfile & KundliProfile via onDelete: Cascade)
+    await prisma.user.delete({ where: { id: userId, role: "ASTROLOGER" } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
