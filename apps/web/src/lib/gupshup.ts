@@ -3,7 +3,7 @@
  * Sends WhatsApp messages to astrologers when a user requests a chat.
  */
 
-const GUPSHUP_API_URL = "https://api.gupshup.io/sm/api/v1/msg";
+const GUPSHUP_API_URL = "https://api.gupshup.io/wa/api/v1/msg";
 
 /**
  * Sends a WhatsApp notification to an astrologer when a user requests a chat.
