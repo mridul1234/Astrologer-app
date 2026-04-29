@@ -4,9 +4,6 @@
  */
 
 const GUPSHUP_API_URL = "https://api.gupshup.io/sm/api/v1/msg";
-const GUPSHUP_API_KEY = process.env.GUPSHUP_API_KEY!;
-const GUPSHUP_SOURCE_NUMBER = process.env.GUPSHUP_SOURCE_NUMBER!; // Your Gupshup registered sender number
-const GUPSHUP_APP_NAME = process.env.GUPSHUP_APP_NAME!; // Your Gupshup app name
 
 /**
  * Sends a WhatsApp notification to an astrologer when a user requests a chat.
@@ -19,8 +16,14 @@ export async function sendChatRequestNotification(
   userName: string,
   sessionId: string
 ): Promise<{ success: boolean; error?: string }> {
+  // Read env vars at request time (not module load time) for Next.js compatibility
+  const GUPSHUP_API_KEY = process.env.GUPSHUP_API_KEY;
+  const GUPSHUP_SOURCE_NUMBER = process.env.GUPSHUP_SOURCE_NUMBER;
+  const GUPSHUP_APP_NAME = process.env.GUPSHUP_APP_NAME;
+
   if (!GUPSHUP_API_KEY || !GUPSHUP_SOURCE_NUMBER || !GUPSHUP_APP_NAME) {
     console.warn("[Gupshup] Missing env vars — skipping WhatsApp notification.");
+    console.warn(`[Gupshup] GUPSHUP_API_KEY: ${GUPSHUP_API_KEY ? 'SET' : 'MISSING'}, GUPSHUP_SOURCE_NUMBER: ${GUPSHUP_SOURCE_NUMBER ? 'SET' : 'MISSING'}, GUPSHUP_APP_NAME: ${GUPSHUP_APP_NAME ? 'SET' : 'MISSING'}`);
     return { success: false, error: "Gupshup not configured" };
   }
 
