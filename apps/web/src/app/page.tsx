@@ -206,10 +206,10 @@ export default function Home() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group absolute left-1/2 -translate-x-1/2">
-            <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-10 w-auto object-contain" />
-            <div>
-              <div className="font-extrabold text-[17px] text-stone-900 tracking-tight leading-none group-hover:text-[#d97706] transition-colors">AstroWalla</div>
-              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Your Celestial Guide</div>
+            <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-8 w-8 object-contain rounded-full" />
+            <div className="flex flex-col leading-none">
+              <span className="font-extrabold text-[17px] text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
+              <span className="text-[8px] uppercase tracking-[0.16em] text-[#d97706] font-bold mt-[2px]">Your Celestial Guide</span>
             </div>
           </Link>
 
