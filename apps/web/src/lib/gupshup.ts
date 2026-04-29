@@ -11,39 +11,8 @@
 // Template endpoint — required for business-initiated conversations
 const GUPSHUP_TEMPLATE_URL = "https://api.gupshup.io/wa/api/v1/template/msg";
 
-// Opt-in endpoint — Gupshup requires registering a number before sending any message
-const GUPSHUP_OPTIN_URL = (appName: string) =>
-  `https://api.gupshup.io/wa/api/v1/app/opt/in/${encodeURIComponent(appName)}`;
-
 // Approved template ID from Gupshup dashboard
 const TEMPLATE_ID = "d5197943-9e97-46e5-99eb-638585a61d5f";
-
-/**
- * Registers a phone number as opted-in for the Gupshup app.
- * This is required before Gupshup will deliver messages to that number.
- */
-async function registerOptIn(
-  phone: string,
-  appName: string,
-  apiKey: string
-): Promise<void> {
-  try {
-    const body = new URLSearchParams({ user: phone });
-    const res = await fetch(GUPSHUP_OPTIN_URL(appName), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        apikey: apiKey,
-      },
-      body: body.toString(),
-    });
-    const text = await res.text();
-    console.log(`[Gupshup] Opt-in for ${phone}: HTTP ${res.status} — ${text}`);
-  } catch (err) {
-    // Non-fatal — log and continue, opt-in may already be registered
-    console.warn(`[Gupshup] Opt-in request failed (non-fatal):`, err);
-  }
-}
 
 /**
  * Sends a WhatsApp notification to an astrologer when a user requests a chat.
@@ -77,11 +46,8 @@ export async function sendChatRequestNotification(
     return { success: false, error: "Invalid phone number" };
   }
 
-  // Step 1: Register opt-in (idempotent — safe to call every time)
-  await registerOptIn(phone, GUPSHUP_APP_NAME, GUPSHUP_API_KEY);
-
-  // Step 2: Send approved template message
   try {
+    // Template payload — no params since template body is static
     const template = JSON.stringify({
       id: TEMPLATE_ID,
       params: [],
