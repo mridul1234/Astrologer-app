@@ -1,15 +1,24 @@
 /**
  * Gupshup WhatsApp Notification Service
  * Sends WhatsApp messages to astrologers when a user requests a chat.
+ * Uses an approved WhatsApp template (required for business-initiated messages).
+ *
+ * Template name : "notification"
+ * Gupshup ID   : d5197943-9e97-46e5-99eb-638585a61d5f
+ * Body          : "Hi, a user wants to talk to you. Please join through the dashboard to respond."
  */
 
-const GUPSHUP_API_URL = "https://api.gupshup.io/wa/api/v1/msg";
+// Template endpoint — required for business-initiated conversations
+const GUPSHUP_TEMPLATE_URL = "https://api.gupshup.io/wa/api/v1/template/msg";
+
+// Approved template ID from Gupshup dashboard
+const TEMPLATE_ID = "d5197943-9e97-46e5-99eb-638585a61d5f";
 
 /**
  * Sends a WhatsApp notification to an astrologer when a user requests a chat.
  * @param astrologerPhone - The astrologer's WhatsApp number (with country code, e.g. 919876543210)
- * @param userName - The name of the user requesting the chat
- * @param sessionId - The chat session ID
+ * @param userName - The name of the user requesting the chat (unused — template is static)
+ * @param sessionId - The chat session ID (for logging)
  */
 export async function sendChatRequestNotification(
   astrologerPhone: string,
@@ -23,7 +32,11 @@ export async function sendChatRequestNotification(
 
   if (!GUPSHUP_API_KEY || !GUPSHUP_SOURCE_NUMBER || !GUPSHUP_APP_NAME) {
     console.warn("[Gupshup] Missing env vars — skipping WhatsApp notification.");
-    console.warn(`[Gupshup] GUPSHUP_API_KEY: ${GUPSHUP_API_KEY ? 'SET' : 'MISSING'}, GUPSHUP_SOURCE_NUMBER: ${GUPSHUP_SOURCE_NUMBER ? 'SET' : 'MISSING'}, GUPSHUP_APP_NAME: ${GUPSHUP_APP_NAME ? 'SET' : 'MISSING'}`);
+    console.warn(
+      `[Gupshup] GUPSHUP_API_KEY: ${GUPSHUP_API_KEY ? "SET" : "MISSING"}, ` +
+      `GUPSHUP_SOURCE_NUMBER: ${GUPSHUP_SOURCE_NUMBER ? "SET" : "MISSING"}, ` +
+      `GUPSHUP_APP_NAME: ${GUPSHUP_APP_NAME ? "SET" : "MISSING"}`
+    );
     return { success: false, error: "Gupshup not configured" };
   }
 
@@ -33,25 +46,29 @@ export async function sendChatRequestNotification(
     return { success: false, error: "Invalid phone number" };
   }
 
-  const message = buildChatRequestMessage(userName, sessionId);
-
   try {
-    const params = new URLSearchParams({
-      channel: "whatsapp",
-      source: GUPSHUP_SOURCE_NUMBER,
-      destination: phone,
-      message: JSON.stringify({ type: "text", text: message }),
-      "src.name": GUPSHUP_APP_NAME,
+    // Template payload — no params since template body is static
+    const template = JSON.stringify({
+      id: TEMPLATE_ID,
+      params: [],
     });
 
-    console.log("[Gupshup] Sending request with params:", {
+    const params = new URLSearchParams({
+      source: GUPSHUP_SOURCE_NUMBER,
+      destination: phone,
+      "src.name": GUPSHUP_APP_NAME,
+      template,
+    });
+
+    console.log("[Gupshup] Sending template notification:", {
       source: GUPSHUP_SOURCE_NUMBER,
       destination: phone,
       appName: GUPSHUP_APP_NAME,
+      templateId: TEMPLATE_ID,
       apiKeyPreview: GUPSHUP_API_KEY?.slice(0, 8) + "...",
     });
 
-    const response = await fetch(GUPSHUP_API_URL, {
+    const response = await fetch(GUPSHUP_TEMPLATE_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -67,11 +84,11 @@ export async function sendChatRequestNotification(
     try { data = JSON.parse(rawText); } catch { data = { rawText }; }
 
     if (!response.ok || data?.status === "error") {
-      console.error("[Gupshup] Notification failed:", data);
+      console.error("[Gupshup] Template notification failed:", data);
       return { success: false, error: data?.message ?? data?.details ?? rawText ?? "Unknown error" };
     }
 
-    console.log(`[Gupshup] Notification sent to ${phone} for session ${sessionId}`);
+    console.log(`[Gupshup] Template notification sent to ${phone} for session ${sessionId}`);
     return { success: true };
   } catch (err) {
     console.error("[Gupshup] Request error:", err);
@@ -90,14 +107,4 @@ function normalisePhone(raw: string): string | null {
   // Assume Indian number — prepend 91
   if (digits.length === 10) return `91${digits}`;
   return digits;
-}
-
-function buildChatRequestMessage(userName: string, sessionId: string): string {
-  return (
-    `🔮 *New Chat Request on AstroWalla!*\n\n` +
-    `👤 *User:* ${userName}\n` +
-    `🕐 *Requested at:* ${new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}\n\n` +
-    `Please open your AstroWalla dashboard to accept the chat.\n\n` +
-    `Session ID: \`${sessionId}\``
-  );
 }
