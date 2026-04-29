@@ -33,6 +33,7 @@ interface AstrologerProfile {
   languages: string | null;
   ratePerMin: number;
   profileImage?: string | null;
+  whatsappNumber?: string | null;
 }
 
 export default function AstrologerPortal() {
@@ -58,7 +59,7 @@ export default function AstrologerPortal() {
 
   // Settings Form State
   const [isUpdating, setIsUpdating] = useState(false);
-  const [editProfile, setEditProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0, profileImage: "" });
+  const [editProfile, setEditProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0, profileImage: "", whatsappNumber: "" });
   const [editProfileImageFile, setEditProfileImageFile] = useState<File | null>(null);
 
   const [profileOpen, setProfileOpen] = useState(false);
@@ -144,6 +145,7 @@ export default function AstrologerPortal() {
            languages: data.languages || "",
            ratePerMin: data.ratePerMin || 0,
            profileImage: data.profileImage || "",
+           whatsappNumber: data.whatsappNumber || "",
          });
       }
       
@@ -661,6 +663,21 @@ export default function AstrologerPortal() {
                   </div>
                 </div>
 
+                <div>
+                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">WhatsApp Number</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-3.5 text-base select-none">📱</span>
+                    <input
+                      type="tel"
+                      value={editProfile.whatsappNumber || ""}
+                      onChange={e => setEditProfile({...editProfile, whatsappNumber: e.target.value})}
+                      placeholder="e.g. 919876543210 (with country code)"
+                      maxLength={15}
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#d97706]/50 focus:border-[#d97706] transition-all bg-slate-50 focus:bg-white"
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1.5 ml-1 font-semibold">🔒 Used only to notify you of new chat requests via WhatsApp. Never shown publicly.</p>
+                </div>
 
                 <div className="pt-4 border-t border-slate-100">
                   <button 
