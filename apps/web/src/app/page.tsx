@@ -197,25 +197,25 @@ export default function Home() {
         {/* Brand gradient strip */}
         <div style={{ height: "3px", background: "linear-gradient(90deg, #1a1040 0%, #2d1b69 40%, #FF9933 70%, #f5c842 100%)" }} />
         <div className="max-w-6xl mx-auto px-4 h-[60px] flex items-center justify-between gap-3">
-          {/* Hamburger */}
-          <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-lg hover:bg-stone-100 transition-colors">
-            <svg className="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-            </svg>
-          </button>
-
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group absolute left-1/2 -translate-x-1/2">
-            <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-8 w-8 object-contain rounded-full" />
-            <div className="flex flex-col leading-none">
-              <span className="font-extrabold text-[17px] text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
-              <span className="text-[8px] uppercase tracking-[0.16em] text-[#d97706] font-bold mt-[2px]">Your Celestial Guide</span>
-            </div>
-          </Link>
+          {/* Left: Hamburger + Logo */}
+          <div className="flex items-center gap-2">
+            <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-lg hover:bg-stone-100 transition-colors">
+              <svg className="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+              </svg>
+            </button>
+            <Link href="/" className="flex items-center gap-2 group">
+              <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-8 w-8 object-contain rounded-full" />
+              <div className="flex flex-col leading-none">
+                <span className="font-extrabold text-[17px] text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
+                <span className="text-[8px] uppercase tracking-[0.16em] text-[#d97706] font-bold mt-[2px]">Your Celestial Guide</span>
+              </div>
+            </Link>
+          </div>
 
           {/* Right CTA */}
           <Link href="/login"
-            className="px-4 py-2 rounded-full font-bold text-sm text-white transition-all hover:opacity-90 hover:scale-105 shrink-0"
+            className="px-5 py-2.5 rounded-full font-bold text-sm text-white transition-all hover:opacity-90 hover:scale-105 shrink-0"
             style={{ background: "linear-gradient(135deg,#FF9933,#f5c842)", boxShadow: "0 4px 12px rgba(255,153,51,0.3)" }}>
             Get Started
           </Link>
