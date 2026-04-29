@@ -62,19 +62,21 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // ─── Send WhatsApp notification to astrologer (non-blocking) ─────────────────
+  // ─── Send WhatsApp notification to astrologer ────────────────────────────────
+  // NOTE: Must be awaited — Vercel kills pending promises after response is sent
   console.log(`[chat/start] Astrologer ID: ${astrologer.id}, whatsappNumber: ${astrologer.whatsappNumber ?? "NOT SET"}`);
   if (astrologer.whatsappNumber) {
     console.log(`[chat/start] Sending WhatsApp notification to ${astrologer.whatsappNumber} for user ${user.name}`);
-    sendChatRequestNotification(
-      astrologer.whatsappNumber,
-      user.name,
-      chatSession.id
-    ).then((result) =>
-      console.log("[chat/start] WhatsApp notification result:", JSON.stringify(result))
-    ).catch((err) =>
-      console.error("[chat/start] WhatsApp notification error:", err)
-    );
+    try {
+      const result = await sendChatRequestNotification(
+        astrologer.whatsappNumber,
+        user.name,
+        chatSession.id
+      );
+      console.log("[chat/start] WhatsApp notification result:", JSON.stringify(result));
+    } catch (err) {
+      console.error("[chat/start] WhatsApp notification error:", err);
+    }
   } else {
     console.warn(`[chat/start] Skipping WhatsApp — astrologer ${astrologer.id} has no whatsappNumber in DB`);
   }
