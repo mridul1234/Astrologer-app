@@ -44,6 +44,13 @@ export async function sendChatRequestNotification(
       "src.name": GUPSHUP_APP_NAME,
     });
 
+    console.log("[Gupshup] Sending request with params:", {
+      source: GUPSHUP_SOURCE_NUMBER,
+      destination: phone,
+      appName: GUPSHUP_APP_NAME,
+      apiKeyPreview: GUPSHUP_API_KEY?.slice(0, 8) + "...",
+    });
+
     const response = await fetch(GUPSHUP_API_URL, {
       method: "POST",
       headers: {
@@ -53,11 +60,15 @@ export async function sendChatRequestNotification(
       body: params.toString(),
     });
 
-    const data = await response.json().catch(() => ({}));
+    const rawText = await response.text();
+    console.log(`[Gupshup] HTTP ${response.status} — Raw response: ${rawText}`);
+
+    let data: any = {};
+    try { data = JSON.parse(rawText); } catch { data = { rawText }; }
 
     if (!response.ok || data?.status === "error") {
       console.error("[Gupshup] Notification failed:", data);
-      return { success: false, error: data?.message ?? "Unknown error" };
+      return { success: false, error: data?.message ?? data?.details ?? rawText ?? "Unknown error" };
     }
 
     console.log(`[Gupshup] Notification sent to ${phone} for session ${sessionId}`);
