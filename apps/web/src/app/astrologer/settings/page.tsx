@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -46,20 +46,65 @@ export default function AstrologerSettingsPage() {
     ratePerMin: EMPTY_ASTROLOGER.ratePerMin,
     languages: EMPTY_ASTROLOGER.languages,
     selectedSpecialities: [] as string[],
+    whatsappNumber: "",
   });
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const [selectedZodiac, setSelectedZodiac] = useState(0); // Aries
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [showZodiacPicker, setShowZodiacPicker] = useState(false);
   const [showPayoutModal, setShowPayoutModal] = useState(false);
 
+  // Load astrologer profile from API
+  useEffect(() => {
+    fetch("/api/astrologer/profile")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.id) {
+          setProfile((p) => ({
+            ...p,
+            name: data.user?.name ?? "",
+            bio: data.bio ?? "",
+            ratePerMin: data.ratePerMin ?? 20,
+            languages: data.languages ? data.languages.split(", ") : [],
+            selectedSpecialities: data.speciality ? data.speciality.split(", ") : [],
+            whatsappNumber: data.whatsappNumber ?? "",
+          }));
+        }
+        setProfileLoaded(true);
+      })
+      .catch(() => setProfileLoaded(true));
+  }, []);
+
   async function handleSave() {
     setSaving(true);
-    // Replace with: await fetch("/api/astrologer/profile", { method: "PATCH", body: JSON.stringify(profile) })
-    await new Promise((r) => setTimeout(r, 900));
-    setSaving(false);
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 2500);
+    setSaveError(null);
+    try {
+      const res = await fetch("/api/astrologer/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: profile.name,
+          bio: profile.bio,
+          ratePerMin: profile.ratePerMin,
+          languages: profile.languages.join(", "),
+          speciality: profile.selectedSpecialities.join(", "),
+          whatsappNumber: profile.whatsappNumber,
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        setSaveError(d?.error ?? "Failed to save. Please try again.");
+      } else {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 2500);
+      }
+    } catch {
+      setSaveError("Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   function toggleSpeciality(s: string) {
@@ -319,14 +364,37 @@ export default function AstrologerSettingsPage() {
                   </div>
                 </div>
 
-                {/* Read-only */}
+                {/* WhatsApp Number */}
                 <div>
-                  <label className="block text-sm font-medium text-purple-200/70 mb-2">Mobile Number <span className="text-purple-400/40">(cannot be changed)</span></label>
-                  <div className="px-4 py-3.5 rounded-xl text-purple-300/50 text-sm flex items-center gap-2"
-                    style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    🔒 {EMPTY_ASTROLOGER.phone}
+                  <label className="block text-sm font-medium text-purple-200/70 mb-2">
+                    WhatsApp Number
+                    <span className="ml-2 text-purple-400/40">(for chat request alerts)</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg select-none">📱</span>
+                    <input
+                      id="astro-whatsapp-input"
+                      type="tel"
+                      value={profile.whatsappNumber}
+                      onChange={(e) =>
+                        setProfile((p) => ({ ...p, whatsappNumber: e.target.value }))
+                      }
+                      className="astrowalla-input w-full pl-10 pr-4 py-3.5 rounded-xl text-base"
+                      placeholder="e.g. 9876543210"
+                      maxLength={15}
+                    />
                   </div>
+                  <p className="text-purple-400/40 text-xs mt-1.5">
+                    🔒 Only used to notify you of new chat requests via WhatsApp. Never shared publicly.
+                  </p>
                 </div>
+
+                {saveError && (
+                  <div className="px-4 py-3 rounded-xl text-sm text-center"
+                    style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}>
+                    ⚠️ {saveError}
+                  </div>
+                )}
 
                 {saveSuccess && (
                   <div className="px-4 py-3 rounded-xl text-sm text-center"

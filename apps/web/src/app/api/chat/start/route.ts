@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
 import { auth } from "@/auth";
 import jwt from "jsonwebtoken";
+import { sendChatRequestNotification } from "@/lib/gupshup";
 
 // POST /api/chat/start  — resumes or starts a chat session
 export async function POST(req: NextRequest) {
@@ -59,6 +60,17 @@ export async function POST(req: NextRequest) {
         status: "ACTIVE",
       },
     });
+  }
+
+  // ─── Send WhatsApp notification to astrologer (non-blocking) ─────────────────
+  if (astrologer.whatsappNumber) {
+    sendChatRequestNotification(
+      astrologer.whatsappNumber,
+      user.name,
+      chatSession.id
+    ).catch((err) =>
+      console.error("[chat/start] WhatsApp notification error:", err)
+    );
   }
 
   // Generate a short-lived socket token for this user

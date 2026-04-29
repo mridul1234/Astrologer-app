@@ -60,6 +60,7 @@ model Astrologer {
   ratePerMin      Float    @default(10)
   isOnline        Boolean  @default(false)
   fakeOrders      Int      @default(0)
+  whatsappNumber  String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
