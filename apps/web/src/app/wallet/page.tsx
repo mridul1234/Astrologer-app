@@ -11,7 +11,11 @@ import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-const packs = [100, 200, 500];
+const packs = [
+  { amount: 100, label: "₹100", sessions: "~10 min", tag: null, color: "from-amber-50 to-yellow-50", border: "border-amber-200" },
+  { amount: 200, label: "₹200", sessions: "~20 min", tag: "🔥 Most Popular", color: "from-orange-50 to-amber-50", border: "border-orange-300" },
+  { amount: 500, label: "₹500", sessions: "~50 min", tag: "⭐ Best Value", color: "from-yellow-50 to-amber-100", border: "border-yellow-400" },
+];
 
 declare global {
   interface Window {
@@ -27,7 +31,7 @@ export default function WalletPage() {
 
   const [paying, setPaying] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
-  const [selectedPack, setSelectedPack] = useState<number | null>(null);
+  const [selectedPack, setSelectedPack] = useState<number | null>(200);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const loadRazorpayScript = () =>
@@ -162,20 +166,34 @@ export default function WalletPage() {
           <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">You pay exactly what you see — no bonuses, no deductions</p>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-3 gap-4">
           {packs.map((pack) => (
             <button
-              key={pack}
-              onClick={() => setSelectedPack(pack)}
+              key={pack.amount}
+              onClick={() => { setSelectedPack(pack.amount); setCustomAmount(""); }}
               disabled={paying}
-              className={`relative bg-white border transition-all p-4 rounded-2xl flex flex-col items-center gap-1 shadow-sm disabled:opacity-50 ${
-                selectedPack === pack
-                  ? "border-[#f5c842] shadow-[0_4px_20px_rgba(245,200,66,0.3)] scale-105"
-                  : "border-slate-200 hover:border-[#f5c842]/60 hover:shadow-md"
+              className={`relative bg-gradient-to-b ${pack.color} border-2 transition-all p-5 rounded-3xl flex flex-col items-center gap-2 shadow-sm disabled:opacity-50 ${
+                selectedPack === pack.amount
+                  ? `${pack.border} shadow-[0_6px_24px_rgba(245,200,66,0.35)] scale-105 ring-2 ring-offset-1 ring-amber-300`
+                  : `border-slate-200 hover:${pack.border} hover:shadow-md hover:scale-102`
               }`}
             >
-              <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Add</div>
-              <div className="text-xl sm:text-2xl font-extrabold text-slate-800">₹{pack}</div>
+              {/* Tag badge */}
+              {pack.tag && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full bg-gradient-to-r from-[#FF9933] to-[#f5c842] text-stone-900 shadow-md">
+                  {pack.tag}
+                </span>
+              )}
+              <div className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">Add</div>
+              <div className="text-3xl font-extrabold text-slate-800">{pack.label}</div>
+              <div className="text-[11px] font-semibold text-stone-500 bg-white/70 px-2.5 py-1 rounded-full border border-stone-200">
+                ⏱ {pack.sessions} chat
+              </div>
+              {selectedPack === pack.amount && (
+                <div className="absolute bottom-2 right-2 w-5 h-5 rounded-full bg-[#f5c842] flex items-center justify-center">
+                  <span className="text-stone-900 text-[10px] font-black">✓</span>
+                </div>
+              )}
             </button>
           ))}
         </div>
