@@ -7,6 +7,7 @@ import { signOut, useSession } from "next-auth/react";
 import useSWR from "swr";
 import VedicLoader from "@/components/VedicLoader";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import UserHeader from "@/components/UserHeader";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -124,16 +125,7 @@ export default function UserProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-[#fdfaf5]">
-        <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8] shadow-[0_2px_12px_rgba(245,200,66,0.08)]">
-          <div className="max-w-5xl mx-auto px-6 h-[64px] flex items-center justify-between">
-            <Link href="/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#ffce4b] rounded-full flex items-center justify-center">
-                <span className="text-xl">✨</span>
-              </div>
-              <span className="text-xl font-extrabold text-stone-900 tracking-tight">AstroWalla</span>
-            </Link>
-          </div>
-        </nav>
+        <UserHeader />
         <div className="flex-1 flex items-center justify-center">
           <VedicLoader size="lg" text="Loading your profile…" />
         </div>
@@ -143,23 +135,7 @@ export default function UserProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#fdfaf5] text-stone-800 font-sans">
-      {/* ─── NAVBAR ─── */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8] shadow-[0_2px_12px_rgba(245,200,66,0.08)]">
-        <div className="max-w-5xl mx-auto px-6 h-[64px] flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-[#ffce4b] rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-              <span className="text-amber-800 text-lg">☽</span>
-            </div>
-            <div>
-              <div className="text-[18px] font-extrabold text-stone-900 group-hover:text-[#d97706] transition-colors">Astrastrowalla</div>
-              <div className="text-[8px] uppercase tracking-widest text-[#d97706] font-bold">Divine Astrastrowalla</div>
-            </div>
-          </Link>
-          <Link href="/dashboard" className="text-sm font-semibold text-stone-500 hover:text-[#d97706] transition-colors flex items-center gap-1">
-            ← Dashboard
-          </Link>
-        </div>
-      </nav>
+      <UserHeader />
 
       <main className="max-w-5xl mx-auto px-4 py-8">
 
