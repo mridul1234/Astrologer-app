@@ -49,6 +49,11 @@ function txLabel(tx: Transaction, sessions: ChatSession[]): { title: string; sub
   if (tx.type === "CREDIT") {
     return { title: "Wallet Recharge", sub: "Money added to wallet" };
   }
+  const r = tx.reason ?? "";
+  // Free trial deduction
+  if (r.toLowerCase().includes("free") || r.toLowerCase().includes("trial")) {
+    return { title: "Free Trial Used", sub: "2 free minutes with new account" };
+  }
   // For DEBIT: try to match by approximate timestamp with a session that ended nearby
   const txTime = new Date(tx.createdAt).getTime();
   let matched: ChatSession | undefined;
@@ -58,17 +63,14 @@ function txLabel(tx: Transaction, sessions: ChatSession[]): { title: string; sub
     const diff = Math.abs(txTime - endTime);
     if (diff < minDiff) { minDiff = diff; matched = s; }
   }
-  // If within 2 minutes of a session end, match it
   if (matched && minDiff < 2 * 60 * 1000) {
     return {
       title: `Chat with ${matched.astrologer.user.name}`,
       sub: `₹${matched.astrologer.ratePerMin}/min · ${matched.astrologer.speciality ?? "Vedic"}`,
     };
   }
-  // Fallback: clean up reason text
-  const r = tx.reason ?? "";
   if (r.toLowerCase().includes("chat")) return { title: "Chat Session", sub: "Astrology consultation" };
-  return { title: r || "Chat Deduction", sub: "Astrology consultation" };
+  return { title: "Chat Deduction", sub: "Astrology consultation" };
 }
 
 export default function UserProfilePage() {
@@ -144,41 +146,40 @@ export default function UserProfilePage() {
           <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-[#f5c842]/10 pointer-events-none" />
           <div className="absolute top-8 -right-4 w-24 h-24 rounded-full bg-[#ffb347]/10 pointer-events-none" />
 
-          <div className="flex items-center gap-5 relative">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 relative">
             {/* Avatar */}
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#f5c842] to-[#ffb347] flex items-center justify-center text-2xl font-extrabold text-stone-900 shadow-lg shadow-amber-200/50 shrink-0 border-2 border-white/60">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#f5c842] to-[#ffb347] flex items-center justify-center text-2xl font-extrabold text-stone-900 shadow-lg shadow-amber-200/50 shrink-0 border-2 border-white/60">
               {initials}
             </div>
 
-            {/* Name + stats */}
+            {/* Info */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-extrabold text-stone-900 leading-tight truncate">{userName}</h1>
-              <p className="text-stone-400 text-xs mb-3 flex items-center gap-1 flex-wrap">
-                <span>📱</span><span>{displayPhone}</span>
+              <h1 className="text-2xl font-extrabold text-stone-900 mb-1">{userName}</h1>
+              <p className="text-stone-400 text-sm mb-4 flex items-center gap-1.5">
+                <span>📱</span>
+                <span>{displayPhone}</span>
                 <span className="text-stone-300">·</span>
-                <span>Since {memberSince}</span>
+                <span>Member since {memberSince}</span>
               </p>
-              {/* Stats horizontal row */}
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex flex-wrap gap-4">
                 {[
                   { icon: "💬", label: "Sessions", value: profile?.chatSessions.length ?? 0, color: "text-stone-900" },
                   { icon: "💰", label: "Balance", value: `₹${(profile?.walletBalance ?? 0).toFixed(0)}`, color: "text-green-600" },
-                  { icon: "📥", label: "Added", value: `₹${totalCredits.toFixed(0)}`, color: "text-stone-900" },
-                  { icon: "📤", label: "Spent", value: `₹${totalDebits.toFixed(0)}`, color: "text-stone-900" },
+                  { icon: "📥", label: "Total Added", value: `₹${totalCredits.toFixed(0)}`, color: "text-stone-900" },
+                  { icon: "📤", label: "Total Spent", value: `₹${totalDebits.toFixed(0)}`, color: "text-stone-900" },
                 ].map((s) => (
-                  <div key={s.label} className="flex items-center gap-1.5 bg-white/70 border border-[#f0e6c8] rounded-xl px-3 py-2 hover:shadow-sm hover:border-[#f5c842]/40 transition-all duration-200">
-                    <span className="text-sm">{s.icon}</span>
+                  <div key={s.label} className="flex items-center gap-2 bg-white/70 border border-[#f0e6c8] rounded-2xl px-4 py-2.5 hover:shadow-sm hover:border-[#f5c842]/40 transition-all duration-200">
+                    <span className="text-base">{s.icon}</span>
                     <div>
-                      <div className={`font-extrabold text-xs leading-none ${s.color}`}>{s.value}</div>
-                      <div className="text-stone-400 text-[9px] mt-0.5">{s.label}</div>
+                      <div className={`font-extrabold text-sm leading-none ${s.color}`}>{s.value}</div>
+                      <div className="text-stone-400 text-[10px] mt-0.5">{s.label}</div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Add Money */}
-            <Link href="/wallet" className="shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white border border-[#f0e6c8] text-sm font-semibold text-stone-700 hover:border-[#f5c842] hover:text-[#d97706] hover:shadow-md transition-all duration-200">
+            <Link href="/wallet" className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#f0e6c8] text-sm font-semibold text-stone-700 hover:border-[#f5c842] hover:text-[#d97706] hover:shadow-md transition-all duration-200">
               💳 Add Money
             </Link>
           </div>
