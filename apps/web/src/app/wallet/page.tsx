@@ -11,7 +11,7 @@ import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-const packs = [10, 50, 100, 200, 500, 1000, 2000, 3000, 5000];
+const packs = [100, 200, 500];
 
 declare global {
   interface Window {
