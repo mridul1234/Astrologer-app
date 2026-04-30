@@ -37,7 +37,7 @@ const BANNERS = [
     href: "/dashboard",
     gradient: "linear-gradient(135deg, #1a1040 0%, #2d1b69 60%, #4c1d95 100%)",
     accent: "#f5c842",
-    emoji: "🌟",
+    image: "/banner-cosmic.png",
   },
   {
     id: 1,
@@ -49,7 +49,7 @@ const BANNERS = [
     href: "/dashboard",
     gradient: "linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #c2410c 100%)",
     accent: "#fde68a",
-    emoji: "❤️",
+    image: "/banner-love.png",
   },
   {
     id: 2,
@@ -61,7 +61,7 @@ const BANNERS = [
     href: "/dashboard",
     gradient: "linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)",
     accent: "#fef3c7",
-    emoji: "💼",
+    image: "/banner-career.png",
   },
 ];
 
@@ -150,42 +150,53 @@ export default function HomePage() {
             className="absolute inset-0 transition-opacity duration-300"
             style={{ background: banner.gradient, opacity: isTransitioning ? 0 : 1 }}
           />
-          {/* Decorative orbs */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute -top-4 -right-4 w-32 h-32 rounded-full opacity-10" style={{ background: banner.accent }} />
-            <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full opacity-10" style={{ background: banner.accent }} />
-          </div>
 
           <div
-            className="relative z-10 px-5 py-6 flex flex-col justify-between"
+            className="relative z-10 flex items-stretch"
             style={{ minHeight: 190, opacity: isTransitioning ? 0 : 1, transition: "opacity 0.3s" }}
           >
-            <div>
-              <span
-                className="inline-block text-[11px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full mb-3"
-                style={{ background: "rgba(255,255,255,0.15)", color: banner.accent, border: `1px solid ${banner.accent}40` }}
-              >
-                {banner.badge}
-              </span>
-              <h2 className="text-white font-black text-2xl sm:text-3xl leading-tight">
-                {banner.title}
-              </h2>
-              <p className="font-bold mt-0.5" style={{ color: banner.accent, fontSize: 14 }}>
-                {banner.subtitle}
-              </p>
-              <p className="text-white/70 text-xs mt-1.5 max-w-[220px] leading-relaxed">
-                {banner.desc}
-              </p>
+            {/* Text side */}
+            <div className="flex-1 px-5 py-6 flex flex-col justify-between">
+              <div>
+                <span
+                  className="inline-block text-[11px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full mb-3"
+                  style={{ background: "rgba(255,255,255,0.15)", color: banner.accent, border: `1px solid ${banner.accent}40` }}
+                >
+                  {banner.badge}
+                </span>
+                <h2 className="text-white font-black text-2xl sm:text-3xl leading-tight">
+                  {banner.title}
+                </h2>
+                <p className="font-bold mt-0.5" style={{ color: banner.accent, fontSize: 14 }}>
+                  {banner.subtitle}
+                </p>
+                <p className="text-white/70 text-xs mt-1.5 max-w-[200px] leading-relaxed">
+                  {banner.desc}
+                </p>
+              </div>
+              <div className="mt-4">
+                <Link
+                  href={banner.href}
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all hover:scale-105 active:scale-95"
+                  style={{ background: banner.accent, color: "#1a1040" }}
+                >
+                  {banner.cta} →
+                </Link>
+              </div>
             </div>
-            <div className="flex items-end justify-between mt-4">
-              <Link
-                href={banner.href}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all hover:scale-105 active:scale-95"
-                style={{ background: banner.accent, color: "#1a1040" }}
-              >
-                {banner.cta} →
-              </Link>
-              <span className="text-4xl">{banner.emoji}</span>
+
+            {/* Image side */}
+            <div className="relative shrink-0 w-[140px] sm:w-[180px] overflow-hidden">
+              <img
+                src={banner.image}
+                alt={banner.title}
+                className="absolute inset-0 w-full h-full object-cover object-left"
+                style={{ opacity: 0.92, mixBlendMode: "luminosity" }}
+              />
+              {/* Fade edge to blend with gradient */}
+              <div className="absolute inset-y-0 left-0 w-10"
+                style={{ background: `linear-gradient(to right, ${banner.gradient.match(/#[a-f0-9]{6}/i)?.[0] ?? "#1a1040"}, transparent)` }}
+              />
             </div>
           </div>
 
