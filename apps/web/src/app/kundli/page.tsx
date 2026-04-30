@@ -1,9 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import useSWR from "swr";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
 import MobileBottomNav from "@/components/MobileBottomNav";
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 // ─────────────────────────────────────────────
 //  Constants
@@ -192,20 +195,16 @@ export default function KundliPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<KundliResult | null>(null);
-  const [hasSavedProfile, setHasSavedProfile] = useState(false);
 
-  // Pre-fill from saved kundli profile
+  const { data: savedKundli } = useSWR("/api/user/kundli", fetcher);
+  const hasSavedProfile = !!(savedKundli?.fullName);
+
+  // Pre-fill form once SWR data arrives (instant on revisit)
   useEffect(() => {
-    fetch("/api/user/kundli")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data && data.fullName) {
-          setForm({ name: data.fullName, dob: data.dateOfBirth, tob: data.timeOfBirth || "12:00", city: data.placeOfBirth });
-          setHasSavedProfile(true);
-        }
-      })
-      .catch(() => {});
-  }, []);
+    if (savedKundli?.fullName) {
+      setForm({ name: savedKundli.fullName, dob: savedKundli.dateOfBirth, tob: savedKundli.timeOfBirth || "12:00", city: savedKundli.placeOfBirth });
+    }
+  }, [savedKundli?.fullName]);
 
   async function generate() {
     if (!form.name || !form.dob || !form.city) { setError("Please fill all fields."); return; }
