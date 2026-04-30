@@ -256,14 +256,14 @@ io.on("connection", (socket) => {
           }
         };
 
-        // Notify both sides that billing has officially started
-        // This is the authoritative signal for clients to start their display timers
+        // Notify both sides that billing has officially started.
+        // This is the authoritative signal for clients to start their display timers.
         io.to(sessionId).emit("billing_started");
 
-        // Charge the FIRST minute immediately (minimum charge)
-        await chargeMinute();
-
-        // Then continue charging every 60 seconds
+        // Start the 60-second interval IMMEDIATELY at the same moment as the emit,
+        // so the server clock and client display timer are in sync from t=0.
+        // chargeMinute() for minute 1 runs async (non-blocking) alongside the interval.
+        chargeMinute(); // fire-and-forget: charges minute 1 without delaying the clock start
         const timer = setInterval(chargeMinute, 60_000);
         billingTimers.set(sessionId, timer);
       }
