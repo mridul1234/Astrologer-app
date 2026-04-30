@@ -60,6 +60,9 @@ export default function UserChatPage() {
   const [rate, setRate] = useState(0);
   const [myUserId, setMyUserId] = useState<string | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  // billingStarted = server has confirmed both parties in room and billing is live.
+  // Keeps the display timer perfectly in sync with actual server-side charges.
+  const [billingStarted, setBillingStarted] = useState(false);
 
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -87,10 +90,11 @@ export default function UserChatPage() {
   useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
 
   useEffect(() => {
-    if (ended || !connected || !astrologerJoined) return;
+    // Only tick when billing is officially confirmed by the server
+    if (ended || !connected || !billingStarted) return;
     timerRef.current = setInterval(() => setDuration((d) => d + 1), 1000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [ended, connected, astrologerJoined]);
+  }, [ended, connected, billingStarted]);
 
   useEffect(() => {
     if (ended || astrologerJoined) return;
@@ -123,10 +127,19 @@ export default function UserChatPage() {
         setBalance(sessionData.user?.walletBalance || 0);
         if (sessionData.status === "ENDED") setEnded(true);
 
-        const createdMs = new Date(sessionData.createdAt).getTime();
-        const rem = Math.max(0, 600 - Math.floor((Date.now() - createdMs) / 1000));
+        // Use startedAt (which is reset on every "Continue") as the epoch for this session.
+        // Messages before this timestamp are from a previous conversation — ignore them
+        // for determining astrologer join status.
+        const startedAtMs = new Date(sessionData.startedAt).getTime();
+        const rem = Math.max(0, 600 - Math.floor((Date.now() - startedAtMs) / 1000));
         setWaitingTimeLeft(rem);
         if (rem === 0 && sessionData.status !== "ENDED") setWaitTimeOver(true);
+
+        // If billing was already running before this page load (reconnect / rejoin),
+        // seed billingStarted so the timer resumes immediately.
+        if ((sessionData.totalCost || 0) > 0 && sessionData.status !== "ENDED") {
+          setBillingStarted(true);
+        }
 
         const profileRes = await fetch("/api/user/profile");
         const profile = await profileRes.json();
@@ -137,9 +150,16 @@ export default function UserChatPage() {
           setIsFreeMinute(profile.freeMinutesLeft > 0);
         }
 
-        if (sessionData.messages?.length > 0) {
+        // Only count messages created AFTER this session's startedAt as "current".
+        // Old messages from a prior continuation would otherwise falsely indicate
+        // that the astrologer has already joined the new request.
+        const currentMessages = (sessionData.messages ?? []).filter(
+          (m: { createdAt: string }) => new Date(m.createdAt).getTime() >= startedAtMs
+        );
+
+        if (currentMessages.length > 0) {
           setAstrologerJoined(true);
-          const mapped = sessionData.messages.map((m: { id: string; senderId: string; content: string; createdAt: string }) => ({
+          const mapped = currentMessages.map((m: { id: string; senderId: string; content: string; createdAt: string }) => ({
             id: m.id, senderId: m.senderId, content: m.content,
             createdAt: new Date(m.createdAt), isMe: m.senderId === uid,
           }));
@@ -180,6 +200,8 @@ export default function UserChatPage() {
         });
         socket.on("session_ended", () => { setEnded(true); if (timerRef.current) clearInterval(timerRef.current); });
         socket.on("astrologer_joined", () => setAstrologerJoined(true));
+        // Authoritative signal from server: billing is live, start display timer
+        socket.on("billing_started", () => setBillingStarted(true));
         socket.on("session_cancelled", () => {
           setEnded(true);
           if (timerRef.current) clearInterval(timerRef.current);
@@ -193,7 +215,14 @@ export default function UserChatPage() {
             if (!r.ok) return;
             const d = await r.json();
             if (d.status === "ENDED") { setEnded(true); clearInterval(pollWait); }
-            else if (d.messages?.length > 0) { setAstrologerJoined(true); clearInterval(pollWait); }
+            else {
+              // Only count messages from the current session epoch (after startedAt)
+              const epochMs = new Date(d.startedAt).getTime();
+              const newMsgs = (d.messages ?? []).filter(
+                (m: { createdAt: string }) => new Date(m.createdAt).getTime() >= epochMs
+              );
+              if (newMsgs.length > 0) { setAstrologerJoined(true); clearInterval(pollWait); }
+            }
           } catch { /* ignore */ }
         }, 5000);
 

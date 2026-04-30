@@ -46,21 +46,13 @@ interface UserProfile {
 
 // Derive a clean label for any transaction
 function txLabel(tx: Transaction, sessions: ChatSession[]): { title: string; sub: string } {
+  if (tx.type === "CREDIT") {
+    return { title: "Wallet Recharge", sub: "Money added to wallet" };
+  }
   const r = tx.reason ?? "";
-
   // Free trial deduction
   if (r.toLowerCase().includes("free") || r.toLowerCase().includes("trial")) {
     return { title: "Free Trial Used", sub: "2 free minutes with new account" };
-  }
-  
-  // Refund for cancelled chat
-  if (r.toLowerCase().includes("cancelled")) {
-    return { title: "Chat Cancelled", sub: "Refunded (astrologer unavailable)" };
-  }
-
-  // If it's a CREDIT and we didn't catch it above, it's a wallet recharge
-  if (tx.type === "CREDIT") {
-    return { title: "Wallet Recharge", sub: "Money added to wallet" };
   }
   // For DEBIT: try to match by approximate timestamp with a session that ended nearby
   const txTime = new Date(tx.createdAt).getTime();

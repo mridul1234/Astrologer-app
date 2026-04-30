@@ -94,6 +94,8 @@ export default function UserDashboard() {
       router.push("/wallet");
       return;
     }
+    // Set starting FIRST — this triggers the full-screen overlay immediately
+    // so the user sees a loading screen from the very first click, not a frozen button.
     setStarting(astrologerId);
     try {
       const res = await fetch("/api/chat/start", {
@@ -141,6 +143,17 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen bg-[#fdfaf5] text-slate-800 font-sans flex flex-col">
+
+      {/* ── Full-screen loading overlay — shown immediately on click, stays until navigation ── */}
+      {starting && (
+        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#faf8f5]/95 backdrop-blur-sm">
+          <VedicLoader size="lg" text="Connecting you to your astrologer…" />
+          <p className="mt-4 text-sm text-stone-400 font-medium animate-pulse">
+            Sending your request · Please wait
+          </p>
+        </div>
+      )}
+
       <UserHeader />
 
       {/* ─── MAIN CONTENT ─── */}

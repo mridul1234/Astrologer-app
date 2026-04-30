@@ -256,6 +256,10 @@ io.on("connection", (socket) => {
           }
         };
 
+        // Notify both sides that billing has officially started
+        // This is the authoritative signal for clients to start their display timers
+        io.to(sessionId).emit("billing_started");
+
         // Charge the FIRST minute immediately (minimum charge)
         await chargeMinute();
 

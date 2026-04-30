@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@astrology/db";
 import { auth } from "@/auth";
 import jwt from "jsonwebtoken";
@@ -62,31 +62,34 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // ─── Send WhatsApp notification to astrologer ────────────────────────────────
-  // NOTE: Must be awaited — Vercel kills pending promises after response is sent
-  console.log(`[chat/start] Astrologer ID: ${astrologer.id}, whatsappNumber: ${astrologer.whatsappNumber ?? "NOT SET"}`);
-  if (astrologer.whatsappNumber) {
-    console.log(`[chat/start] Sending WhatsApp notification to ${astrologer.whatsappNumber} for user ${user.name}`);
-    try {
-      const result = await sendChatRequestNotification(
-        astrologer.whatsappNumber,
-        user.name,
-        chatSession.id
-      );
-      console.log("[chat/start] WhatsApp notification result:", JSON.stringify(result));
-    } catch (err) {
-      console.error("[chat/start] WhatsApp notification error:", err);
-    }
-  } else {
-    console.warn(`[chat/start] Skipping WhatsApp — astrologer ${astrologer.id} has no whatsappNumber in DB`);
-  }
-
   // Generate a short-lived socket token for this user
   const socketToken = jwt.sign(
     { userId: session.user.id },
     process.env.SOCKET_SECRET!,
     { expiresIn: "24h" }
   );
+
+  // ─── Send WhatsApp notification AFTER the response ───────────────────────────
+  // after() runs once the response has been sent, so the user is redirected to
+  // the chat page immediately without waiting for Gupshup's API.
+  after(async () => {
+    console.log(`[chat/start] Astrologer ID: ${astrologer.id}, whatsappNumber: ${astrologer.whatsappNumber ?? "NOT SET"}`);
+    if (astrologer.whatsappNumber) {
+      console.log(`[chat/start] Sending WhatsApp notification to ${astrologer.whatsappNumber} for user ${user.name}`);
+      try {
+        const result = await sendChatRequestNotification(
+          astrologer.whatsappNumber,
+          user.name,
+          chatSession.id
+        );
+        console.log("[chat/start] WhatsApp notification result:", JSON.stringify(result));
+      } catch (err) {
+        console.error("[chat/start] WhatsApp notification error:", err);
+      }
+    } else {
+      console.warn(`[chat/start] Skipping WhatsApp — astrologer ${astrologer.id} has no whatsappNumber in DB`);
+    }
+  });
 
   return NextResponse.json({
     sessionId: chatSession.id,

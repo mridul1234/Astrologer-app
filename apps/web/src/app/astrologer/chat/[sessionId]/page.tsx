@@ -54,6 +54,9 @@ export default function AstrologerChatPage() {
   const [earnings, setEarnings] = useState(0);
   const [latestMsgId, setLatestMsgId] = useState<string | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  // billingStarted = server has confirmed both parties are in the room and billing is active.
+  // Timer only runs after this — prevents display drift when user hasn't joined yet.
+  const [billingStarted, setBillingStarted] = useState(false);
   const [kundliProfile, setKundliProfile] = useState<{
     fullName: string; dateOfBirth: string; timeOfBirth: string; placeOfBirth: string;
   } | null>(null);
@@ -72,7 +75,8 @@ export default function AstrologerChatPage() {
   useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
 
   useEffect(() => {
-    if (ended || !connected) return;
+    // Only tick when billing is officially active (server confirmed both parties in room)
+    if (ended || !connected || !billingStarted) return;
     timerRef.current = setInterval(() => {
       setDuration((d) => {
         const next = d + 1;
@@ -81,7 +85,7 @@ export default function AstrologerChatPage() {
       });
     }, 1000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [ended, connected, rate]);
+  }, [ended, connected, billingStarted, rate]);
 
   useEffect(() => {
     let socket: Socket;
@@ -96,6 +100,12 @@ export default function AstrologerChatPage() {
         if (sessionData.status === "ENDED") setEnded(true);
         setEarnings(sessionData.totalCost || 0);
         if (sessionData.user?.kundliProfile) setKundliProfile(sessionData.user.kundliProfile);
+
+        // If billing was already running (reconnect scenario), seed billingStarted immediately.
+        // totalCost > 0 means at least one minute has been charged in this session.
+        if ((sessionData.totalCost || 0) > 0 && sessionData.status !== "ENDED") {
+          setBillingStarted(true);
+        }
 
         const profileRes = await fetch("/api/astrologer/profile");
         const profile = await profileRes.json();
@@ -137,6 +147,8 @@ export default function AstrologerChatPage() {
           if (t) { if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current); typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 3000); }
         });
         socket.on("session_ended", () => { setEnded(true); if (timerRef.current) clearInterval(timerRef.current); });
+        // Authoritative signal from server: both parties confirmed, billing is live
+        socket.on("billing_started", () => setBillingStarted(true));
 
       } catch (err) { console.error(err); setStatus("error"); }
     }
