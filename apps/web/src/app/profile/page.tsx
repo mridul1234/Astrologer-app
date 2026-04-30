@@ -4,8 +4,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
+import useSWR from "swr";
 import VedicLoader from "@/components/VedicLoader";
 import MobileBottomNav from "@/components/MobileBottomNav";
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 type Tab = "overview" | "sessions" | "transactions" | "settings";
 
@@ -71,21 +74,16 @@ export default function UserProfilePage() {
   useRouter();
   const { data: sessionData } = useSession();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
   const [editName, setEditName] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  const { data: profile, isLoading: loading, mutate } = useSWR<UserProfile>("/api/user/profile", fetcher);
+
+  // Sync editName once profile loads
   useEffect(() => {
-    fetch("/api/user/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.id) { setProfile(data); setEditName(data.name); }
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+    if (profile?.name && !editName) setEditName(profile.name);
+  }, [profile?.name]);
 
   async function handleSaveProfile() {
     if (!editName.trim() || !profile) return;
@@ -98,7 +96,7 @@ export default function UserProfilePage() {
       });
       const updated = await res.json();
       if (updated?.name) {
-        setProfile((p) => p ? { ...p, name: updated.name } : p);
+        mutate({ ...profile, name: updated.name }, false); // update SWR cache instantly
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 2500);
       }
