@@ -85,6 +85,10 @@ export default function HomePage() {
   const { data: profile } = useSWR("/api/user/profile", fetcher);
   const { data: astrologers } = useSWR("/api/astrologers", fetcher, { refreshInterval: 60000 });
 
+  // Prefetch other tabs in background so they load instantly on first visit
+  useSWR("/api/user/kundli", fetcher);
+  useSWR("/api/user/chats", fetcher);
+
   const [bannerIdx, setBannerIdx] = useState(0);
   const [selectedZodiac, setSelectedZodiac] = useState<number | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
