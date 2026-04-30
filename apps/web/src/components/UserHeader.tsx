@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import useSWR from "swr";
+import AppDownloadBanner from "./AppDownloadBanner";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -35,7 +36,9 @@ export default function UserHeader() {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 w-full" style={{ background: "white", borderBottom: "1px solid #f0e6c8", boxShadow: "0 2px 16px rgba(245,200,66,0.08)" }}>
+    <div className="sticky top-0 z-50 w-full">
+      <AppDownloadBanner />
+      <nav style={{ background: "white", borderBottom: "1px solid #f0e6c8", boxShadow: "0 2px 16px rgba(245,200,66,0.08)" }}>
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 sm:h-[70px] flex items-center justify-between gap-3 sm:gap-6">
         {/* ── Logo ── */}
@@ -143,6 +146,7 @@ export default function UserHeader() {
           </div>
         </div>
       </div>
-    </nav>
+      </nav>
+    </div>
   );
 }
