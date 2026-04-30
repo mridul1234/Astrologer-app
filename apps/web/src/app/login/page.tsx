@@ -170,7 +170,7 @@ export default function LoginPage() {
         ))}
         <div className="relative max-w-md mx-auto px-4 py-8 sm:py-10 text-center">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-4 hover:opacity-90 transition-opacity">
-            <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-9 w-9 object-contain rounded-full" />
+            <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-9 w-9 object-contain" />
             <div className="flex flex-col leading-none text-left">
               <span className="font-cinzel font-black text-white text-lg tracking-wide leading-none">AstroWalla</span>
               <span className="text-[8px] uppercase tracking-[0.16em] font-bold mt-[3px]" style={{ color: "rgba(245,200,66,0.8)" }}>Your Celestial Guide</span>
@@ -191,7 +191,7 @@ export default function LoginPage() {
           {step === "phone" && (
             <>
               <div className="text-center mb-6 sm:mb-8">
-                <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-14 w-14 object-contain rounded-full mx-auto mb-4" />
+                <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-14 w-14 object-contain mx-auto mb-4" />
                 <h1 className="font-cinzel text-xl sm:text-3xl font-bold text-slate-800 tracking-wide">Welcome Back</h1>
                 <p className="text-slate-500 font-medium mt-2 text-xs sm:text-sm">
                   Enter your mobile number to receive a one-time passcode
