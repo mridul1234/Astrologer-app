@@ -172,7 +172,7 @@ function SkeletonCard() {
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
+
   const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
   const [loadingAstrologers, setLoadingAstrologers] = useState(true);
 
@@ -194,24 +194,15 @@ export default function Home() {
           NAVBAR
       ══════════════════════════════════════════ */}
       <nav className="sticky top-0 z-50 bg-white border-b border-[#f0e6c8]" style={{ boxShadow: "0 2px 16px rgba(245,200,66,0.1)" }}>
-        {/* Brand gradient strip */}
-        <div style={{ height: "3px", background: "linear-gradient(90deg, #1a1040 0%, #2d1b69 40%, #FF9933 70%, #f5c842 100%)" }} />
-        <div className="max-w-6xl mx-auto px-4 h-[60px] flex items-center justify-between gap-3">
-          {/* Left: Hamburger + Logo */}
-          <div className="flex items-center gap-2">
-            <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-lg hover:bg-stone-100 transition-colors">
-              <svg className="w-5 h-5 text-stone-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-              </svg>
-            </button>
-            <Link href="/" className="flex items-center gap-2 group">
-              <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-8 w-8 object-contain rounded-full" />
-              <div className="flex flex-col leading-none">
-                <span className="font-extrabold text-[17px] text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
-                <span className="text-[8px] uppercase tracking-[0.16em] text-[#d97706] font-bold mt-[2px]">Your Celestial Guide</span>
-              </div>
-            </Link>
-          </div>
+        <div className="max-w-6xl mx-auto px-4 h-[68px] flex items-center justify-between gap-3">
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-11 w-11 object-contain rounded-full" />
+            <div className="flex flex-col leading-none">
+              <span className="font-extrabold text-[20px] text-stone-900 tracking-tight group-hover:text-[#d97706] transition-colors">AstroWalla</span>
+              <span className="text-[9px] uppercase tracking-[0.16em] text-[#d97706] font-bold mt-[3px]">Your Celestial Guide</span>
+            </div>
+          </Link>
 
           {/* Right CTA */}
           <Link href="/login"
@@ -220,26 +211,6 @@ export default function Home() {
             Get Started
           </Link>
         </div>
-
-        {/* Mobile dropdown menu */}
-        {menuOpen && (
-          <div className="bg-white border-t border-[#f0e6c8] px-5 py-3 flex flex-col gap-1 shadow-lg">
-            {[
-              ["🏠 Home", "/"],
-              ["🔮 Top Astrologers", "#astrologers"],
-              ["🛎️ Our Services", "#services"],
-              ["⭐ Testimonials", "#testimonials"],
-              ["❓ FAQ", "#faq"],
-              ["📖 Free Kundli", "/kundli"],
-              ["👤 Sign In", "/login"],
-            ].map(([l, h]) => (
-              <a key={l} href={h} onClick={() => setMenuOpen(false)}
-                className="py-2.5 px-2 text-sm font-medium text-stone-600 hover:text-[#d97706] hover:bg-[#fffbee] rounded-lg transition-colors">
-                {l}
-              </a>
-            ))}
-          </div>
-        )}
       </nav>
 
       {/* ══════════════════════════════════════════
