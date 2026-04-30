@@ -234,55 +234,63 @@ export default function AstrologerChatPage() {
         <div className="absolute bottom-0 left-0 right-0 h-[1.5px] pointer-events-none"
           style={{ background: "linear-gradient(90deg, transparent, rgba(255,153,51,0.5), rgba(245,200,66,0.6), transparent)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
 
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.push("/astrologer")} className="w-9 h-9 rounded-xl bg-[#faf8f5] border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#FF9933] hover:border-[#FF9933]/30 transition-all text-lg font-bold hover:scale-110">←</button>
-            <div className="relative">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 gap-2">
+          {/* Left: back + avatar + name — flex-1 + min-w-0 ensures name truncates before pushing right side off */}
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <button onClick={() => router.push("/astrologer")} className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#faf8f5] border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#FF9933] hover:border-[#FF9933]/30 transition-all text-base sm:text-lg font-bold shrink-0">←</button>
+            <div className="relative shrink-0">
               {/* User avatar with purple ring */}
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-100 to-violet-100 border-2 border-purple-200/60 flex items-center justify-center text-lg font-extrabold text-purple-500 shadow-sm"
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-purple-100 to-violet-100 border-2 border-purple-200/60 flex items-center justify-center text-base sm:text-lg font-extrabold text-purple-500 shadow-sm"
                 style={{ animation: connected ? "glowPulse 3s ease-in-out infinite" : "none", boxShadow: connected ? undefined : "none" }}>
                 {userInitial}
               </div>
-              <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${connected ? "bg-emerald-400" : "bg-red-400"}`}
+              <span className={`absolute -bottom-1 -right-1 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${connected ? "bg-emerald-400" : "bg-red-400"}`}
                 style={connected ? { animation: "connBlink 2s ease-in-out infinite" } : {}} />
             </div>
-            <div>
-              <div className="text-slate-800 font-bold text-[15px] tracking-tight leading-tight">{userName}</div>
-              <div className="text-[10px] font-bold tracking-widest text-purple-400">✦ Seeker</div>
+            <div className="min-w-0">
+              <div className="text-slate-800 font-bold text-[13px] sm:text-[15px] tracking-tight leading-tight truncate">{userName}</div>
+              <div className="text-[9px] sm:text-[10px] font-bold tracking-widest text-purple-400">✦ Seeker</div>
             </div>
-            {/* Kundli toggle button */}
+            {/* Kundli toggle button — shorter label on mobile */}
             {kundliProfile && (
               <button
                 onClick={() => setShowKundli((v) => !v)}
-                className="ml-1 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest transition-all"
+                className="shrink-0 ml-1 px-2 sm:px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest transition-all"
                 style={{
                   background: showKundli ? "linear-gradient(135deg,#FF9933,#f5c842)" : "rgba(245,200,66,0.1)",
                   color: showKundli ? "#1a1040" : "#d97706",
                   border: "1px solid rgba(245,200,66,0.4)",
                 }}>
-                🪐 Kundli
+                <span className="sm:hidden">🪐</span>
+                <span className="hidden sm:inline">🪐 Kundli</span>
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100 text-center">
+          {/* Right: Time + Earnings + End — shrink-0 so it never collapses */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Time: compact pill on mobile, full badge on sm+ */}
+            <div className="hidden sm:block px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100 text-center">
               <div className="text-[8px] uppercase tracking-widest font-bold text-amber-400">Time</div>
               <div className="font-cinzel font-bold text-xs text-amber-600">{formatDuration(duration)}</div>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100 text-center"
+            <div className="sm:hidden px-2 py-1 rounded-lg bg-amber-50 border border-amber-100 text-center">
+              <div className="font-cinzel font-bold text-[11px] text-amber-600">{formatDuration(duration)}</div>
+            </div>
+            <div className="px-2 sm:px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100 text-center"
               style={{ animation: duration > 0 && duration % 60 === 0 ? "emeraldPulse 1s ease-out" : "none" }}>
               <div className="text-[8px] uppercase tracking-widest font-bold text-emerald-500">Earned</div>
-              <div className="font-cinzel font-extrabold text-xs text-emerald-600">₹{earnings.toFixed(0)}</div>
+              <div className="font-cinzel font-extrabold text-[11px] sm:text-xs text-emerald-600">₹{earnings.toFixed(0)}</div>
               <div className="text-[7px] text-emerald-400">{Math.ceil(duration / 60)} min</div>
             </div>
             <div className="hidden sm:block px-3 py-1.5 rounded-xl bg-[#faf8f5] border border-[#f5c842]/30 text-center">
               <div className="text-[8px] uppercase tracking-widest font-bold text-[#FF9933]">Rate</div>
               <div className="font-cinzel font-bold text-xs text-slate-700">₹{rate}/min</div>
             </div>
+            {/* End button — always visible, never hidden */}
             {!ended && (
               <button id="end-session-btn" onClick={handleEndSession}
-                className="px-4 py-2 rounded-xl text-[11px] uppercase tracking-widest font-extrabold bg-red-50 border border-red-200 text-red-500 hover:bg-red-500 hover:text-white transition-all hover:shadow-md">
+                className="px-3 sm:px-4 py-2 rounded-xl text-[10px] sm:text-[11px] uppercase tracking-widest font-extrabold bg-red-50 border border-red-200 text-red-500 hover:bg-red-500 hover:text-white transition-all hover:shadow-md whitespace-nowrap">
                 End
               </button>
             )}
