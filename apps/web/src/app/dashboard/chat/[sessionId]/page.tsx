@@ -295,13 +295,6 @@ export default function UserChatPage() {
     .msg-in-me { animation: msgInMe 0.35s cubic-bezier(.34,1.4,.64,1) both; }
   `;
 
-  // ─── Loading ───────────────────────────────────────────────────────────────
-  if (status === "loading") return (
-    <div className="flex h-screen items-center justify-center bg-[#faf8f5]">
-      <VedicLoader size="lg" text="Your kundli is being shared with the astrologer..." />
-    </div>
-  );
-
   if (status === "error") return (
     <div className="flex flex-col h-screen items-center justify-center bg-[#faf8f5] gap-4 text-center p-4">
       <div className="text-6xl">🪐</div>
@@ -311,8 +304,8 @@ export default function UserChatPage() {
     </div>
   );
 
-  // ─── Waiting screen ────────────────────────────────────────────────────────
-  if (!astrologerJoined && !ended && !waitTimeOver) {
+  // ─── Unified waiting screen (covers both initial loading + waiting-for-astrologer) ───
+  if ((status === "loading" || !astrologerJoined) && !ended && !waitTimeOver) {
     const mins = Math.floor(waitingTimeLeft / 60);
     const secs = waitingTimeLeft % 60;
     return (
@@ -356,24 +349,46 @@ export default function UserChatPage() {
             </div>
           </div>
 
-          <h2 className="text-2xl font-cinzel font-bold text-slate-800 mb-1">Awaiting Your Guide</h2>
-          <p className="text-slate-500 text-sm mb-3">Connecting you to <strong className="text-[#FF9933]">{astrologerName}</strong>…</p>
-          
+          <h2 className="text-2xl font-cinzel font-bold text-slate-800 mb-1">
+            {status === "loading" ? "Preparing Your Session" : "Awaiting Your Guide"}
+          </h2>
+          <p className="text-slate-500 text-sm mb-3">
+            {status === "loading"
+              ? "Sharing your kundli with the astrologer…"
+              : <>Connecting you to <strong className="text-[#FF9933]">{astrologerName}</strong>…</>}
+          </p>
+
           <div className="mb-6 px-4 py-2 bg-[#FF9933]/10 border border-[#FF9933]/20 rounded-full text-[#FF9933] text-xs font-bold animate-pulse shadow-sm">
             ✨ Your kundli is being shared with the astrologer
           </div>
 
-          <div className="w-full bg-[#faf8f5] border border-[#f5c842]/25 rounded-2xl px-6 py-4 mb-6" style={{ animation: "glowPulse 2.5s ease-in-out infinite" }}>
-            <div className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1">Session expires in</div>
-            <div className="text-5xl font-cinzel font-bold text-slate-800">{mins.toString().padStart(2, "0")}:{secs.toString().padStart(2, "0")}</div>
-          </div>
+          {status === "loading" ? (
+            // ── Still connecting: pulse rings instead of a countdown ──
+            <div className="w-full bg-[#faf8f5] border border-[#f5c842]/25 rounded-2xl px-6 py-6 mb-6 flex flex-col items-center gap-3" style={{ animation: "glowPulse 2.5s ease-in-out infinite" }}>
+              <div className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Connecting</div>
+              <div className="flex items-center gap-2">
+                {[0, 0.2, 0.4].map((d, i) => (
+                  <span key={i} className="w-3 h-3 rounded-full bg-gradient-to-b from-[#f5c842] to-[#FF9933]"
+                    style={{ animation: `dotBounce 1.2s ease-in-out ${d}s infinite` }} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            // ── Connected: show the session-expiry countdown ──
+            <div className="w-full bg-[#faf8f5] border border-[#f5c842]/25 rounded-2xl px-6 py-4 mb-6" style={{ animation: "glowPulse 2.5s ease-in-out infinite" }}>
+              <div className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1">Session expires in</div>
+              <div className="text-5xl font-cinzel font-bold text-slate-800">{mins.toString().padStart(2, "0")}:{secs.toString().padStart(2, "0")}</div>
+            </div>
+          )}
 
-          <div className="flex items-center gap-2 mb-6">
-            {[0, 0.2, 0.4].map((d, i) => (
-              <span key={i} className="w-2.5 h-2.5 rounded-full bg-gradient-to-b from-[#f5c842] to-[#FF9933]"
-                style={{ animation: `dotBounce 1.2s ease-in-out ${d}s infinite` }} />
-            ))}
-          </div>
+          {status !== "loading" && (
+            <div className="flex items-center gap-2 mb-6">
+              {[0, 0.2, 0.4].map((d, i) => (
+                <span key={i} className="w-2.5 h-2.5 rounded-full bg-gradient-to-b from-[#f5c842] to-[#FF9933]"
+                  style={{ animation: `dotBounce 1.2s ease-in-out ${d}s infinite` }} />
+              ))}
+            </div>
+          )}
 
           <button onClick={endSessionEarly} className="text-slate-400 hover:text-red-400 text-sm transition-colors underline underline-offset-4">Cancel session</button>
         </div>
