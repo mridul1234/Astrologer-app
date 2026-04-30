@@ -7,7 +7,6 @@ import UserFooter from "@/components/UserFooter";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import VedicLoader from "@/components/VedicLoader";
 import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -146,11 +145,58 @@ export default function UserDashboard() {
 
       {/* ── Full-screen loading overlay — shown immediately on click, stays until navigation ── */}
       {starting && (
-        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#faf8f5]/95 backdrop-blur-sm">
-          <VedicLoader size="lg" text="Connecting you to your astrologer…" />
-          <p className="mt-4 text-sm text-stone-400 font-medium animate-pulse">
-            Sending your request · Please wait
-          </p>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden" style={{ background: "#faf8f5" }}>
+          <style>{`
+            @keyframes _aurora1 { 0%,100%{transform:translate(0,0) scale(1);opacity:.07} 50%{transform:translate(40px,-30px) scale(1.15);opacity:.12} }
+            @keyframes _aurora2 { 0%,100%{transform:translate(0,0) scale(1);opacity:.06} 50%{transform:translate(-30px,40px) scale(1.2);opacity:.1} }
+            @keyframes _twinkle { 0%,100%{opacity:.15;transform:scale(1)} 50%{opacity:.9;transform:scale(1.4)} }
+            @keyframes _breatheOm { 0%,100%{opacity:.04;transform:scale(1)} 50%{opacity:.07;transform:scale(1.04)} }
+            @keyframes _ringRotate { to{transform:rotate(360deg)} }
+            @keyframes _glowPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,153,51,0)} 50%{box-shadow:0 0 0 8px rgba(255,153,51,0.18)} }
+            @keyframes _dotBounce { 0%,80%,100%{transform:translateY(0);opacity:.6} 40%{transform:translateY(-6px);opacity:1} }
+          `}</style>
+
+          {/* Aurora blobs */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] rounded-full" style={{ background: "radial-gradient(circle, rgba(255,153,51,0.08) 0%, transparent 70%)", animation: "_aurora1 9s ease-in-out infinite" }} />
+            <div className="absolute bottom-[15%] right-[10%] w-[600px] h-[600px] rounded-full" style={{ background: "radial-gradient(circle, rgba(245,200,66,0.08) 0%, transparent 70%)", animation: "_aurora2 12s ease-in-out infinite" }} />
+          </div>
+
+          {/* ॐ watermark */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ animation: "_breatheOm 6s ease-in-out infinite" }}>
+            <span className="text-[#FF9933] font-bold" style={{ fontSize: "280px", lineHeight: 1 }}>ॐ</span>
+          </div>
+
+          {/* Card */}
+          <div className="relative z-10 bg-white/80 backdrop-blur-2xl border border-white/60 p-10 rounded-3xl flex flex-col items-center text-center max-w-sm w-full mx-4 shadow-[0_20px_60px_rgba(255,153,51,0.12)]">
+            {/* Rotating ring icon */}
+            <div className="relative mb-6 w-20 h-20">
+              <div className="absolute inset-0 rounded-2xl" style={{ background: "conic-gradient(from 0deg, #FF9933, #f5c842, #FF9933)", animation: "_ringRotate 3s linear infinite", padding: "2.5px", borderRadius: "18px" }}>
+                <div className="w-full h-full bg-white rounded-2xl" />
+              </div>
+              <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-[#FF9933]/20 to-[#f5c842]/20 flex items-center justify-center text-5xl z-10">
+                🔮
+              </div>
+            </div>
+
+            <h2 className="text-2xl font-cinzel font-bold text-slate-800 mb-1">Connecting You</h2>
+            <p className="text-slate-500 text-sm mb-4">Reaching your astrologer…</p>
+
+            {/* Kundli badge */}
+            <div className="mb-6 px-4 py-2 bg-[#FF9933]/10 border border-[#FF9933]/20 rounded-full text-[#FF9933] text-xs font-bold animate-pulse shadow-sm">
+              ✨ Your kundli is being shared with the astrologer
+            </div>
+
+            {/* Bouncing dots */}
+            <div className="flex items-center gap-2 mb-4">
+              {[0, 0.2, 0.4].map((d, i) => (
+                <span key={i} className="w-2.5 h-2.5 rounded-full bg-gradient-to-b from-[#f5c842] to-[#FF9933]"
+                  style={{ animation: `_dotBounce 1.2s ease-in-out ${d}s infinite` }} />
+              ))}
+            </div>
+
+            <p className="text-[11px] text-slate-400 font-medium uppercase tracking-widest">Please wait · Do not close this screen</p>
+          </div>
         </div>
       )}
 
