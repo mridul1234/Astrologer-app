@@ -91,9 +91,20 @@ export default function AstrologerChatPage() {
     let socket: Socket;
     async function init() {
       try {
-        const sessionRes = await fetch(`/api/chat/session/${sessionId}`);
+        // Run all 3 fetches in parallel — none depend on each other's response
+        const [sessionRes, profileRes, tokenRes] = await Promise.all([
+          fetch(`/api/chat/session/${sessionId}`),
+          fetch("/api/astrologer/profile"),
+          fetch("/api/chat/socket-token"),
+        ]);
+
         if (!sessionRes.ok) { setStatus("error"); return; }
-        const sessionData = await sessionRes.json();
+
+        const [sessionData, profile, tokenData] = await Promise.all([
+          sessionRes.json(),
+          profileRes.json(),
+          tokenRes.json(),
+        ]);
 
         setUserName(sessionData.user?.name || "User");
         setRate(sessionData.astrologer?.ratePerMin || 0);
@@ -107,8 +118,6 @@ export default function AstrologerChatPage() {
           setBillingStarted(true);
         }
 
-        const profileRes = await fetch("/api/astrologer/profile");
-        const profile = await profileRes.json();
         const uid = profile?.userId || profile?.id;
         if (uid) setMyUserId(uid);
 
@@ -121,7 +130,8 @@ export default function AstrologerChatPage() {
           setLatestMsgId(mapped[mapped.length-1]?.id || null);
         }
 
-        const { token } = await (await fetch("/api/chat/socket-token")).json();
+        // Socket token already fetched — connect immediately
+        const { token } = tokenData;
         const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
         socket = io(SOCKET_URL, { auth: { token }, transports: ["websocket"], timeout: 60000, reconnection: true, reconnectionAttempts: 10, reconnectionDelay: 2000 });
         socketRef.current = socket;
