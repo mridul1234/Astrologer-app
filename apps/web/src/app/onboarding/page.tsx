@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import VedicLoader from "../../components/VedicLoader";
 
 const STEPS = ["Personal", "Birth Date", "Birth Place"];
 
@@ -79,10 +80,10 @@ export default function OnboardingPage() {
 
   if (loading || status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg,#1a1040,#2d1b69)" }}>
-        <div className="flex flex-col items-center gap-4">
-          <img src="/logo.jpeg" alt="AstroWalla Logo" className="h-16 w-auto object-contain mx-auto" />
-          <p className="text-white/60 text-sm font-medium animate-pulse">Aligning the stars…</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#faf8f5" }}>
+        <div className="text-center">
+          <VedicLoader size="xl" text="Aligning the Stars…" />
+          <p className="text-slate-500 font-medium text-sm mt-4">Preparing your AstroWalla experience</p>
         </div>
       </div>
     );
