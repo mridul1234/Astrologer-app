@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import useSWR from "swr";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
 import MobileBottomNav from "@/components/MobileBottomNav";
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 interface ChatSummary {
   id: string;
@@ -50,28 +52,13 @@ function formatDuration(start: string, end: string | null): string {
 
 export default function MyChatsPage() {
   const router = useRouter();
-  const [sessions, setSessions] = useState<ChatSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [myUserId, setMyUserId] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      const [chatsRes, profileRes] = await Promise.all([
-        fetch("/api/user/chats"),
-        fetch("/api/user/profile"),
-      ]);
-      if (chatsRes.ok) {
-        const data = await chatsRes.json();
-        setSessions(data.sessions || []);
-      }
-      if (profileRes.ok) {
-        const p = await profileRes.json();
-        setMyUserId(p.id);
-      }
-      setLoading(false);
-    }
-    load();
-  }, []);
+  const { data: chatsData, isLoading: loadingChats } = useSWR("/api/user/chats", fetcher);
+  const { data: profile } = useSWR("/api/user/profile", fetcher);
+
+  const sessions: ChatSummary[] = chatsData?.sessions || [];
+  const myUserId: string | null = profile?.id ?? null;
+  const loading = loadingChats;
 
   const handleContinue = async (astrologerId: string) => {
     const res = await fetch("/api/chat/start", {
