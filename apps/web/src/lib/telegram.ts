@@ -29,10 +29,10 @@ export async function sendChatRequestNotification(
   }
 
   const message =
-    `🔔 *New Chat Request!*\n\n` +
-    `👤 User *${escapeMarkdown(userName)}* wants to consult with you\\.\n\n` +
-    `👉 [Open Dashboard](https://astrowalla.com/astrologer) to accept the request\\.\n\n` +
-    `_Session ID: \`${sessionId}\`_`;
+    `🔔 <b>New Chat Request!</b>\n\n` +
+    `👤 User <b>${escapeHtml(userName)}</b> wants to consult with you.\n\n` +
+    `👉 <a href="https://astrowalla.com/astrologer">Open Dashboard</a> to accept the request.\n\n` +
+    `<i>Session ID: <code>${sessionId}</code></i>`;
 
   try {
     const res = await fetch(`${TELEGRAM_API}/bot${token}/sendMessage`, {
@@ -41,7 +41,7 @@ export async function sendChatRequestNotification(
       body: JSON.stringify({
         chat_id: telegramChatId,
         text: message,
-        parse_mode: "MarkdownV2",
+        parse_mode: "HTML",
         disable_web_page_preview: true,
       }),
     });
@@ -87,7 +87,10 @@ export async function sendTelegramMessage(
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Escapes special chars for Telegram MarkdownV2 */
-function escapeMarkdown(text: string): string {
-  return text.replace(/[_*[\]()~`>#+\-=|{}.!]/g, "\\$&");
+/** Escapes special HTML chars to prevent injection in Telegram HTML mode */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
