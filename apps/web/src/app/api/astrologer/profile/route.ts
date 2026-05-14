@@ -63,7 +63,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { name, bio, speciality, ratePerMin, languages, whatsappNumber } = body;
+  const { name, bio, speciality, ratePerMin, languages, telegramChatId } = body;
 
   // Update user name if provided
   if (name?.trim()) {
@@ -83,7 +83,7 @@ export async function PATCH(req: NextRequest) {
       ...(body.isOnline !== undefined ? { isOnline: Boolean(body.isOnline) } : {}),
       ...(languages !== undefined ? { languages } : {}),
       ...(body.profileImage !== undefined ? { profileImage: body.profileImage } : {}),
-      ...(whatsappNumber !== undefined ? { whatsappNumber: whatsappNumber?.trim() || null } : {}),
+      ...(telegramChatId !== undefined ? { telegramChatId: telegramChatId?.trim() || null } : {}),
     },
     include: {
       user: { select: { name: true, email: true } },

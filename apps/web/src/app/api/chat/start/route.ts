@@ -2,7 +2,7 @@ import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@astrology/db";
 import { auth } from "@/auth";
 import jwt from "jsonwebtoken";
-import { sendChatRequestNotification } from "@/lib/gupshup";
+import { sendChatRequestNotification } from "@/lib/telegram";
 
 // POST /api/chat/start  — resumes or starts a chat session
 export async function POST(req: NextRequest) {
@@ -69,25 +69,25 @@ export async function POST(req: NextRequest) {
     { expiresIn: "24h" }
   );
 
-  // ─── Send WhatsApp notification AFTER the response ───────────────────────────
+  // ─── Send Telegram notification AFTER the response ───────────────────────────
   // after() runs once the response has been sent, so the user is redirected to
-  // the chat page immediately without waiting for Gupshup's API.
+  // the chat page immediately without waiting for the Telegram API.
   after(async () => {
-    console.log(`[chat/start] Astrologer ID: ${astrologer.id}, whatsappNumber: ${astrologer.whatsappNumber ?? "NOT SET"}`);
-    if (astrologer.whatsappNumber) {
-      console.log(`[chat/start] Sending WhatsApp notification to ${astrologer.whatsappNumber} for user ${user.name}`);
+    console.log(`[chat/start] Astrologer ID: ${astrologer.id}, telegramChatId: ${astrologer.telegramChatId ?? "NOT SET"}`);
+    if (astrologer.telegramChatId) {
+      console.log(`[chat/start] Sending Telegram notification to chat_id ${astrologer.telegramChatId} for user ${user.name}`);
       try {
         const result = await sendChatRequestNotification(
-          astrologer.whatsappNumber,
+          astrologer.telegramChatId,
           user.name,
           chatSession.id
         );
-        console.log("[chat/start] WhatsApp notification result:", JSON.stringify(result));
+        console.log("[chat/start] Telegram notification result:", JSON.stringify(result));
       } catch (err) {
-        console.error("[chat/start] WhatsApp notification error:", err);
+        console.error("[chat/start] Telegram notification error:", err);
       }
     } else {
-      console.warn(`[chat/start] Skipping WhatsApp — astrologer ${astrologer.id} has no whatsappNumber in DB`);
+      console.warn(`[chat/start] Skipping Telegram — astrologer ${astrologer.id} has no telegramChatId in DB`);
     }
   });
 

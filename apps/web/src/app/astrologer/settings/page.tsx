@@ -46,7 +46,7 @@ export default function AstrologerSettingsPage() {
     ratePerMin: EMPTY_ASTROLOGER.ratePerMin,
     languages: EMPTY_ASTROLOGER.languages,
     selectedSpecialities: [] as string[],
-    whatsappNumber: "",
+    telegramChatId: "",
   });
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [selectedZodiac, setSelectedZodiac] = useState(0); // Aries
@@ -69,7 +69,7 @@ export default function AstrologerSettingsPage() {
             ratePerMin: data.ratePerMin ?? 20,
             languages: data.languages ? data.languages.split(", ") : [],
             selectedSpecialities: data.speciality ? data.speciality.split(", ") : [],
-            whatsappNumber: data.whatsappNumber ?? "",
+            telegramChatId: data.telegramChatId ?? "",
           }));
         }
         setProfileLoaded(true);
@@ -90,7 +90,7 @@ export default function AstrologerSettingsPage() {
           ratePerMin: profile.ratePerMin,
           languages: profile.languages.join(", "),
           speciality: profile.selectedSpecialities.join(", "),
-          whatsappNumber: profile.whatsappNumber,
+          telegramChatId: profile.telegramChatId,
         }),
       });
       if (!res.ok) {
@@ -364,28 +364,46 @@ export default function AstrologerSettingsPage() {
                   </div>
                 </div>
 
-                {/* WhatsApp Number */}
+                {/* Telegram Chat ID */}
                 <div>
                   <label className="block text-sm font-medium text-purple-200/70 mb-2">
-                    WhatsApp Number
+                    Telegram Chat ID
                     <span className="ml-2 text-purple-400/40">(for chat request alerts)</span>
                   </label>
+
+                  {/* Step-by-step setup card */}
+                  <div className="mb-3 p-4 rounded-2xl space-y-2" style={{ background: "rgba(33,150,243,0.07)", border: "1px solid rgba(33,150,243,0.18)" }}>
+                    <p className="text-xs font-bold text-blue-300 mb-2">📲 How to connect Telegram (one-time setup):</p>
+                    {[
+                      { step: "1", text: <>Open Telegram → search <strong className="text-white">@astrowalla_alerts_bot</strong></> },
+                      { step: "2", text: <>Send <code className="px-1.5 py-0.5 rounded text-xs font-mono" style={{ background: "rgba(255,255,255,0.1)" }}>/start</code> — the bot will reply with your unique Chat ID</> },
+                      { step: "3", text: <>Copy the number and paste it in the field below, then click <strong className="text-white">Save Profile</strong></> },
+                    ].map(({ step, text }) => (
+                      <div key={step} className="flex items-start gap-3">
+                        <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5" style={{ background: "rgba(33,150,243,0.25)", color: "#90caf9" }}>{step}</span>
+                        <p className="text-xs text-blue-200/70 leading-relaxed">{text}</p>
+                      </div>
+                    ))}
+                    <p className="text-[10px] text-blue-300/50 mt-2 pt-2" style={{ borderTop: "1px solid rgba(33,150,243,0.15)" }}>
+                      💡 Alternatively, send <code className="font-mono">/link your@email.com</code> to auto-link your account.
+                    </p>
+                  </div>
+
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg select-none">📱</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg select-none">✈️</span>
                     <input
-                      id="astro-whatsapp-input"
-                      type="tel"
-                      value={profile.whatsappNumber}
+                      id="astro-telegram-input"
+                      type="text"
+                      value={profile.telegramChatId}
                       onChange={(e) =>
-                        setProfile((p) => ({ ...p, whatsappNumber: e.target.value }))
+                        setProfile((p) => ({ ...p, telegramChatId: e.target.value }))
                       }
-                      className="astrowalla-input w-full pl-10 pr-4 py-3.5 rounded-xl text-base"
-                      placeholder="e.g. 9876543210"
-                      maxLength={15}
+                      className="astrowalla-input w-full pl-10 pr-4 py-3.5 rounded-xl text-base font-mono"
+                      placeholder="e.g. 123456789"
                     />
                   </div>
                   <p className="text-purple-400/40 text-xs mt-1.5">
-                    🔒 Only used to notify you of new chat requests via WhatsApp. Never shared publicly.
+                    🔒 Only used to notify you of new chat requests via Telegram. Never shared publicly.
                   </p>
                 </div>
 

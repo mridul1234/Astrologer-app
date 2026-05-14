@@ -33,7 +33,7 @@ interface AstrologerProfile {
   languages: string | null;
   ratePerMin: number;
   profileImage?: string | null;
-  whatsappNumber?: string | null;
+  telegramChatId?: string | null;
 }
 
 export default function AstrologerPortal() {
@@ -59,7 +59,7 @@ export default function AstrologerPortal() {
 
   // Settings Form State
   const [isUpdating, setIsUpdating] = useState(false);
-  const [editProfile, setEditProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0, profileImage: "", whatsappNumber: "" });
+  const [editProfile, setEditProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0, profileImage: "", telegramChatId: "" });
   const [editProfileImageFile, setEditProfileImageFile] = useState<File | null>(null);
 
   const [profileOpen, setProfileOpen] = useState(false);
@@ -145,7 +145,7 @@ export default function AstrologerPortal() {
            languages: data.languages || "",
            ratePerMin: data.ratePerMin || 0,
            profileImage: data.profileImage || "",
-           whatsappNumber: data.whatsappNumber || "",
+           telegramChatId: data.telegramChatId || "",
          });
       }
       
@@ -664,19 +664,25 @@ export default function AstrologerPortal() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">WhatsApp Number</label>
+                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Telegram Chat ID</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-3.5 text-base select-none">📱</span>
+                    <span className="absolute left-4 top-3.5 text-base select-none">✈️</span>
                     <input
-                      type="tel"
-                      value={editProfile.whatsappNumber || ""}
-                      onChange={e => setEditProfile({...editProfile, whatsappNumber: e.target.value})}
-                      placeholder="e.g. 919876543210 (with country code)"
-                      maxLength={15}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#d97706]/50 focus:border-[#d97706] transition-all bg-slate-50 focus:bg-white"
+                      type="text"
+                      value={editProfile.telegramChatId || ""}
+                      onChange={e => setEditProfile({...editProfile, telegramChatId: e.target.value})}
+                      placeholder="e.g. 123456789"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#d97706]/50 focus:border-[#d97706] transition-all bg-slate-50 focus:bg-white font-mono"
                     />
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-1.5 ml-1 font-semibold">🔒 Used only to notify you of new chat requests via WhatsApp. Never shown publicly.</p>
+                  <div className="mt-3 px-4 py-3 rounded-xl border border-blue-100 bg-blue-50/50">
+                    <p className="text-[11px] text-blue-700 font-semibold leading-relaxed">
+                      📲 <strong>How to get your Chat ID:</strong><br/>
+                      1. Open Telegram → search <strong>@astrowalla_alerts_bot</strong><br/>
+                      2. Send <code className="bg-blue-100 px-1 rounded">/start</code> — the bot will reply with your ID<br/>
+                      3. Copy the number and paste it above
+                    </p>
+                  </div>
                 </div>
 
                 <div className="pt-4 border-t border-slate-100">
