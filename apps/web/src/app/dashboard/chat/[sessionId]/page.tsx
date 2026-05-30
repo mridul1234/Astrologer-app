@@ -13,6 +13,18 @@ interface Message {
   isMe: boolean;
 }
 
+const WALLET_PACKS = [
+  { amount: 100, label: "Rs 100", hint: "Quick top-up" },
+  { amount: 200, label: "Rs 200", hint: "Popular" },
+  { amount: 500, label: "Rs 500", hint: "Longer chat" },
+];
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 // Fixed star positions to avoid hydration mismatch
 const STARS = [
   { top: 8, left: 12, size: 2, delay: 0, dur: 3.2 },
@@ -70,6 +82,11 @@ export default function UserChatPage() {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [latestMsgId, setLatestMsgId] = useState<string | null>(null);
+  const [selectedTopUp, setSelectedTopUp] = useState(200);
+  const [customTopUp, setCustomTopUp] = useState("");
+  const [paying, setPaying] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null);
+  const [continuingSession, setContinuingSession] = useState(false);
 
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -88,6 +105,9 @@ export default function UserChatPage() {
   }, [sessionId, router]);
 
   useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
+  useEffect(() => {
+    if (ended && (reviewSubmitted || !astrologerJoined)) scrollToBottom();
+  }, [ended, reviewSubmitted, astrologerJoined, scrollToBottom]);
 
   useEffect(() => {
     // Only tick when billing is officially confirmed by the server
@@ -270,9 +290,119 @@ export default function UserChatPage() {
     setIsSubmittingReview(true);
     try {
       const res = await fetch("/api/chat/review", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId, astrologerId, rating, comment }) });
-      if (res.ok) { setReviewSubmitted(true); setTimeout(() => router.push("/dashboard"), 1500); }
+      if (res.ok) setReviewSubmitted(true);
     } catch (e) { console.error(e); } finally { setIsSubmittingReview(false); }
   };
+
+  const loadRazorpayScript = () =>
+    new Promise<boolean>((resolve) => {
+      if (document.getElementById("razorpay-script")) return resolve(true);
+      const script = document.createElement("script");
+      script.id = "razorpay-script";
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+
+  async function handleRecharge(amount: number) {
+    if (!amount || amount < 10) {
+      alert("Minimum recharge amount is Rs 10.");
+      return;
+    }
+
+    setPaying(true);
+    setPaymentSuccess(null);
+
+    const loaded = await loadRazorpayScript();
+    if (!loaded) {
+      alert("Failed to load payment gateway. Please check your connection.");
+      setPaying(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/user/wallet/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      });
+      const order = await res.json();
+
+      if (!res.ok) {
+        alert(order.error || "Failed to create order.");
+        setPaying(false);
+        return;
+      }
+
+      const options = {
+        key: order.keyId,
+        amount: order.amount * 100,
+        currency: order.currency,
+        name: "AstroWalla",
+        description: "Wallet Top-up",
+        order_id: order.orderId,
+        handler: async (response: any) => {
+          const verifyRes = await fetch("/api/user/wallet/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              amount,
+            }),
+          });
+          const verified = await verifyRes.json();
+          if (verifyRes.ok) {
+            setBalance(Number(verified.balance ?? balance + amount));
+            setPaymentSuccess(`Rs ${amount} added. You can continue your chat now.`);
+          } else {
+            alert(verified.error || "Payment verification failed.");
+          }
+          setPaying(false);
+        },
+        theme: { color: "#f5c842" },
+        modal: {
+          ondismiss: () => setPaying(false),
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+      setPaying(false);
+    }
+  }
+
+  async function continueSession() {
+    if (!astrologerId || continuingSession) return;
+    setContinuingSession(true);
+    try {
+      const res = await fetch("/api/chat/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ astrologerId }),
+      });
+      const data = await res.json();
+      if (res.status === 402) {
+        alert(data.error || "Please add wallet balance to continue.");
+        return;
+      }
+      if (!res.ok) {
+        alert(data.error || "Could not continue this session.");
+        return;
+      }
+      window.location.href = `/dashboard/chat/${data.sessionId}`;
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setContinuingSession(false);
+    }
+  }
 
   function handleEndSession() {
     if (!socketRef.current) return;
@@ -458,7 +588,7 @@ export default function UserChatPage() {
               className="w-full bg-[#faf8f5] border border-slate-200 rounded-2xl p-4 text-slate-800 placeholder:text-slate-400 resize-none focus:outline-none focus:border-[#f5c842]/50 focus:ring-2 focus:ring-[#f5c842]/15 mb-5 font-medium text-sm" rows={3} />
 
             <div className="flex w-full gap-3">
-              <button onClick={() => router.push("/dashboard")} className="flex-1 py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors text-sm font-bold">Skip</button>
+              <button onClick={() => setReviewSubmitted(true)} className="flex-1 py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors text-sm font-bold">Skip</button>
               <button disabled={rating === 0 || isSubmittingReview} onClick={submitReview}
                 className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-[#FF9933] to-[#f5c842] text-white disabled:opacity-50 text-sm font-extrabold shadow-md hover:shadow-[0_4px_24px_rgba(255,153,51,0.4)] hover:scale-[1.02] transition-all">
                 {isSubmittingReview ? "Submitting…" : "Submit ✨"}
@@ -658,11 +788,78 @@ export default function UserChatPage() {
           )}
 
           {ended && (
-            <div className="flex justify-center pt-8 pb-4 msg-in">
-              <button id="back-to-dashboard-btn" onClick={() => router.push("/dashboard")}
-                className="group px-8 py-3.5 rounded-2xl bg-white border border-[#FF9933]/25 text-[#FF9933] font-bold uppercase tracking-widest text-xs transition-all shadow-sm hover:bg-gradient-to-r hover:from-[#FF9933] hover:to-[#f5c842] hover:text-white hover:shadow-[0_4px_24px_rgba(255,153,51,0.35)] hover:scale-105">
-                ← Return to Dashboard
-              </button>
+            <div className="pt-8 pb-5 msg-in">
+              <div className="mx-auto w-full max-w-md rounded-3xl bg-white border border-[#f5c842]/25 p-5 shadow-[0_12px_40px_rgba(255,153,51,0.13)]">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-widest font-extrabold text-[#FF9933] mb-1">Session ended</div>
+                    <h3 className="font-cinzel text-xl font-extrabold text-slate-800">Continue when you are ready</h3>
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">Add wallet balance instantly, then restart your chat with {astrologerName}.</p>
+                  </div>
+                  <div className="shrink-0 rounded-2xl bg-emerald-50 border border-emerald-100 px-3 py-2 text-right">
+                    <div className="text-[8px] uppercase tracking-widest font-bold text-emerald-500">Balance</div>
+                    <div className="font-cinzel font-extrabold text-emerald-600">Rs {balance.toFixed(0)}</div>
+                  </div>
+                </div>
+
+                {paymentSuccess && (
+                  <div className="mb-4 rounded-2xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm font-bold text-emerald-700">
+                    {paymentSuccess}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {WALLET_PACKS.map((pack) => (
+                    <button
+                      key={pack.amount}
+                      onClick={() => { setSelectedTopUp(pack.amount); setCustomTopUp(""); }}
+                      disabled={paying}
+                      className={`rounded-2xl border p-3 text-center transition-all disabled:opacity-50 ${
+                        selectedTopUp === pack.amount && !customTopUp
+                          ? "border-[#f5c842] bg-[#fffbee] shadow-[0_4px_18px_rgba(245,200,66,0.22)]"
+                          : "border-slate-200 bg-[#faf8f5] hover:border-[#f5c842]/60"
+                      }`}
+                    >
+                      <div className="text-sm font-extrabold text-slate-800">{pack.label}</div>
+                      <div className="text-[9px] uppercase tracking-widest font-bold text-slate-400 mt-1">{pack.hint}</div>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="relative mb-4">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-extrabold">Rs</span>
+                  <input
+                    type="number"
+                    min={10}
+                    value={customTopUp}
+                    onChange={(e) => { setCustomTopUp(e.target.value); setSelectedTopUp(0); }}
+                    placeholder="Custom amount"
+                    className="w-full rounded-2xl border border-slate-200 bg-[#faf8f5] py-3.5 pl-11 pr-4 text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/15"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button
+                    onClick={() => handleRecharge(Number(customTopUp) || selectedTopUp)}
+                    disabled={paying || (!selectedTopUp && !customTopUp)}
+                    className="py-3.5 rounded-2xl bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold text-sm shadow-md shadow-amber-200/50 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {paying ? "Opening payment..." : `Add Rs ${Number(customTopUp) || selectedTopUp}`}
+                  </button>
+                  <button
+                    onClick={continueSession}
+                    disabled={continuingSession || (!freeMinutesLeft && rate > 0 && balance < rate)}
+                    className="py-3.5 rounded-2xl bg-[#FF9933] text-white font-extrabold text-sm shadow-md hover:bg-[#f08a20] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {continuingSession ? "Continuing..." : "Continue chat"}
+                  </button>
+                </div>
+
+                <button id="back-to-dashboard-btn" onClick={() => router.push("/dashboard")}
+                  className="mt-4 w-full text-xs font-extrabold uppercase tracking-widest text-slate-400 hover:text-[#FF9933] transition-colors">
+                  Return to Dashboard
+                </button>
+              </div>
             </div>
           )}
           <div ref={messagesEndRef} />
