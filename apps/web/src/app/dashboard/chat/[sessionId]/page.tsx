@@ -509,12 +509,12 @@ export default function UserChatPage() {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-cinzel font-black text-slate-900 mb-2">
-            {status === "loading" ? "Session taiyaar ho raha hai" : "Astrologer ko request mil gayi hai"}
+            {status === "loading" ? "Preparing your session" : "Your request is with the astrologer"}
           </h2>
           <p className="text-slate-500 text-sm sm:text-[15px] leading-relaxed mb-3">
             {status === "loading"
-              ? "Aapki kundli astrologer ke saath securely share ho rahi hai."
-              : <><strong className="text-[#FF9933]">{astrologerName}</strong> ko call alert aur chat request bhej di gayi hai.</>}
+              ? "Your kundli is being securely shared with the astrologer."
+              : <><strong className="text-[#FF9933]">{astrologerName}</strong> has received the chat request and call alert.</>}
           </p>
 
           <div className="mb-6 px-4 py-2 bg-[#FF9933]/10 border border-[#FF9933]/20 rounded-full text-[#FF9933] text-xs font-bold animate-pulse shadow-sm">
@@ -549,6 +549,13 @@ export default function UserChatPage() {
               </div>
             </div>
           )}
+
+          <div className="w-full rounded-2xl border border-orange-100 bg-orange-50/60 px-4 py-3 mb-5 text-left">
+            <div className="text-[10px] uppercase tracking-widest font-black text-orange-500 mb-1">Make this session count</div>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Think of one clear question while we connect you. Specific questions usually get clearer guidance.
+            </p>
+          </div>
 
           {status !== "loading" && (
             <div className="flex items-center gap-2 mb-6">

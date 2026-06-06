@@ -177,6 +177,8 @@ export default function UserDashboard() {
             @keyframes _ringRotate { to{transform:rotate(360deg)} }
             @keyframes _glowPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,153,51,0)} 50%{box-shadow:0 0 0 8px rgba(255,153,51,0.18)} }
             @keyframes _dotBounce { 0%,80%,100%{transform:translateY(0);opacity:.6} 40%{transform:translateY(-6px);opacity:1} }
+            @keyframes _floatSoft { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-8px) rotate(4deg)} }
+            @keyframes _slideShine { 0%{background-position:200% center} 100%{background-position:-200% center} }
           `}</style>
 
           {/* Aurora blobs */}
@@ -190,10 +192,15 @@ export default function UserDashboard() {
             <span className="text-[#FF9933] font-bold" style={{ fontSize: "280px", lineHeight: 1 }}>ॐ</span>
           </div>
 
+          <div className="absolute left-[12%] top-[18%] hidden sm:block text-4xl opacity-30" style={{ animation: "_floatSoft 5s ease-in-out infinite" }}>🪔</div>
+          <div className="absolute right-[12%] bottom-[18%] hidden sm:block text-4xl opacity-30" style={{ animation: "_floatSoft 6s ease-in-out .4s infinite" }}>✨</div>
+
           {/* Card */}
-          <div className="relative z-10 bg-white/80 backdrop-blur-2xl border border-white/60 p-10 rounded-3xl flex flex-col items-center text-center max-w-sm w-full mx-4 shadow-[0_20px_60px_rgba(255,153,51,0.12)]">
+          <div className="relative z-10 bg-white/85 backdrop-blur-2xl border border-white/70 px-5 py-7 sm:p-9 rounded-[32px] flex flex-col items-center text-center max-w-[430px] w-full mx-4 shadow-[0_24px_80px_rgba(255,153,51,0.16)] overflow-hidden">
+            <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#f5c842] to-transparent" />
             {/* Rotating ring icon */}
-            <div className="relative mb-6 w-20 h-20">
+            <div className="relative mb-6 w-24 h-24">
+              <div className="absolute inset-0 rounded-full border border-dashed border-[#FF9933]/25" style={{ animation: "_ringRotate 9s linear infinite" }} />
               <div className="absolute inset-0 rounded-2xl" style={{ background: "conic-gradient(from 0deg, #FF9933, #f5c842, #FF9933)", animation: "_ringRotate 3s linear infinite", padding: "2.5px", borderRadius: "18px" }}>
                 <div className="w-full h-full bg-white rounded-2xl" />
               </div>
@@ -207,8 +214,8 @@ export default function UserDashboard() {
               Request Sent
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-cinzel font-black text-slate-900 mb-2">Astrologer se jod rahe hain</h2>
-            <p className="text-slate-500 text-sm sm:text-[15px] leading-relaxed mb-4">Aapki kundli aur chat request astrologer ko bhej di gayi hai.</p>
+            <h2 className="text-2xl sm:text-3xl font-cinzel font-black text-slate-900 mb-2">Connecting you to your astrologer</h2>
+            <p className="text-slate-500 text-sm sm:text-[15px] leading-relaxed mb-4">Your kundli and chat request have been shared. We are alerting the astrologer now.</p>
 
             {/* Kundli badge */}
             <div className="mb-6 px-4 py-2 bg-[#FF9933]/10 border border-[#FF9933]/20 rounded-full text-[#FF9933] text-xs font-bold animate-pulse shadow-sm">
@@ -230,6 +237,15 @@ export default function UserDashboard() {
                   <div className="text-[10px] font-bold leading-tight text-slate-600">{label}</div>
                 </div>
               ))}
+            </div>
+
+            <div className="w-full rounded-2xl border border-orange-100 bg-orange-50/60 px-4 py-3 mb-4 text-left">
+              <div className="text-[10px] uppercase tracking-widest font-black text-orange-500 mb-1">While you wait</div>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">Keep your birth details ready and think of one clear question. A focused question helps the guidance feel sharper.</p>
+            </div>
+
+            <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-orange-100">
+              <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-[#FF9933] via-[#f5c842] to-[#FF9933]" style={{ backgroundSize: "200% 100%", animation: "_slideShine 1.8s linear infinite" }} />
             </div>
 
             <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Please stay here while we connect</p>
