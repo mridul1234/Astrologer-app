@@ -14,9 +14,9 @@ interface Message {
 }
 
 const WALLET_PACKS = [
-  { amount: 100, label: "Rs 100", hint: "Quick top-up" },
-  { amount: 200, label: "Rs 200", hint: "Popular" },
-  { amount: 500, label: "Rs 500", hint: "Longer chat" },
+  { amount: 30, label: "Rs 30", hint: "Quick top-up" },
+  { amount: 50, label: "Rs 50", hint: "Popular" },
+  { amount: 100, label: "Rs 100", hint: "Longer chat" },
 ];
 
 declare global {
@@ -82,7 +82,7 @@ export default function UserChatPage() {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [latestMsgId, setLatestMsgId] = useState<string | null>(null);
-  const [selectedTopUp, setSelectedTopUp] = useState(200);
+  const [selectedTopUp, setSelectedTopUp] = useState(50);
   const [customTopUp, setCustomTopUp] = useState("");
   const [paying, setPaying] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState<string | null>(null);
