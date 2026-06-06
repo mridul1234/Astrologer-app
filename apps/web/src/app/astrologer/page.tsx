@@ -34,6 +34,7 @@ interface AstrologerProfile {
   ratePerMin: number;
   profileImage?: string | null;
   telegramChatId?: string | null;
+  phoneNumber?: string | null;
 }
 
 export default function AstrologerPortal() {
@@ -59,7 +60,7 @@ export default function AstrologerPortal() {
 
   // Settings Form State
   const [isUpdating, setIsUpdating] = useState(false);
-  const [editProfile, setEditProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0, profileImage: "", telegramChatId: "" });
+  const [editProfile, setEditProfile] = useState<AstrologerProfile>({ bio: "", speciality: "", languages: "", ratePerMin: 0, profileImage: "", telegramChatId: "", phoneNumber: "" });
   const [editProfileImageFile, setEditProfileImageFile] = useState<File | null>(null);
 
   const [profileOpen, setProfileOpen] = useState(false);
@@ -145,6 +146,7 @@ export default function AstrologerPortal() {
            languages: data.languages || "",
            ratePerMin: data.ratePerMin || 0,
            profileImage: data.profileImage || "",
+           phoneNumber: data.phoneNumber || "",
            telegramChatId: data.telegramChatId || "",
          });
       }
@@ -238,7 +240,8 @@ export default function AstrologerPortal() {
         setEditProfileImageFile(null); // clear file
         fetchProfileData();
       } else {
-        alert("Failed to update profile.");
+        const d = await res.json().catch(() => ({}));
+        alert(d.error || "Failed to update profile.");
       }
     } catch (err) {
       alert("An error occurred");
@@ -661,6 +664,23 @@ export default function AstrologerPortal() {
                       className="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#d97706]/50 focus:border-[#d97706] transition-all bg-slate-50 focus:bg-white font-mono font-bold text-lg"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Phone Number for Call Alerts</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-3.5 text-base select-none">☎</span>
+                    <input
+                      type="tel"
+                      value={editProfile.phoneNumber || ""}
+                      onChange={e => setEditProfile({...editProfile, phoneNumber: e.target.value})}
+                      placeholder="e.g. 9876543210 or +919876543210"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#d97706]/50 focus:border-[#d97706] transition-all bg-slate-50 focus:bg-white font-mono"
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1.5 ml-1 font-semibold">
+                    Used only to call you when a seeker starts a chat. Indian mobile numbers are saved in +91 format.
+                  </p>
                 </div>
 
                 <div>
