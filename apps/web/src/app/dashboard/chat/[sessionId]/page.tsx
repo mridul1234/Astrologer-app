@@ -65,7 +65,7 @@ export default function UserChatPage() {
   const [duration, setDuration] = useState(0);
   const [connected, setConnected] = useState(false);
   const [astrologerJoined, setAstrologerJoined] = useState(false);
-  const [waitingTimeLeft, setWaitingTimeLeft] = useState(600);
+  const [, setWaitingTimeLeft] = useState(600);
   const [waitTimeOver, setWaitTimeOver] = useState(false);
   const [astrologerName, setAstrologerName] = useState("Astrologer");
   const [astrologerId, setAstrologerId] = useState("");
@@ -467,8 +467,6 @@ export default function UserChatPage() {
 
   // ─── Unified waiting screen (covers both initial loading + waiting-for-astrologer) ───
   if ((status === "loading" || !astrologerJoined) && !ended && !waitTimeOver) {
-    const mins = Math.floor(waitingTimeLeft / 60);
-    const secs = waitingTimeLeft % 60;
     return (
       <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden bg-[#faf8f5]">
         <style>{styles}</style>
@@ -510,17 +508,17 @@ export default function UserChatPage() {
             </div>
           </div>
 
-          <h2 className="text-2xl font-cinzel font-bold text-slate-800 mb-1">
-            {status === "loading" ? "Preparing Your Session" : "Awaiting Your Guide"}
+          <h2 className="text-2xl sm:text-3xl font-cinzel font-black text-slate-900 mb-2">
+            {status === "loading" ? "Session taiyaar ho raha hai" : "Astrologer ko request mil gayi hai"}
           </h2>
-          <p className="text-slate-500 text-sm mb-3">
+          <p className="text-slate-500 text-sm sm:text-[15px] leading-relaxed mb-3">
             {status === "loading"
-              ? "Sharing your kundli with the astrologer…"
-              : <>Connecting you to <strong className="text-[#FF9933]">{astrologerName}</strong>…</>}
+              ? "Aapki kundli astrologer ke saath securely share ho rahi hai."
+              : <><strong className="text-[#FF9933]">{astrologerName}</strong> ko call alert aur chat request bhej di gayi hai.</>}
           </p>
 
           <div className="mb-6 px-4 py-2 bg-[#FF9933]/10 border border-[#FF9933]/20 rounded-full text-[#FF9933] text-xs font-bold animate-pulse shadow-sm">
-            ✨ Your kundli is being shared with the astrologer
+            Kundli shared • Astrologer notified
           </div>
 
           {status === "loading" ? (
@@ -535,10 +533,20 @@ export default function UserChatPage() {
               </div>
             </div>
           ) : (
-            // ── Connected: show the session-expiry countdown ──
+            // Connected: show a calm waiting state without exposing the long timeout.
             <div className="w-full bg-[#faf8f5] border border-[#f5c842]/25 rounded-2xl px-6 py-4 mb-6" style={{ animation: "glowPulse 2.5s ease-in-out infinite" }}>
-              <div className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-1">Session expires in</div>
-              <div className="text-5xl font-cinzel font-bold text-slate-800">{mins.toString().padStart(2, "0")}:{secs.toString().padStart(2, "0")}</div>
+              <div className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-3">Request window active</div>
+              <div className="grid grid-cols-3 gap-2 text-left">
+                {["Kundli shared", "Astrologer alerted", "Waiting to join"].map((label, i) => (
+                  <div key={label} className="rounded-xl bg-white border border-slate-100 px-3 py-3">
+                    <div className={`mb-1 h-2 w-2 rounded-full ${i < 2 ? "bg-emerald-500" : "bg-[#FF9933] animate-pulse"}`} />
+                    <div className="text-[10px] font-bold leading-tight text-slate-600">{label}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-orange-100">
+                <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-[#FF9933] via-[#f5c842] to-[#FF9933]" style={{ backgroundSize: "200% 100%", animation: "shimmer 2s linear infinite" }} />
+              </div>
             </div>
           )}
 
@@ -561,7 +569,7 @@ export default function UserChatPage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#faf8f5] p-4 text-center gap-4">
       <div className="text-6xl">⌛</div>
       <h2 className="text-xl font-cinzel font-bold text-slate-700">Astrologer Unavailable</h2>
-      <p className="text-slate-400 text-sm max-w-xs">No response within 10 minutes. Session cancelled — you were not charged.</p>
+      <p className="text-slate-400 text-sm max-w-xs">Astrologer could not join in time. Session cancelled — you were not charged.</p>
       <button onClick={() => router.push("/dashboard")} className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#FF9933] to-[#f5c842] text-white font-bold shadow-lg hover:scale-105 transition-all">← Dashboard</button>
     </div>
   );

@@ -202,8 +202,13 @@ export default function UserDashboard() {
               </div>
             </div>
 
-            <h2 className="text-2xl font-cinzel font-bold text-slate-800 mb-1">Connecting You</h2>
-            <p className="text-slate-500 text-sm mb-4">Reaching your astrologer…</p>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.18em] text-emerald-700">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              Request Sent
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-cinzel font-black text-slate-900 mb-2">Astrologer se jod rahe hain</h2>
+            <p className="text-slate-500 text-sm sm:text-[15px] leading-relaxed mb-4">Aapki kundli aur chat request astrologer ko bhej di gayi hai.</p>
 
             {/* Kundli badge */}
             <div className="mb-6 px-4 py-2 bg-[#FF9933]/10 border border-[#FF9933]/20 rounded-full text-[#FF9933] text-xs font-bold animate-pulse shadow-sm">
@@ -218,7 +223,16 @@ export default function UserDashboard() {
               ))}
             </div>
 
-            <p className="text-[11px] text-slate-400 font-medium uppercase tracking-widest">Please wait · Do not close this screen</p>
+            <div className="grid grid-cols-3 gap-2 w-full mb-4">
+              {["Kundli shared", "Alert sent", "Joining soon"].map((label, i) => (
+                <div key={label} className="rounded-2xl border border-[#f5c842]/20 bg-[#fffbee] px-2 py-3">
+                  <div className="mx-auto mb-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#f5c842] text-[11px] font-black text-stone-900">{i + 1}</div>
+                  <div className="text-[10px] font-bold leading-tight text-slate-600">{label}</div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Please stay here while we connect</p>
           </div>
         </div>
       )}
