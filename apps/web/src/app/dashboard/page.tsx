@@ -46,6 +46,9 @@ export default function UserDashboard() {
   const balanceLoaded = profile !== undefined;
 
   const [starting, setStarting] = useState<string | null>(null);
+  const pendingSessionIdRef = useRef<string | null>(null);
+  const mountedRef = useRef(true);
+  const navigatingToChatRef = useRef(false);
   
   // New UI states
   const [profileOpen, setProfileOpen] = useState(false);
@@ -57,6 +60,7 @@ export default function UserDashboard() {
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    mountedRef.current = true;
     // Click outside for dropdown
     function handleClickOutside(event: MouseEvent) {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -65,9 +69,22 @@ export default function UserDashboard() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
+      mountedRef.current = false;
+      if (pendingSessionIdRef.current && !navigatingToChatRef.current) {
+        cancelPendingSession(pendingSessionIdRef.current);
+      }
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  function cancelPendingSession(sessionId: string) {
+    fetch("/api/chat/cancel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId }),
+      keepalive: true,
+    }).catch(() => {});
+  }
 
   const categories = ["All", "Love", "Education", "Career", "Marriage"];
 
@@ -108,6 +125,12 @@ export default function UserDashboard() {
         setStarting(null);
         return;
       }
+      pendingSessionIdRef.current = data.sessionId;
+      if (!mountedRef.current) {
+        cancelPendingSession(data.sessionId);
+        return;
+      }
+      navigatingToChatRef.current = true;
       router.push(`/dashboard/chat/${data.sessionId}`);
     } catch (err) {
       console.error("Failed to start chat:", err);

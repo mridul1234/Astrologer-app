@@ -93,6 +93,13 @@ export default function UserChatPage() {
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const endedRef = useRef(false);
+  const astrologerJoinedRef = useRef(false);
+  const billingStartedRef = useRef(false);
+
+  useEffect(() => { endedRef.current = ended; }, [ended]);
+  useEffect(() => { astrologerJoinedRef.current = astrologerJoined; }, [astrologerJoined]);
+  useEffect(() => { billingStartedRef.current = billingStarted; }, [billingStarted]);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -124,6 +131,12 @@ export default function UserChatPage() {
           clearInterval(interval);
           setWaitTimeOver(true);
           if (socketRef.current) socketRef.current.emit("end_session", { sessionId });
+          fetch("/api/chat/cancel", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionId }),
+            keepalive: true,
+          }).catch(() => {});
           return 0;
         }
         return prev - 1;
@@ -260,6 +273,14 @@ export default function UserChatPage() {
     }
     init();
     return () => {
+      if (!endedRef.current && !astrologerJoinedRef.current && !billingStartedRef.current) {
+        fetch("/api/chat/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId }),
+          keepalive: true,
+        }).catch(() => {});
+      }
       if (socketRef.current) { socketRef.current.disconnect(); socketRef.current = null; }
       if (timerRef.current) clearInterval(timerRef.current);
     };

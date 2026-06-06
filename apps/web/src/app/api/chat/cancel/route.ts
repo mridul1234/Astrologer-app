@@ -4,8 +4,9 @@ import { auth } from "@/auth";
 
 /**
  * POST /api/chat/cancel
- * Called by the astrologer to reject/cancel an incoming session before joining.
- * Marks the session ENDED and refunds the user's wallet.
+ * Cancels a session before it starts billing:
+ * - astrologer rejects an incoming request
+ * - user leaves the waiting screen before the astrologer joins
  */
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -18,24 +19,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "sessionId required" }, { status: 400 });
   }
 
-  // Verify the session belongs to this astrologer
-  const astrologer = await prisma.astrologer.findUnique({
-    where: { userId: session.user.id },
-  });
-  if (!astrologer) {
-    return NextResponse.json({ error: "Not an astrologer" }, { status: 403 });
-  }
-
   const chatSession = await prisma.chatSession.findUnique({
     where: { id: sessionId },
-    include: { user: true },
+    include: {
+      user: true,
+      astrologer: { select: { userId: true } },
+      messages: { select: { createdAt: true } },
+    },
   });
 
   if (!chatSession) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  if (chatSession.astrologerId !== astrologer.id) {
+  const isUser = chatSession.userId === session.user.id;
+  const isAstrologer = chatSession.astrologer.userId === session.user.id;
+  if (!isUser && !isAstrologer) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -43,7 +42,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Session already ended" }, { status: 400 });
   }
 
-  // End the session with 0 cost (refund — no charge since astrologer never joined)
+  const startedAtMs = chatSession.startedAt.getTime();
+  const hasCurrentMessages = chatSession.messages.some((m) => m.createdAt.getTime() >= startedAtMs);
+  if (chatSession.totalCost > 0 || hasCurrentMessages) {
+    return NextResponse.json(
+      { error: "Session has already started and cannot be cancelled." },
+      { status: 409 }
+    );
+  }
+
   await prisma.chatSession.update({
     where: { id: sessionId },
     data: {
@@ -53,14 +60,14 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Refund any deducted balance (totalCost was 0 at creation, so no refund needed)
-  // But log a descriptive transaction for transparency
   await prisma.transaction.create({
     data: {
       userId: chatSession.userId,
       amount: 0,
       type: "CREDIT",
-      reason: "Chat cancelled by astrologer (no charge)",
+      reason: isUser
+        ? "Chat cancelled by user before astrologer joined (no charge)"
+        : "Chat cancelled by astrologer (no charge)",
     },
   });
 
