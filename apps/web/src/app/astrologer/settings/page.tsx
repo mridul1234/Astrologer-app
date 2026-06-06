@@ -46,6 +46,7 @@ export default function AstrologerSettingsPage() {
     ratePerMin: EMPTY_ASTROLOGER.ratePerMin,
     languages: EMPTY_ASTROLOGER.languages,
     selectedSpecialities: [] as string[],
+    phoneNumber: "",
     telegramChatId: "",
   });
   const [profileLoaded, setProfileLoaded] = useState(false);
@@ -69,6 +70,7 @@ export default function AstrologerSettingsPage() {
             ratePerMin: data.ratePerMin ?? 20,
             languages: data.languages ? data.languages.split(", ") : [],
             selectedSpecialities: data.speciality ? data.speciality.split(", ") : [],
+            phoneNumber: data.phoneNumber ?? "",
             telegramChatId: data.telegramChatId ?? "",
           }));
         }
@@ -90,6 +92,7 @@ export default function AstrologerSettingsPage() {
           ratePerMin: profile.ratePerMin,
           languages: profile.languages.join(", "),
           speciality: profile.selectedSpecialities.join(", "),
+          phoneNumber: profile.phoneNumber,
           telegramChatId: profile.telegramChatId,
         }),
       });
@@ -362,6 +365,30 @@ export default function AstrologerSettingsPage() {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Vobiz call alert phone */}
+                <div>
+                  <label className="block text-sm font-medium text-purple-200/70 mb-2">
+                    Phone Number for Call Alerts
+                    <span className="ml-2 text-purple-400/40">(Vobiz voice call)</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg select-none">📞</span>
+                    <input
+                      id="astro-phone-number-input"
+                      type="tel"
+                      value={profile.phoneNumber}
+                      onChange={(e) =>
+                        setProfile((p) => ({ ...p, phoneNumber: e.target.value }))
+                      }
+                      className="astrowalla-input w-full pl-10 pr-4 py-3.5 rounded-xl text-base font-mono"
+                      placeholder="e.g. 9876543210 or +919876543210"
+                    />
+                  </div>
+                  <p className="text-purple-400/40 text-xs mt-1.5">
+                    Used only to call you when a seeker starts a chat. Indian mobile numbers are saved as +91 format.
+                  </p>
                 </div>
 
                 {/* Telegram Chat ID */}

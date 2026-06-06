@@ -61,6 +61,7 @@ model Astrologer {
   isOnline        Boolean  @default(false)
   fakeOrders      Int      @default(0)
   telegramChatId  String?
+  phoneNumber     String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

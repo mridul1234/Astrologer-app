@@ -1,0 +1,2 @@
+ALTER TABLE "Astrologer"
+ADD COLUMN IF NOT EXISTS "phoneNumber" TEXT;

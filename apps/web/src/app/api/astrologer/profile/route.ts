@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
 import { auth } from "@/auth";
+import { normalizeIndianPhoneNumber } from "@/lib/vobiz";
 
 // GET /api/astrologer/profile
 export async function GET() {
@@ -63,7 +64,19 @@ export async function PATCH(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { name, bio, speciality, ratePerMin, languages, telegramChatId } = body;
+  const { name, bio, speciality, ratePerMin, languages, telegramChatId, phoneNumber } = body;
+
+  let normalizedPhoneNumber: string | null | undefined;
+  if (phoneNumber !== undefined) {
+    try {
+      normalizedPhoneNumber = normalizeIndianPhoneNumber(phoneNumber);
+    } catch (err) {
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : "Invalid phone number." },
+        { status: 400 }
+      );
+    }
+  }
 
   // Update user name if provided
   if (name?.trim()) {
@@ -84,6 +97,7 @@ export async function PATCH(req: NextRequest) {
       ...(languages !== undefined ? { languages } : {}),
       ...(body.profileImage !== undefined ? { profileImage: body.profileImage } : {}),
       ...(telegramChatId !== undefined ? { telegramChatId: telegramChatId?.trim() || null } : {}),
+      ...(phoneNumber !== undefined ? { phoneNumber: normalizedPhoneNumber } : {}),
     },
     include: {
       user: { select: { name: true, email: true } },

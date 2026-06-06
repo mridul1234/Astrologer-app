@@ -3,6 +3,7 @@ import { prisma } from "@astrology/db";
 import { auth } from "@/auth";
 import jwt from "jsonwebtoken";
 import { sendChatRequestNotification } from "@/lib/telegram";
+import { sendChatRequestCall } from "@/lib/vobiz";
 
 // POST /api/chat/start  — resumes or starts a chat session
 export async function POST(req: NextRequest) {
@@ -71,9 +72,24 @@ export async function POST(req: NextRequest) {
 
   // ─── Send Telegram notification AFTER the response ───────────────────────────
   // after() runs once the response has been sent, so the user is redirected to
-  // the chat page immediately without waiting for the Telegram API.
+  // the chat page immediately without waiting for external alert APIs.
   after(async () => {
-    console.log(`[chat/start] Astrologer ID: ${astrologer.id}, telegramChatId: ${astrologer.telegramChatId ?? "NOT SET"}`);
+    console.log(`[chat/start] Astrologer ID: ${astrologer.id}, phoneNumber: ${astrologer.phoneNumber ?? "NOT SET"}, telegramChatId: ${astrologer.telegramChatId ?? "NOT SET"}`);
+    if (astrologer.phoneNumber) {
+      console.log(`[chat/start] Sending Vobiz call alert to ${astrologer.phoneNumber} for user ${user.name}`);
+      try {
+        const result = await sendChatRequestCall({
+          phoneNumber: astrologer.phoneNumber,
+          sessionId: chatSession.id,
+        });
+        console.log("[chat/start] Vobiz call result:", JSON.stringify(result));
+      } catch (err) {
+        console.error("[chat/start] Vobiz call error:", err);
+      }
+    } else {
+      console.warn(`[chat/start] Skipping Vobiz call — astrologer ${astrologer.id} has no phoneNumber in DB`);
+    }
+
     if (astrologer.telegramChatId) {
       console.log(`[chat/start] Sending Telegram notification to chat_id ${astrologer.telegramChatId} for user ${user.name}`);
       try {
