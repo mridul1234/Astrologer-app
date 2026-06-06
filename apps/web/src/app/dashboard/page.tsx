@@ -155,14 +155,6 @@ export default function UserDashboard() {
   // Derive a fake original (crossed-out) rate from actual rate
   const getOriginalRate = (rate: number) => Math.floor(rate * 1.5);
 
-  // Estimate wait time from session start (assume avg session is 15 min)
-  const getWaitMins = (sessionStartedAt: string | null): number => {
-    if (!sessionStartedAt) return 5;
-    const elapsed = (Date.now() - new Date(sessionStartedAt).getTime()) / 60000;
-    const remaining = Math.max(2, Math.round(15 - elapsed));
-    return remaining;
-  };
-
   return (
     <div className="min-h-screen bg-[#fdfaf5] text-slate-800 font-sans flex flex-col">
 
@@ -455,7 +447,7 @@ export default function UserDashboard() {
                           </button>
                           <div className="text-right">
                             <p className="text-[11px] text-stone-400 font-medium leading-tight">Est. wait</p>
-                            <p className="text-sm font-extrabold text-orange-500">~{getWaitMins(a.sessionStartedAt)} min</p>
+                            <p className="text-sm font-extrabold text-orange-500">~2 min</p>
                           </div>
                         </div>
                       ) : !a.isOnline ? (
