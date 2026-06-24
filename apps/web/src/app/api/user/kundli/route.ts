@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
-import { auth } from "@/auth";
+import { getRequestUser } from "@/lib/mobile-auth";
 
 // GET /api/user/kundli — returns the current user's KundliProfile (null if not set)
-export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
+export async function GET(req: NextRequest) {
+  const identity = await getRequestUser(req);
+  if (!identity?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const profile = await prisma.kundliProfile.findUnique({
-    where: { userId: session.user.id },
+    where: { userId: identity.id },
   });
 
   return NextResponse.json(profile ?? null);
@@ -18,8 +18,8 @@ export async function GET() {
 
 // POST /api/user/kundli — creates or updates the kundli profile
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const identity = await getRequestUser(req);
+  if (!identity?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -58,9 +58,9 @@ export async function POST(req: NextRequest) {
 
   const [profile] = await Promise.all([
     prisma.kundliProfile.upsert({
-      where: { userId: session.user.id },
+      where: { userId: identity.id },
       create: {
-        userId: session.user.id,
+        userId: identity.id,
         fullName: nameToSave,
         dateOfBirth,
         timeOfBirth: timeOfBirth || "12:00",
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     }),
     // Also update the user's display name
     prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: identity.id },
       data: { name: nameToSave },
     }),
   ]);
