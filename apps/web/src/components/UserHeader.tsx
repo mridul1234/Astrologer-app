@@ -83,20 +83,20 @@ export default function UserHeader() {
             </div>
             <div className="flex flex-col items-start leading-none">
               {freeMinutesLeft > 0 ? (
-                <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-emerald-500 font-semibold">Free Trial</span>
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-emerald-500 font-semibold">Intro Pass</span>
               ) : (
                 <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-stone-400 font-semibold">Wallet</span>
               )}
               {isLoadingBalance ? (
                 <div className="h-3.5 w-8 mt-0.5 bg-stone-200 animate-pulse rounded"></div>
               ) : freeMinutesLeft > 0 ? (
-                <span className="text-[12px] sm:text-[13px] font-extrabold text-emerald-600">🎁 {freeMinutesLeft} min free</span>
+                <span className="text-[12px] sm:text-[13px] font-extrabold text-emerald-600">{freeMinutesLeft} intro min</span>
               ) : (
                 <span className="text-[13px] sm:text-[14px] font-extrabold text-stone-800">₹{balance.toFixed(0)}</span>
               )}
             </div>
             <span className="hidden sm:block text-[10px] font-extrabold text-[#FF9933] uppercase tracking-widest border-l border-[#f0e0b0] pl-2.5 ml-1 group-hover:text-[#d97706] transition-colors">
-              {freeMinutesLeft > 0 ? "Try Now" : "Recharge"}
+              {freeMinutesLeft > 0 ? "Chat Now" : "Recharge"}
             </span>
           </button>
 

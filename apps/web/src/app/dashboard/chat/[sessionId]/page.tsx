@@ -719,8 +719,8 @@ export default function UserChatPage() {
           style={{ animation: "glowPulse 2s ease-in-out infinite" }}>
           <span className="text-xl">🎁</span>
           <div className="text-sm">
-            <div className="uppercase tracking-widest text-[9px] mb-0.5">Free Trial Active</div>
-            {freeMinutesLeft} free minute{freeMinutesLeft !== 1 ? "s" : ""} remaining — enjoy!
+            <div className="uppercase tracking-widest text-[9px] mb-0.5">Intro Chat Pass Active</div>
+            {freeMinutesLeft} intro minute{freeMinutesLeft !== 1 ? "s" : ""} remaining
           </div>
         </div>
       )}

@@ -8,6 +8,7 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import { useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import useSWR from "swr";
+import IntroChatPaywall from "@/components/IntroChatPaywall";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -37,12 +38,13 @@ export default function UserDashboard() {
     revalidateOnFocus: true 
   });
   
-  const { data: profile } = useSWR("/api/user/profile", fetcher);
+  const { data: profile, mutate: mutateProfile } = useSWR("/api/user/profile", fetcher);
   
   const astrologers = apiAstrologers ? [...apiAstrologers].sort((a: Astrologer, b: Astrologer) => b.reviewCount - a.reviewCount) : [];
   
   const balance = profile?.walletBalance !== undefined ? Number(profile.walletBalance) : 0;
   const freeMinutesLeft = profile?.freeMinutesLeft !== undefined ? Number(profile.freeMinutesLeft) : 0;
+  const introOfferUsed = profile?.introOfferUsed === true;
   const balanceLoaded = profile !== undefined;
 
   const [starting, setStarting] = useState<string | null>(null);
@@ -54,6 +56,7 @@ export default function UserDashboard() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("All");
+  const [paywallAstrologer, setPaywallAstrologer] = useState<{ id: string; rate: number } | null>(null);
 
   // Use the name saved in profile (from onboarding), or fall back to session
   const userName = profile?.name && profile.name.trim() !== "" ? profile.name : (session?.user?.name || session?.user?.email?.split("@")[0] || "User");
@@ -103,11 +106,10 @@ export default function UserDashboard() {
     return matchesSearch && matchesCategory;
   });
 
-  async function startChat(astrologerId: string, rate: number) {
-    // Only do front-end balance guard if we've successfully loaded the balance
-    // Allow users to start a chat if they have free minutes, even if wallet balance is low
+  async function startChat(astrologerId: string, rate: number, bypassPaywall = false) {
     if (balanceLoaded && balance < rate && freeMinutesLeft <= 0) {
-      router.push("/wallet");
+      if (!bypassPaywall && !introOfferUsed) setPaywallAstrologer({ id: astrologerId, rate });
+      else router.push("/wallet");
       return;
     }
     // Set starting FIRST — this triggers the full-screen overlay immediately
@@ -121,7 +123,8 @@ export default function UserDashboard() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (res.status === 402) router.push("/wallet"); 
+        if (res.status === 402 && data.introOfferAvailable && !bypassPaywall) setPaywallAstrologer({ id: astrologerId, rate });
+        else if (res.status === 402) router.push("/wallet");
         setStarting(null);
         return;
       }
@@ -472,7 +475,7 @@ export default function UserDashboard() {
                               <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"/>
                               Starting...
                             </span>
-                          ) : ((a.ratePerMin === 0 || freeMinutesLeft > 0) ? "💬 Free Chat" : "💬 Chat Now")}
+                          ) : "💬 Chat Now"}
                         </button>
                       )}
 
@@ -486,6 +489,18 @@ export default function UserDashboard() {
           </div>
         )}
       </main>
+
+      {paywallAstrologer && (
+        <IntroChatPaywall
+          onClose={() => setPaywallAstrologer(null)}
+          onActivated={() => {
+            const astrologer = paywallAstrologer;
+            setPaywallAstrologer(null);
+            mutateProfile();
+            startChat(astrologer.id, astrologer.rate, true);
+          }}
+        />
+      )}
 
       <MobileBottomNav />
       <UserFooter />

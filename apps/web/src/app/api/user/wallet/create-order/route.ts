@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { prisma } from "@astrology/db";
 import Razorpay from "razorpay";
 
 export async function POST(req: NextRequest) {
@@ -8,10 +9,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { amount } = await req.json();
+  const { amount, purpose } = await req.json();
   const amountNum = Number(amount);
-  if (!amountNum || amountNum < 10) {
+  const isIntroChatPass = purpose === "INTRO_CHAT_PASS";
+  if (isIntroChatPass && amountNum !== 1) {
+    return NextResponse.json({ error: "The intro chat pass costs Rs 1" }, { status: 400 });
+  }
+  if (!isIntroChatPass && (!amountNum || amountNum < 10)) {
     return NextResponse.json({ error: "Minimum recharge is ₹10" }, { status: 400 });
+  }
+
+  if (isIntroChatPass) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { introOfferUsed: true },
+    });
+    if (user?.introOfferUsed) {
+      return NextResponse.json({ error: "This one-time intro offer has already been used" }, { status: 409 });
+    }
   }
 
   const razorpay = new Razorpay({
@@ -27,6 +42,10 @@ export async function POST(req: NextRequest) {
       amount: amountNum * 100, // paise
       currency: "INR",
       receipt,
+      notes: {
+        purpose: isIntroChatPass ? "intro_chat_pass" : "wallet_top_up",
+        userId: session.user.id,
+      },
     });
 
     return NextResponse.json({
@@ -34,6 +53,7 @@ export async function POST(req: NextRequest) {
       amount: amountNum,
       currency: "INR",
       keyId: process.env.RAZORPAY_KEY_ID,
+      purpose: isIntroChatPass ? "INTRO_CHAT_PASS" : "WALLET_TOP_UP",
     });
   } catch (err: any) {
     console.error("Razorpay order creation failed:", JSON.stringify(err));

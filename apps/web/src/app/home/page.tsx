@@ -317,7 +317,7 @@ export default function HomePage() {
             <div className="text-4xl">🎁</div>
             <div className="flex-1">
               <p className="text-[#4ade80] text-[11px] font-extrabold uppercase tracking-widest">Special Offer</p>
-              <p className="text-white font-black text-base leading-tight">You have {freeMinutes} free {freeMinutes === 1 ? "minute" : "minutes"}!</p>
+              <p className="text-white font-black text-base leading-tight">You have {freeMinutes} intro {freeMinutes === 1 ? "minute" : "minutes"}!</p>
               <p className="text-white/60 text-xs mt-0.5">Use them to talk to any astrologer right now.</p>
             </div>
             <Link

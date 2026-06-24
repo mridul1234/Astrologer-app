@@ -17,6 +17,7 @@ export async function GET() {
       email: true,
       walletBalance: true,
       freeMinutesLeft: true,
+      introOfferUsed: true,
       createdAt: true,
       kundliProfile: true,
       transactions: {

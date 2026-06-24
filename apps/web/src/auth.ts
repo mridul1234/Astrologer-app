@@ -74,7 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 email,
                 password: hashed,
                 role: "USER",
-                freeMinutesLeft: 2, // 2 free trial minutes for new users
+                freeMinutesLeft: 0,
               },
             });
           }

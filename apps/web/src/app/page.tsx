@@ -142,7 +142,7 @@ function AstrologerCard({ a }: { a: Astrologer }) {
           href="/login?callbackUrl=/dashboard"
           className="block w-full py-2.5 rounded-xl text-center font-bold text-sm border-2 border-[#16a34a] text-[#16a34a] hover:bg-[#16a34a] hover:text-white transition-all duration-200"
         >
-          💬 {a.ratePerMin === 0 ? "Free Chat" : "Chat Now"}
+          💬 Chat Now
         </Link>
       </div>
     </div>

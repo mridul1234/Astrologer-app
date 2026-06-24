@@ -3,9 +3,11 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import useSWR from "swr";
+import { useState } from "react";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import IntroChatPaywall from "@/components/IntroChatPaywall";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -59,8 +61,16 @@ export default function MyChatsPage() {
   const sessions: ChatSummary[] = chatsData?.sessions || [];
   const myUserId: string | null = profile?.id ?? null;
   const loading = loadingChats;
+  const [paywallAstrologer, setPaywallAstrologer] = useState<{ id: string; rate: number } | null>(null);
 
-  const handleContinue = async (astrologerId: string) => {
+  const handleContinue = async (astrologerId: string, rate: number, bypassPaywall = false) => {
+    const balance = Number(profile?.walletBalance ?? 0);
+    const promoMinutes = Number(profile?.freeMinutesLeft ?? 0);
+    if (!bypassPaywall && profile && balance < rate && promoMinutes <= 0) {
+      if (!profile.introOfferUsed) setPaywallAstrologer({ id: astrologerId, rate });
+      else router.push("/wallet");
+      return;
+    }
     const res = await fetch("/api/chat/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -70,7 +80,8 @@ export default function MyChatsPage() {
     if (res.ok) {
       router.push(`/dashboard/chat/${data.sessionId}`);
     } else if (res.status === 402) {
-      router.push("/wallet");
+      if (data.introOfferAvailable && !bypassPaywall) setPaywallAstrologer({ id: astrologerId, rate });
+      else router.push("/wallet");
     } else {
       alert(data.error || "Failed to resume chat");
     }
@@ -193,7 +204,7 @@ export default function MyChatsPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleContinue(s.astrologer.id);
+                          handleContinue(s.astrologer.id, s.astrologer.ratePerMin);
                         }}
                         className="shrink-0 px-3 py-1.5 bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 text-[11px] font-extrabold rounded-lg shadow-sm shadow-amber-200/50 hover:-translate-y-0.5 hover:shadow-md hover:shadow-amber-200/70 transition-all active:scale-95"
                       >
@@ -209,6 +220,17 @@ export default function MyChatsPage() {
       </main>
 
       <UserFooter />
+      {paywallAstrologer && (
+        <IntroChatPaywall
+          onClose={() => setPaywallAstrologer(null)}
+          onActivated={() => {
+            const astrologer = paywallAstrologer;
+            setPaywallAstrologer(null);
+            handleContinue(astrologer.id, astrologer.rate, true);
+          }}
+        />
+      )}
+
       <MobileBottomNav />
     </div>
   );

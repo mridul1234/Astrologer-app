@@ -27,10 +27,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Astrologer not found" }, { status: 404 });
   }
 
-  // Allow entry if user has free minutes OR sufficient wallet balance
+  // Allow entry when the user has intro-pass minutes or sufficient wallet balance.
   if (user.freeMinutesLeft <= 0 && user.walletBalance < astrologer.ratePerMin) {
     return NextResponse.json(
-      { error: "Insufficient balance. Please top up your wallet." },
+      {
+        error: "Insufficient balance. Please top up your wallet.",
+        introOfferAvailable: !user.introOfferUsed,
+      },
       { status: 402 }
     );
   }

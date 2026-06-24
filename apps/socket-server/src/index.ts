@@ -73,7 +73,9 @@ setInterval(async () => {
 interface SessionMeta {
   userId: string;
   astrologerId: string;
+  astrologerUserId: string;
   ratePerMin: number;
+  netRatePerMin: number;
 }
 const billingTimers = new Map<string, NodeJS.Timeout>();
 const activeSessions = new Map<string, SessionMeta>();
@@ -187,7 +189,7 @@ io.on("connection", (socket) => {
                     userId: currentMeta.userId,
                     amount: 0,
                     type: "DEBIT",
-                    reason: `Free trial minute - session ${sessionId}`,
+                    reason: `Intro Chat Pass minute - session ${sessionId}`,
                   },
                 }),
                 prisma.transaction.create({
@@ -195,7 +197,7 @@ io.on("connection", (socket) => {
                     userId: currentMeta.astrologerUserId,
                     amount: 0,
                     type: "CREDIT",
-                    reason: `Chat Earnings (Free Trial) - session ${sessionId}`,
+                    reason: `Chat Earnings (Intro Chat Pass) - session ${sessionId}`,
                   },
                 }),
               ]);

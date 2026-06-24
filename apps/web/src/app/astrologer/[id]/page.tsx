@@ -5,6 +5,10 @@ import { useRouter, useParams } from "next/navigation";
 import UserHeader from "@/components/UserHeader";
 import UserFooter from "@/components/UserFooter";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import IntroChatPaywall from "@/components/IntroChatPaywall";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Review {
   id: string;
@@ -36,6 +40,8 @@ export default function PublicAstrologerProfile() {
   const [profile, setProfile] = useState<AstrologerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const { data: account, mutate: mutateAccount } = useSWR("/api/user/profile", fetcher);
 
   useEffect(() => {
     if (!params.id) return;
@@ -66,8 +72,15 @@ export default function PublicAstrologerProfile() {
     return 5;
   };
 
-  async function startChat() {
+  async function startChat(bypassPaywall = false) {
     if (!profile) return;
+    const balance = Number(account?.walletBalance ?? 0);
+    const promoMinutes = Number(account?.freeMinutesLeft ?? 0);
+    if (!bypassPaywall && account && balance < profile.ratePerMin && promoMinutes <= 0) {
+      if (!account.introOfferUsed) setShowPaywall(true);
+      else router.push("/wallet");
+      return;
+    }
     setStarting(true);
     try {
       const res = await fetch("/api/chat/start", {
@@ -77,7 +90,8 @@ export default function PublicAstrologerProfile() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (res.status === 402) router.push("/wallet"); 
+        if (res.status === 402 && data.introOfferAvailable && !bypassPaywall) setShowPaywall(true);
+        else if (res.status === 402) router.push("/wallet");
         setStarting(false);
         return;
       }
@@ -207,7 +221,7 @@ export default function PublicAstrologerProfile() {
              <div className="pt-4 border-t border-stone-100 hidden sm:block">
                {/* Desktop CTA */}
                <button 
-                  onClick={startChat}
+                   onClick={() => startChat()}
                   disabled={starting || !profile.isOnline}
                   className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-3.5 rounded-xl text-sm shadow-md shadow-amber-200/50 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:from-stone-200 disabled:to-stone-300 disabled:text-stone-500 disabled:shadow-none"
                >
@@ -250,10 +264,21 @@ export default function PublicAstrologerProfile() {
 
       </main>
 
+      {showPaywall && (
+        <IntroChatPaywall
+          onClose={() => setShowPaywall(false)}
+          onActivated={() => {
+            setShowPaywall(false);
+            mutateAccount();
+            startChat(true);
+          }}
+        />
+      )}
+
       {/* Floating Action Bar (Mobile Only) */}
       <div className="fixed bottom-14 left-0 right-0 sm:hidden bg-white/80 backdrop-blur-md border-t border-stone-200 p-4 pb-6 z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
          <button 
-            onClick={startChat}
+             onClick={() => startChat()}
             disabled={starting || !profile.isOnline}
             className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-4 rounded-2xl shadow-lg shadow-amber-200/50 active:scale-95 transition-all text-lg disabled:opacity-50 flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:from-stone-200 disabled:to-stone-300 disabled:shadow-none"
          >
