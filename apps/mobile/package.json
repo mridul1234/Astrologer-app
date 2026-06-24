@@ -8,13 +8,15 @@
     "android": "set EXPO_NO_METRO_WORKSPACE_ROOT=1&& set EXPO_ROUTER_APP_ROOT=app&& expo start --android",
     "export:android": "set EXPO_NO_METRO_WORKSPACE_ROOT=1&& set EXPO_ROUTER_APP_ROOT=app&& expo export --platform android",
     "typecheck": "tsc --noEmit",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "expo": "~53.0.20",
-    "expo-router": "~5.1.4",
+    "expo-constants": "~17.1.8",
+    "expo-router": "~5.1.11",
     "expo-secure-store": "~14.2.3",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
