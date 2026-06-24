@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getRequestUser } from "@/lib/mobile-auth";
 import { prisma } from "@astrology/db";
 import Razorpay from "razorpay";
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   if (isIntroChatPass) {
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.id },
       select: { introOfferUsed: true },
     });
     if (user?.introOfferUsed) {
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
   try {
     // Receipt must be ≤40 chars for Razorpay
-    const receipt = `wp_${session.user.id.slice(-10)}_${Date.now().toString().slice(-8)}`;
+    const receipt = `wp_${session.id.slice(-10)}_${Date.now().toString().slice(-8)}`;
 
     const order = await (razorpay.orders as any).create({
       amount: amountNum * 100, // paise
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       receipt,
       notes: {
         purpose: isIntroChatPass ? "intro_chat_pass" : "wallet_top_up",
-        userId: session.user.id,
+        userId: session.id,
       },
     });
 

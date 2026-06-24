@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
 import bcrypt from "bcryptjs";
+import { createMobileAccessToken } from "@/lib/mobile-auth";
 
 const BASE_URL = "https://cpaas.messagecentral.com";
 const CUSTOMER_ID = process.env.MC_CUSTOMER_ID!;
@@ -31,7 +32,7 @@ async function getMCAuthToken(): Promise<string> {
  */
 export async function POST(req: NextRequest) {
   try {
-    const { phone, verificationId, otp } = await req.json();
+    const { phone, verificationId, otp, client, name } = await req.json();
 
     if (!phone || !verificationId || !otp) {
       return NextResponse.json(
@@ -74,10 +75,28 @@ export async function POST(req: NextRequest) {
     }
 
     // OTP is valid — user creation is handled by NextAuth signIn callback
-    return NextResponse.json({
-      success: true,
-      phone,
-    });
+    if (client === "mobile") {
+      const email = `${phone}@astrowalla.com`;
+      let user = await prisma.user.findUnique({ where: { email } });
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            name: name?.trim() || phone,
+            email,
+            password: await bcrypt.hash("dummy_otp_pass", 10),
+            role: "USER",
+          },
+        });
+      }
+      return NextResponse.json({
+        success: true,
+        phone,
+        accessToken: createMobileAccessToken({ id: user.id, role: user.role }),
+        user: { id: user.id, name: user.name, role: user.role },
+      });
+    }
+
+    return NextResponse.json({ success: true, phone });
   } catch (err) {
     console.error("OTP verify route error:", err);
     return NextResponse.json(

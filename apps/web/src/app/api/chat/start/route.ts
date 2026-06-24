@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { prisma } from "@astrology/db";
-import { auth } from "@/auth";
+import { getRequestUser } from "@/lib/mobile-auth";
 import jwt from "jsonwebtoken";
 import { sendChatRequestNotification } from "@/lib/telegram";
 import { sendChatRequestCall } from "@/lib/vobiz";
 
 // POST /api/chat/start  — resumes or starts a chat session
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "astrologerId required" }, { status: 400 });
   }
 
-  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  const user = await prisma.user.findUnique({ where: { id: session.id } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
   const astrologer = await prisma.astrologer.findUnique({
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   // --- Check for an existing session between this user + astrologer ---
   const existingSession = await prisma.chatSession.findFirst({
     where: {
-      userId: session.user.id,
+      userId: session.id,
       astrologerId,
     },
     orderBy: { startedAt: "desc" },
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     // Create a brand new session
     chatSession = await prisma.chatSession.create({
       data: {
-        userId: session.user.id,
+        userId: session.id,
         astrologerId,
         status: "ACTIVE",
       },
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
   // Generate a short-lived socket token for this user
   const socketToken = jwt.sign(
-    { userId: session.user.id },
+    { userId: session.id },
     process.env.SOCKET_SECRET!,
     { expiresIn: "24h" }
   );

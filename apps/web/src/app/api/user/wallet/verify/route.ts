@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
-import { auth } from "@/auth";
+import { getRequestUser } from "@/lib/mobile-auth";
 import crypto from "crypto";
 import Razorpay from "razorpay";
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   const amountNum = Number(order.amount) / 100;
   const isIntroChatPass = order.notes?.purpose === "intro_chat_pass";
 
-  if (order.notes?.userId !== session.user.id) {
+  if (order.notes?.userId !== session.id) {
     return NextResponse.json({ error: "This payment belongs to another account" }, { status: 403 });
   }
   if (isIntroChatPass && amountNum !== 1) {
@@ -52,14 +52,14 @@ export async function POST(req: NextRequest) {
     const user = await prisma.$transaction(async (tx) => {
       if (isIntroChatPass) {
         const claimedOffer = await tx.user.updateMany({
-          where: { id: session.user.id, introOfferUsed: false },
+          where: { id: session.id, introOfferUsed: false },
           data: { freeMinutesLeft: { increment: 3 }, introOfferUsed: true },
         });
         if (claimedOffer.count !== 1) throw new Error("INTRO_OFFER_USED");
-        const updatedUser = await tx.user.findUniqueOrThrow({ where: { id: session.user.id } });
+        const updatedUser = await tx.user.findUniqueOrThrow({ where: { id: session.id } });
         await tx.transaction.create({
           data: {
-            userId: session.user.id,
+            userId: session.id,
             amount: amountNum,
             type: "CREDIT",
             reason: `Rs 1 Intro Chat Pass - 3 minutes unlocked (${razorpay_payment_id})`,
@@ -70,12 +70,12 @@ export async function POST(req: NextRequest) {
       }
 
       const updatedUser = await tx.user.update({
-        where: { id: session.user.id },
+        where: { id: session.id },
         data: { walletBalance: { increment: amountNum } },
       });
       await tx.transaction.create({
         data: {
-          userId: session.user.id,
+          userId: session.id,
           amount: amountNum,
           type: "CREDIT",
           reason: `Wallet top-up via Razorpay (${razorpay_payment_id})`,
