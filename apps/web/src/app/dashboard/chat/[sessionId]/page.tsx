@@ -479,7 +479,7 @@ export default function UserChatPage() {
         </div>
 
         {/* Twinkling stars */}
-        {STARS.map((s, i) => (
+        {false && STARS.map((s, i) => (
           <div key={i} className="absolute rounded-full bg-[#f5c842] pointer-events-none"
             style={{ top: `${s.top}%`, left: `${s.left}%`, width: s.size, height: s.size, animation: `twinkle ${s.dur}s ease-in-out ${s.delay}s infinite` }} />
         ))}
@@ -583,7 +583,7 @@ export default function UserChatPage() {
 
   // ─── Active chat ───────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col h-screen overflow-hidden" style={{ background: "#faf8f5", fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex flex-col h-screen overflow-hidden bg-[#fff9ef]" style={{ fontFamily: "'Inter', sans-serif" }}>
       <style>{styles}</style>
 
       {/* ── REVIEW OVERLAY ── */}
@@ -635,19 +635,19 @@ export default function UserChatPage() {
       )}
 
       {/* ── HEADER ── */}
-      <header className="shrink-0 z-20 relative" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(245,200,66,0.22)", boxShadow: "0 2px 24px rgba(255,153,51,0.07)" }}>
+      <header className="shrink-0 z-20 bg-white border-b border-slate-200">
         {/* Shimmer line */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1.5px] pointer-events-none"
+        <div className="hidden absolute bottom-0 left-0 right-0 h-[1.5px] pointer-events-none"
           style={{ background: "linear-gradient(90deg, transparent, rgba(245,200,66,0.6), rgba(255,153,51,0.4), transparent)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
 
-        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 gap-2">
+        <div className="flex items-center justify-between px-4 py-3 gap-3 max-w-5xl mx-auto">
           {/* Left: back + avatar + name — flex-1 + min-w-0 ensures name truncates before pushing right side off */}
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <button onClick={() => router.push("/dashboard")} className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#faf8f5] border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#FF9933] hover:border-[#FF9933]/30 transition-all text-base sm:text-lg font-bold shrink-0">
+            <button onClick={() => router.push("/dashboard")} aria-label="Back to astrologers" className="w-10 h-10 rounded-full border-2 border-[#ff8b38] flex items-center justify-center text-[#ff8b38] hover:bg-orange-50 transition-colors text-xl font-bold shrink-0">
               ←
             </button>
             <div className="relative shrink-0">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-[#FF9933]/20 to-[#f5c842]/20 border-2 border-[#f5c842]/40 flex items-center justify-center text-xl sm:text-2xl shadow-sm"
+              <div className="w-11 h-11 rounded-full bg-orange-50 border-2 border-[#ff8b38] flex items-center justify-center text-xl shadow-sm"
                 style={{ animation: connected ? "glowPulse 3s ease-in-out infinite" : "none" }}>
                 🧘
               </div>
@@ -656,7 +656,8 @@ export default function UserChatPage() {
             </div>
             <div className="min-w-0">
               <div className="text-slate-800 font-bold text-[13px] sm:text-[15px] tracking-tight leading-tight truncate">{astrologerName}</div>
-              <div className="text-[9px] sm:text-[10px] font-bold tracking-widest" style={{ background: "linear-gradient(90deg,#FF9933,#f5c842)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              <div className="text-sm leading-tight text-[#e78645]">{isTyping ? "Typing..." : connected ? "Online" : "Connecting..."}</div>
+              <div className="hidden text-[9px] sm:text-[10px] font-bold tracking-widest" style={{ background: "linear-gradient(90deg,#FF9933,#f5c842)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 🔮 Astrologer
               </div>
             </div>
@@ -665,15 +666,15 @@ export default function UserChatPage() {
           {/* Right: Time (hidden on mobile) + Balance + End — shrink-0 so it never collapses */}
           <div className="flex items-center gap-1.5 shrink-0">
             {/* Time badge: hidden on small screens to free up space for End button */}
-            <div className="hidden sm:block px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100 text-center">
+            <div className="hidden px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100 text-center">
               <div className="text-[8px] uppercase tracking-widest font-bold text-amber-400">Time</div>
               <div className="font-cinzel font-bold text-xs text-amber-600">{formatDuration(duration)}</div>
             </div>
             {/* On mobile show time inline as a compact pill */}
-            <div className="sm:hidden px-2 py-1 rounded-lg bg-amber-50 border border-amber-100 text-center">
+            <div className="hidden px-2 py-1 rounded-lg bg-amber-50 border border-amber-100 text-center">
               <div className="font-cinzel font-bold text-[11px] text-amber-600">{formatDuration(duration)}</div>
             </div>
-            <div className={`px-2 sm:px-3 py-1.5 rounded-xl text-center border transition-colors ${
+            <button onClick={() => router.push("/wallet")} className={`px-3 py-2 rounded-full text-center border transition-colors ${
               isFreeMinute && freeMinutesLeft > 0
                 ? "bg-emerald-50 border-emerald-200"
                 : balance < rate * 2 ? "bg-red-50 border-red-200" : "bg-emerald-50 border-emerald-100"
@@ -682,18 +683,18 @@ export default function UserChatPage() {
               <div className={`text-[8px] uppercase tracking-widest font-bold ${
                 isFreeMinute && freeMinutesLeft > 0 ? "text-emerald-500" : balance < rate * 2 ? "text-red-400" : "text-emerald-500"
               }`}>
-                {isFreeMinute && freeMinutesLeft > 0 ? "Free" : "Bal"}
+                Wallet
               </div>
               <div className={`font-cinzel font-bold text-[11px] sm:text-xs ${
                 isFreeMinute && freeMinutesLeft > 0 ? "text-emerald-600" : balance < rate * 2 ? "text-red-500" : "text-emerald-600"
               }`}>
                 {isFreeMinute && freeMinutesLeft > 0 ? `${freeMinutesLeft}m` : `₹${balance.toFixed(0)}`}
               </div>
-            </div>
+            </button>
             {/* End button — always visible, never hidden */}
             {!ended && (
               <button id="end-chat-btn" onClick={handleEndSession}
-                className="px-3 sm:px-4 py-2 rounded-xl text-[10px] sm:text-[11px] uppercase tracking-widest font-extrabold bg-red-50 border border-red-200 text-red-500 hover:bg-red-500 hover:text-white transition-all hover:shadow-md whitespace-nowrap">
+                className="px-3 py-2 rounded-full text-xs font-bold bg-red-50 border border-red-200 text-red-500 hover:bg-red-500 hover:text-white transition-colors whitespace-nowrap">
                 End
               </button>
             )}
@@ -701,7 +702,7 @@ export default function UserChatPage() {
         </div>
 
         {/* Zodiac strip */}
-        <div className="px-4 py-1.5 border-t border-[#f5c842]/10 flex items-center justify-between overflow-hidden">
+        <div className="hidden px-4 py-1.5 border-t border-[#f5c842]/10 flex items-center justify-between overflow-hidden">
           <span className="text-[9px] font-bold tracking-widest" style={{ background: "linear-gradient(90deg,#FF9933,#f5c842)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>₹{rate}/min</span>
           <div className="flex gap-2.5">
             {ZODIAC.map((z, i) => (
@@ -714,7 +715,7 @@ export default function UserChatPage() {
       </header>
 
       {/* Free trial banner */}
-      {astrologerJoined && !ended && isFreeMinute && freeMinutesLeft > 0 && (
+      {false && astrologerJoined && !ended && isFreeMinute && freeMinutesLeft > 0 && (
         <div className="mx-4 mt-3 shrink-0 bg-emerald-50 border border-emerald-300 text-emerald-700 px-4 py-2.5 rounded-2xl flex items-center gap-3 font-bold shadow-sm"
           style={{ animation: "glowPulse 2s ease-in-out infinite" }}>
           <span className="text-xl">🎁</span>
@@ -726,7 +727,7 @@ export default function UserChatPage() {
       )}
 
       {/* Low balance warning (only show after free minutes exhausted) */}
-      {astrologerJoined && !ended && !isFreeMinute && rate > 0 && balance > 0 && balance < rate * 2 && (
+      {false && astrologerJoined && !ended && !isFreeMinute && rate > 0 && balance > 0 && balance < rate * 2 && (
         <div className="mx-4 mt-3 shrink-0 bg-amber-50 border border-amber-300 text-amber-700 px-4 py-2.5 rounded-2xl flex items-center gap-3 font-bold shadow-sm"
           style={{ animation: "glowPulse 1.5s ease-in-out infinite" }}>
           <span className="text-xl">⚠️</span>
@@ -738,25 +739,28 @@ export default function UserChatPage() {
       )}
 
       {/* ── MESSAGES ── */}
-      <div className="flex-1 overflow-y-auto relative">
+      <div className="flex-1 overflow-y-auto relative bg-[#fff9ef]">
         {/* Aurora blobs inside chat area */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="hidden absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[10%] right-[5%] w-[300px] h-[300px] rounded-full" style={{ background: "radial-gradient(circle, rgba(255,153,51,1) 0%, transparent 70%)", animation: "aurora1 12s ease-in-out infinite" }} />
           <div className="absolute bottom-[10%] left-[5%] w-[250px] h-[250px] rounded-full" style={{ background: "radial-gradient(circle, rgba(245,200,66,1) 0%, transparent 70%)", animation: "aurora2 15s ease-in-out infinite" }} />
         </div>
 
         {/* Twinkling stars */}
-        {STARS.map((s, i) => (
+        {false && STARS.map((s, i) => (
           <div key={i} className="absolute rounded-full bg-[#f5c842] pointer-events-none"
             style={{ top: `${s.top}%`, left: `${s.left}%`, width: s.size, height: s.size, animation: `twinkle ${s.dur}s ease-in-out ${s.delay}s infinite` }} />
         ))}
 
         {/* ॐ watermark */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ animation: "breatheOm 8s ease-in-out infinite" }}>
+        <div className="hidden absolute inset-0 flex items-center justify-center pointer-events-none select-none" style={{ animation: "breatheOm 8s ease-in-out infinite" }}>
           <span className="text-[#FF9933] font-bold" style={{ fontSize: "220px", lineHeight: 1 }}>ॐ</span>
         </div>
 
-        <div className="relative z-10 px-4 py-5 space-y-4">
+        <div className="relative z-10 px-4 py-5 space-y-3 max-w-5xl mx-auto">
+          <div className="flex justify-center py-2">
+            <span className="rounded-full bg-slate-700 px-4 py-1.5 text-xs font-bold text-white">Today</span>
+          </div>
           {messages.length === 0 && !ended && (
             <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
               <div className="w-20 h-20 rounded-3xl bg-white border border-[#f5c842]/25 flex items-center justify-center text-4xl shadow-[0_8px_32px_rgba(245,200,66,0.15)]"
@@ -786,24 +790,24 @@ export default function UserChatPage() {
             }
 
             return (
-              <div key={msg.id} className={`flex gap-2.5 ${msg.isMe ? "justify-end msg-in-me" : "justify-start msg-in"}`}>
+              <div key={msg.id} className={`flex ${msg.isMe ? "justify-end msg-in-me" : "justify-start msg-in"}`}>
                 {!msg.isMe && (
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF9933]/15 to-[#f5c842]/15 border-2 border-[#f5c842]/30 flex items-center justify-center text-xl shrink-0 mt-auto shadow-sm">
+                  <div className="hidden w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF9933]/15 to-[#f5c842]/15 border-2 border-[#f5c842]/30 flex items-center justify-center text-xl shrink-0 mt-auto shadow-sm">
                     🧘
                   </div>
                 )}
-                <div className={`max-w-[78%] lg:max-w-md flex flex-col gap-1.5 ${msg.isMe ? "items-end" : "items-start"}`}>
-                  <div className={`px-4 py-3.5 rounded-2xl text-[14.5px] leading-relaxed font-medium transition-all ${
+                <div className={`max-w-[82%] lg:max-w-md flex flex-col gap-1 ${msg.isMe ? "items-end" : "items-start"}`}>
+                  <div className={`px-4 py-3 rounded-2xl text-[15px] leading-relaxed font-medium ${
                     msg.isMe
-                      ? "bg-gradient-to-br from-[#FF9933] to-[#f0a832] text-white rounded-br-sm"
-                      : "bg-white/90 backdrop-blur-sm border border-white/60 text-slate-800 rounded-bl-sm shadow-[0_2px_16px_rgba(0,0,0,0.05)]"
-                  }`} style={msg.isMe ? { boxShadow: "0 4px 24px rgba(255,153,51,0.3)" } : {}}>
+                      ? "bg-[#f88b43] text-white rounded-br-sm"
+                      : "bg-white text-slate-800 rounded-bl-sm shadow-sm"
+                  }`}>
                     {msg.content}
                   </div>
-                  <span className="text-[10px] font-semibold text-slate-300 px-1">{formatTime(msg.createdAt)}</span>
+                  <span className="text-[11px] font-medium text-slate-400 px-1">{formatTime(msg.createdAt)}</span>
                 </div>
                 {msg.isMe && (
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF9933]/15 to-[#f5c842]/15 border-2 border-[#f5c842]/30 flex items-center justify-center text-xs font-bold text-[#FF9933] shrink-0 mt-auto shadow-sm">
+                  <div className="hidden w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF9933]/15 to-[#f5c842]/15 border-2 border-[#f5c842]/30 flex items-center justify-center text-xs font-bold text-[#FF9933] shrink-0 mt-auto shadow-sm">
                     You
                   </div>
                 )}
@@ -812,9 +816,10 @@ export default function UserChatPage() {
           })}
 
           {isTyping && (
-            <div className="flex gap-2.5 justify-start msg-in">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF9933]/15 to-[#f5c842]/15 border-2 border-[#f5c842]/30 flex items-center justify-center text-xl shrink-0 mt-auto shadow-sm">🧘</div>
-              <div className="bg-white/90 border border-white/60 backdrop-blur-sm rounded-2xl rounded-bl-sm px-5 py-4 flex items-center gap-2 shadow-sm">
+            <div className="py-1 text-center text-sm italic text-slate-400">
+              <span>{astrologerName} is typing...</span>
+              <div className="hidden w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF9933]/15 to-[#f5c842]/15 border-2 border-[#f5c842]/30 flex items-center justify-center text-xl shrink-0 mt-auto shadow-sm">🧘</div>
+              <div className="hidden bg-white/90 border border-white/60 backdrop-blur-sm rounded-2xl rounded-bl-sm px-5 py-4 flex items-center gap-2 shadow-sm">
                 {[0, 0.15, 0.3].map((delay, i) => (
                   <span key={i} className="w-2.5 h-2.5 rounded-full"
                     style={{ background: `linear-gradient(135deg, #f5c842, #FF9933)`, animation: `dotBounce 1s ease-in-out ${delay}s infinite` }} />
@@ -904,7 +909,7 @@ export default function UserChatPage() {
 
       {/* ── INPUT ── */}
       {!ended && (
-        <div className="shrink-0 px-4 py-3.5 z-20" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(24px)", borderTop: "1px solid rgba(245,200,66,0.18)" }}>
+        <div className="shrink-0 px-4 py-3 border-t border-slate-200 bg-white z-20">
           <div className="flex gap-3 items-end max-w-5xl mx-auto">
             <textarea
               id="chat-input"
@@ -917,22 +922,22 @@ export default function UserChatPage() {
                 e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
               }}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-              placeholder="Ask the stars… ✦ Enter to send"
-              className="flex-1 px-5 py-4 rounded-2xl text-[14.5px] font-medium resize-none overflow-hidden bg-[#faf8f5] border border-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-[#f5c842]/50 focus:ring-2 focus:ring-[#f5c842]/15 transition-all"
-              style={{ minHeight: "56px", maxHeight: "120px", lineHeight: "1.5" }}
+              placeholder="Type your message..."
+              className="flex-1 px-5 py-3.5 rounded-full text-[15px] font-medium resize-none overflow-hidden bg-white border border-slate-300 placeholder:text-slate-400 focus:outline-none focus:border-[#f88b43] focus:ring-2 focus:ring-orange-100 transition-all"
+              style={{ minHeight: "54px", maxHeight: "120px", lineHeight: "1.5" }}
             />
             <button
               id="send-message-btn"
               onClick={sendMessage}
               disabled={!input.trim()}
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shrink-0 font-bold text-xl ${
+              aria-label="Send message"
+              className={`w-14 h-14 rounded-full flex items-center justify-center transition-all shrink-0 font-bold text-xl ${
                 input.trim()
-                  ? "bg-gradient-to-tr from-[#FF9933] to-[#f5c842] text-white hover:scale-110"
-                  : "bg-slate-100 text-slate-300 cursor-not-allowed"
+                  ? "bg-[#f88b43] text-white hover:bg-[#e97831]"
+                  : "bg-slate-200 text-white cursor-not-allowed"
               }`}
-              style={input.trim() ? { animation: "sendGlow 2s ease-in-out infinite" } : {}}
             >
-              ✦
+              ↑
             </button>
           </div>
         </div>
