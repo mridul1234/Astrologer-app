@@ -666,12 +666,12 @@ export default function UserChatPage() {
           {/* Right: Time (hidden on mobile) + Balance + End — shrink-0 so it never collapses */}
           <div className="flex items-center gap-1.5 shrink-0">
             {/* Time badge: hidden on small screens to free up space for End button */}
-            <div className="hidden px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100 text-center">
+            <div className="hidden sm:block px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-100 text-center">
               <div className="text-[8px] uppercase tracking-widest font-bold text-amber-400">Time</div>
               <div className="font-cinzel font-bold text-xs text-amber-600">{formatDuration(duration)}</div>
             </div>
             {/* On mobile show time inline as a compact pill */}
-            <div className="hidden px-2 py-1 rounded-lg bg-amber-50 border border-amber-100 text-center">
+            <div className="sm:hidden px-2 py-1 rounded-lg bg-amber-50 border border-amber-100 text-center">
               <div className="font-cinzel font-bold text-[11px] text-amber-600">{formatDuration(duration)}</div>
             </div>
             <button onClick={() => router.push("/wallet")} className={`px-3 py-2 rounded-full text-center border transition-colors ${
@@ -715,7 +715,7 @@ export default function UserChatPage() {
       </header>
 
       {/* Free trial banner */}
-      {false && astrologerJoined && !ended && isFreeMinute && freeMinutesLeft > 0 && (
+      {astrologerJoined && !ended && isFreeMinute && freeMinutesLeft > 0 && (
         <div className="mx-4 mt-3 shrink-0 bg-emerald-50 border border-emerald-300 text-emerald-700 px-4 py-2.5 rounded-2xl flex items-center gap-3 font-bold shadow-sm"
           style={{ animation: "glowPulse 2s ease-in-out infinite" }}>
           <span className="text-xl">🎁</span>

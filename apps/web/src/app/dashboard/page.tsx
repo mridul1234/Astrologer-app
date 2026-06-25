@@ -475,7 +475,7 @@ export default function UserDashboard() {
                               <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"/>
                               Starting...
                             </span>
-                          ) : "💬 Chat Now"}
+                          ) : !introOfferUsed ? "✨ Start ₹1 / 3 min" : "💬 Chat Now"}
                         </button>
                       )}
 
