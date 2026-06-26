@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
 import { auth } from "@/auth";
+import { getRequestUser } from "@/lib/mobile-auth";
 
 /**
  * POST /api/chat/cancel
@@ -9,8 +10,8 @@ import { auth } from "@/auth";
  * - user leaves the waiting screen before the astrologer joins
  */
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -32,8 +33,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
-  const isUser = chatSession.userId === session.user.id;
-  const isAstrologer = chatSession.astrologer.userId === session.user.id;
+  const isUser = chatSession.userId === session.id;
+  const isAstrologer = chatSession.astrologer.userId === session.id;
   if (!isUser && !isAstrologer) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
