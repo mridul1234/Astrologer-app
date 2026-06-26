@@ -27,7 +27,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Astrologer not found" }, { status: 404 });
   }
 
-  // Allow entry when the user has intro-pass minutes or sufficient wallet balance.
+  // Brand-new seekers must unlock the Rs 1 intro chat pass before any chat can start.
+  // Wallet balance should not bypass this first-chat paywall.
+  if (!user.introOfferUsed && user.freeMinutesLeft <= 0) {
+    return NextResponse.json(
+      {
+        error: "Unlock your first 3 minutes for Rs 1 before starting chat.",
+        introOfferAvailable: true,
+      },
+      { status: 402 }
+    );
+  }
+
+  // After the intro pass is bought/used, allow entry when the user has intro-pass
+  // minutes or enough wallet balance for the selected astrologer's per-minute rate.
   if (user.freeMinutesLeft <= 0 && user.walletBalance < astrologer.ratePerMin) {
     return NextResponse.json(
       {
