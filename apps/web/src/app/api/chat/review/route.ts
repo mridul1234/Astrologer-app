@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
-import { auth } from "@/auth";
+import { getRequestUser } from "@/lib/mobile-auth";
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
-    if (chatSession.userId !== session.user.id) {
+    if (chatSession.userId !== session.id) {
       return NextResponse.json({ error: "Unauthorized for this session" }, { status: 403 });
     }
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       create: {
         rating,
         comment,
-        userId: session.user.id,
+        userId: session.id,
         astrologerId,
         sessionId,
       },
