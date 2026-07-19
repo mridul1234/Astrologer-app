@@ -12,15 +12,21 @@
     "ios": "expo run:ios"
   },
   "dependencies": {
+    "@expo-google-fonts/nunito-sans": "^0.4.2",
     "@expo/vector-icons": "^14.0.2",
-    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-community/datetimepicker": "8.4.1",
     "expo": "~53.0.20",
+    "expo-asset": "~11.1.7",
     "expo-constants": "~17.1.8",
+    "expo-font": "~13.3.2",
+    "expo-image-picker": "~16.1.4",
+    "expo-linking": "~7.1.7",
     "expo-router": "~5.1.11",
     "expo-secure-store": "~14.2.3",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.5",
+    "react-native": "0.79.6",
     "react-native-razorpay": "^2.3.0",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
@@ -28,6 +34,18 @@
   },
   "devDependencies": {
     "@types/react": "~19.0.10",
+    "eslint-config-expo": "~9.2.0",
     "typescript": "~5.8.3"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-razorpay",
+          "socket.io-client"
+        ],
+        "listUnknownPackages": false
+      }
+    }
   }
 }

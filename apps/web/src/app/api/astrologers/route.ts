@@ -21,9 +21,9 @@ export async function GET() {
     },
   });
 
-  const formatted = astrologers.map(a => {
+  const formatted = astrologers.map((a: any) => {
     const total = a.reviews.length;
-    const avg = total > 0 ? a.reviews.reduce((sum, r) => sum + r.rating, 0) / total : 0;
+    const avg = total > 0 ? a.reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / total : 0;
     const activeSession = a.chatSessions[0] ?? null;
     const orderCount = a._count.chatSessions + a.fakeOrders;
     

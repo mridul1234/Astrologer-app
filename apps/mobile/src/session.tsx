@@ -2,7 +2,10 @@ import * as SecureStore from "expo-secure-store";
 import { createContext, useCallback, useContext, useEffect, useState, type PropsWithChildren } from "react";
 import { api } from "@/src/api";
 
-type User = { id: string; name: string; walletBalance: number; freeMinutesLeft: number; introOfferUsed: boolean };
+type User = {
+  id: string; name: string; walletBalance: number; freeMinutesLeft: number; introOfferUsed: boolean;
+  kundliProfile?: { id: string } | null;
+};
 type SessionContextValue = {
   user: User | null;
   loading: boolean;

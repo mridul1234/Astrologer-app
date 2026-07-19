@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const user = await prisma.$transaction(async (tx) => {
+    const user = await prisma.$transaction(async (tx: any) => {
       if (isIntroChatPass) {
         const claimedOffer = await tx.user.updateMany({
           where: { id: session.id, introOfferUsed: false },

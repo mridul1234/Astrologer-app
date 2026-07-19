@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
-import { auth } from "@/auth";
+import { getRequestUser } from "@/lib/mobile-auth";
 
 // GET /api/user/profile
-export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
+export async function GET(req: NextRequest) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: session.id },
     select: {
       id: true,
       name: true,
@@ -58,8 +58,8 @@ export async function GET() {
 
 // PATCH /api/user/profile
 export async function PATCH(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -67,7 +67,7 @@ export async function PATCH(req: NextRequest) {
   const { name, avataremoji } = body;
 
   const updated = await prisma.user.update({
-    where: { id: session.user.id },
+    where: { id: session.id },
     data: {
       ...(name?.trim() ? { name: name.trim() } : {}),
     },
@@ -75,4 +75,32 @@ export async function PATCH(req: NextRequest) {
   });
 
   return NextResponse.json(updated);
+}
+
+// DELETE /api/user/profile
+export async function DELETE(req: NextRequest) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.id },
+    select: { id: true, role: true },
+  });
+  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (user.role !== "USER") {
+    return NextResponse.json({ error: "Only seeker accounts can be deleted from the app." }, { status: 403 });
+  }
+
+  await prisma.$transaction([
+    prisma.message.deleteMany({ where: { senderId: user.id } }),
+    prisma.review.deleteMany({ where: { userId: user.id } }),
+    prisma.chatSession.deleteMany({ where: { userId: user.id } }),
+    prisma.transaction.deleteMany({ where: { userId: user.id } }),
+    prisma.kundliProfile.deleteMany({ where: { userId: user.id } }),
+    prisma.user.delete({ where: { id: user.id } }),
+  ]);
+
+  return NextResponse.json({ success: true });
 }

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   }
 
   const startedAtMs = chatSession.startedAt.getTime();
-  const hasCurrentMessages = chatSession.messages.some((m) => m.createdAt.getTime() >= startedAtMs);
+  const hasCurrentMessages = chatSession.messages.some((m: any) => m.createdAt.getTime() >= startedAtMs);
   if (chatSession.totalCost > 0 || hasCurrentMessages) {
     return NextResponse.json(
       { error: "Session has already started and cannot be cancelled." },

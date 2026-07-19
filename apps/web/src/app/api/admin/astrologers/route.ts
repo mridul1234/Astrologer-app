@@ -137,7 +137,7 @@ export async function DELETE(req: NextRequest) {
       where: { astrologerId },
       select: { id: true },
     });
-    const sessionIds = chatSessions.map((s) => s.id);
+    const sessionIds = chatSessions.map((s: any) => s.id);
 
     // 1. Delete Messages tied to those sessions
     if (sessionIds.length > 0) {

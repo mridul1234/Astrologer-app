@@ -18,6 +18,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.tsbuildinfo
+*.apk
+**/.kotlin/
 
 # local env files
 .env.local

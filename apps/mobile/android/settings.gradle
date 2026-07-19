@@ -37,3 +37,17 @@ expoAutolinking.useExpoVersionCatalog()
 
 include ':app'
 includeBuild(expoAutolinking.reactNativeGradlePlugin)
+
+def nodeModulesDir = new File(rootDir, "../../../node_modules").canonicalFile
+[
+  "react-native-async-storage_async-storage": "@react-native-async-storage/async-storage/android",
+  "react-native-community_datetimepicker": "@react-native-community/datetimepicker/android",
+  "react-native-razorpay": "react-native-razorpay/android",
+  "react-native-safe-area-context": "react-native-safe-area-context/android",
+  "react-native-screens": "react-native-screens/android",
+].each { projectName, modulePath ->
+  def linkedProject = findProject(":${projectName}")
+  if (linkedProject != null) {
+    linkedProject.projectDir = new File(nodeModulesDir, modulePath)
+  }
+}

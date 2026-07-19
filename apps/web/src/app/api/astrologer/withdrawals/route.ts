@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
-import { auth } from "@/auth";
+import { getRequestUser } from "@/lib/mobile-auth";
 
-export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function GET(req: NextRequest) {
+  const session = await getRequestUser(req);
+  if (!session?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const astrologer = await prisma.astrologer.findUnique({ where: { userId: session.user.id } });
+  const astrologer = await prisma.astrologer.findUnique({ where: { userId: session.id } });
   if (!astrologer) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const withdrawals = await prisma.withdrawalRequest.findMany({
@@ -17,15 +17,15 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const session = await getRequestUser(req);
+  if (!session?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const { amount } = await req.json();
     if (!amount || amount < 500) return NextResponse.json({ error: "Minimum withdrawal is ₹500" }, { status: 400 });
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.id },
       include: { astrologerProfile: true }
     });
 

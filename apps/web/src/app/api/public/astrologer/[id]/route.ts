@@ -27,9 +27,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "Astrologer not found" }, { status: 404 });
     }
 
-    const orderCount = astrologer.chatSessions.length + astrologer.fakeOrders;
-    const avgRating = astrologer.reviews.length > 0 
-      ? astrologer.reviews.reduce((acc, r) => acc + r.rating, 0) / astrologer.reviews.length 
+  const orderCount = astrologer.chatSessions.length + astrologer.fakeOrders;
+  const avgRating = astrologer.reviews.length > 0
+      ? astrologer.reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / astrologer.reviews.length
       : 0;
 
     return NextResponse.json({
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       profileImage: astrologer.profileImage,
       orderCount,
       avgRating,
-      reviews: astrologer.reviews.map(r => ({
+      reviews: astrologer.reviews.map((r: any) => ({
         id: r.id,
         rating: r.rating,
         comment: r.comment,

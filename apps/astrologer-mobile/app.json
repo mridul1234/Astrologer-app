@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "AstroWalla Astrologer",
+    "slug": "astrowalla-astrologer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "astrowallaastro",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "com.astrowalla.astrologer",
+      "versionCode": 1,
+      "newArchEnabled": false,
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF9EF"
+      },
+      "permissions": [
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font"
+    ]
+  }
+}

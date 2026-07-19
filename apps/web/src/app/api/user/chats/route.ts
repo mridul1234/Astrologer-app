@@ -29,7 +29,7 @@ export async function GET() {
       },
     });
 
-    const formatted = sessions.map((s) => ({
+    const formatted = sessions.map((s: any) => ({
       id: s.id,
       status: s.status,
       startedAt: s.startedAt,

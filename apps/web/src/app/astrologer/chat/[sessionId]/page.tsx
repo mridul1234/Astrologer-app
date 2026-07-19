@@ -13,6 +13,20 @@ interface Message {
   isMe: boolean;
 }
 
+type ParsedMessage = { type: "text"; text: string } | { type: "image"; uri: string };
+
+function parseMessageContent(content: string): ParsedMessage {
+  try {
+    const parsed = JSON.parse(content) as { type?: string; uri?: string };
+    if (parsed.type === "image" && typeof parsed.uri === "string" && parsed.uri.startsWith("data:image/")) {
+      return { type: "image", uri: parsed.uri };
+    }
+  } catch {
+    // Older messages are stored as plain text.
+  }
+  return { type: "text", text: content };
+}
+
 const STARS = [
   { top: 8, left: 12, size: 2, delay: 0, dur: 3.2 },
   { top: 15, left: 78, size: 1.5, delay: 1.1, dur: 2.8 },
@@ -370,6 +384,7 @@ export default function AstrologerChatPage() {
           {messages.map((msg) => {
             const isSystem = msg.senderId === "system";
             const isLatest = msg.id === latestMsgId;
+            const parsed = parseMessageContent(msg.content);
 
             if (isSystem) {
               return (
@@ -396,7 +411,11 @@ export default function AstrologerChatPage() {
                       ? "bg-gradient-to-br from-[#FF9933] to-[#f0a832] text-white rounded-br-sm"
                       : "bg-white/90 backdrop-blur-sm border border-white/60 text-slate-800 rounded-bl-sm shadow-[0_2px_16px_rgba(0,0,0,0.05)]"
                   }`} style={msg.isMe ? { boxShadow: "0 4px 24px rgba(255,153,51,0.30)" } : {}}>
-                    {msg.content}
+                    {parsed.type === "image" ? (
+                      <img src={parsed.uri} alt="Shared in chat" className="max-h-72 w-56 rounded-xl object-cover" />
+                    ) : (
+                      parsed.text
+                    )}
                   </div>
                   <span className="text-[10px] font-semibold text-slate-300 px-1">{formatTime(msg.createdAt)}</span>
                 </div>

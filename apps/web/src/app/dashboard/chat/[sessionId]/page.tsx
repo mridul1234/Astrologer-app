@@ -13,6 +13,20 @@ interface Message {
   isMe: boolean;
 }
 
+type ParsedMessage = { type: "text"; text: string } | { type: "image"; uri: string };
+
+function parseMessageContent(content: string): ParsedMessage {
+  try {
+    const parsed = JSON.parse(content) as { type?: string; uri?: string };
+    if (parsed.type === "image" && typeof parsed.uri === "string" && parsed.uri.startsWith("data:image/")) {
+      return { type: "image", uri: parsed.uri };
+    }
+  } catch {
+    // Older messages are stored as plain text.
+  }
+  return { type: "text", text: content };
+}
+
 const WALLET_PACKS = [
   { amount: 30, label: "Rs 30", hint: "Quick top-up" },
   { amount: 50, label: "Rs 50", hint: "Popular" },
@@ -777,6 +791,7 @@ export default function UserChatPage() {
           {messages.map((msg) => {
             const isSystem = msg.senderId === "system";
             const isLatest = msg.id === latestMsgId;
+            const parsed = parseMessageContent(msg.content);
             if (isSystem) {
               return (
                 <div key={msg.id} className="flex justify-center my-3">
@@ -802,7 +817,11 @@ export default function UserChatPage() {
                       ? "bg-[#f88b43] text-white rounded-br-sm"
                       : "bg-white text-slate-800 rounded-bl-sm shadow-sm"
                   }`}>
-                    {msg.content}
+                    {parsed.type === "image" ? (
+                      <img src={parsed.uri} alt="Shared in chat" className="max-h-72 w-56 rounded-xl object-cover" />
+                    ) : (
+                      parsed.text
+                    )}
                   </div>
                   <span className="text-[11px] font-medium text-slate-400 px-1">{formatTime(msg.createdAt)}</span>
                 </div>

@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
-import { auth } from "@/auth";
+import { getRequestUser } from "@/lib/mobile-auth";
 import { normalizeIndianPhoneNumber } from "@/lib/vobiz";
 
 // GET /api/astrologer/profile
-export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
+export async function GET(req: NextRequest) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const astrologer = await prisma.astrologer.findUnique({
-    where: { userId: session.user.id },
+    where: { userId: session.id },
     include: {
       user: {
         select: { id: true, name: true, email: true, createdAt: true, walletBalance: true },
@@ -36,18 +36,18 @@ export async function GET() {
 
   // Calculate Net Total Earnings based on astrologerEarnings (net of platform commission)
   const totalEarnings = astrologer.chatSessions
-    .filter((s) => s.status === "ENDED")
-    .reduce((acc, s) => acc + s.astrologerEarnings, 0);
+    .filter((s: any) => s.status === "ENDED")
+    .reduce((acc: number, s: any) => acc + s.astrologerEarnings, 0);
 
   // Calculate Today's Net Earnings
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
   const todaysEarnings = astrologer.chatSessions
-    .filter((s) => s.status === "ENDED" && s.startedAt >= startOfToday)
-    .reduce((acc, s) => acc + s.astrologerEarnings, 0);
+    .filter((s: any) => s.status === "ENDED" && s.startedAt >= startOfToday)
+    .reduce((acc: number, s: any) => acc + s.astrologerEarnings, 0);
 
-  const avgRating = astrologer.reviews.length > 0 
-    ? astrologer.reviews.reduce((acc, r) => acc + r.rating, 0) / astrologer.reviews.length 
+  const avgRating = astrologer.reviews.length > 0
+    ? astrologer.reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / astrologer.reviews.length
     : 0;
 
   // Add the user's walletBalance to the response so the frontend knows how much they can withdraw
@@ -58,8 +58,8 @@ export async function GET() {
 
 // PATCH /api/astrologer/profile
 export async function PATCH(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const session = await getRequestUser(req);
+  if (!session?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -81,14 +81,14 @@ export async function PATCH(req: NextRequest) {
   // Update user name if provided
   if (name?.trim()) {
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: session.id },
       data: { name: name.trim() },
     });
   }
 
   // Update astrologer profile fields
   const updated = await prisma.astrologer.update({
-    where: { userId: session.user.id },
+    where: { userId: session.id },
     data: {
       ...(bio !== undefined ? { bio } : {}),
       ...(speciality?.trim() ? { speciality } : {}),

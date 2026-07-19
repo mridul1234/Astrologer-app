@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
 import bcrypt from "bcryptjs";
 import { createMobileAccessToken } from "@/lib/mobile-auth";
+import { normalizeIndianPhoneNumber } from "@/lib/vobiz";
 
 const BASE_URL = "https://cpaas.messagecentral.com";
 const CUSTOMER_ID = process.env.MC_CUSTOMER_ID!;
@@ -75,6 +76,35 @@ export async function POST(req: NextRequest) {
     }
 
     // OTP is valid — user creation is handled by NextAuth signIn callback
+    if (client === "astrologer-mobile") {
+      const normalizedPhone = normalizeIndianPhoneNumber(phone);
+      const email = `${phone}@astrowalla.com`;
+      const user = await prisma.user.findFirst({
+        where: {
+          role: "ASTROLOGER",
+          OR: [
+            { email },
+            { astrologerProfile: { phoneNumber: normalizedPhone } },
+          ],
+        },
+        include: { astrologerProfile: true },
+      });
+
+      if (!user?.astrologerProfile) {
+        return NextResponse.json(
+          { error: "No astrologer account is linked with this phone number." },
+          { status: 403 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        phone,
+        accessToken: createMobileAccessToken({ id: user.id, role: user.role }),
+        user: { id: user.id, name: user.name, role: user.role },
+      });
+    }
+
     if (client === "mobile") {
       const email = `${phone}@astrowalla.com`;
       let user = await prisma.user.findUnique({ where: { email } });

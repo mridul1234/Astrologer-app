@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   });
 
   return NextResponse.json({
-    sessions: sessions.map((session) => ({
+    sessions: sessions.map((session: any) => ({
       id: session.id,
       status: session.status,
       startedAt: session.startedAt,

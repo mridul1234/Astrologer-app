@@ -14,7 +14,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" }, // descending to keep the newest block key first
     });
 
-    const aggregatedMap = rawTx.reduce((acc, t) => {
+    const aggregatedMap = rawTx.reduce((acc: Record<string, any>, t: any) => {
       // Group recurring live chat minute transactions perfectly into 1 block
       if (t.reason?.startsWith("Chat - session") || t.reason?.startsWith("Chat Earnings - session")) {
         const key = `${t.type}_${t.reason}`;
