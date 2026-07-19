@@ -265,13 +265,12 @@ function SectionTitle({ title, compact = false }: { title: string; compact?: boo
 }
 
 function DailyHoroscope({ data, loading }: { data: HoroscopeResponse | null; loading: boolean }) {
+  const [selectedHoroscope, setSelectedHoroscope] = useState<HoroscopeItem | null>(null);
+
   if (loading) {
     return (
       <View style={styles.horoscopeWrap}>
         <Skeleton width="100%" height={142} radius={22} />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horoscopeSkeletonRow}>
-          {[0, 1, 2].map((item) => <Skeleton key={item} width={145} height={104} radius={18} />)}
-        </ScrollView>
       </View>
     );
   }
@@ -287,14 +286,12 @@ function DailyHoroscope({ data, loading }: { data: HoroscopeResponse | null; loa
     );
   }
 
-  const otherSigns = data.horoscopes.filter((item) => item.sign !== data.primary.sign);
-
   return (
     <View style={styles.horoscopeWrap}>
       <View style={styles.horoscopeHeader}>
         <View>
           <Text style={styles.horoscopeKicker}>Daily Horoscope</Text>
-          <Text style={styles.horoscopeTitle}>Today for you</Text>
+          <Text style={styles.horoscopeTitle}>Your zodiac insight</Text>
         </View>
         <View style={styles.horoscopeDatePill}>
           <Ionicons name="calendar-clear-outline" size={13} color={colors.orangeDark} />
@@ -302,27 +299,39 @@ function DailyHoroscope({ data, loading }: { data: HoroscopeResponse | null; loa
         </View>
       </View>
 
-      <View style={styles.primaryHoroscope}>
+      <Pressable style={({ pressed }) => [styles.primaryHoroscope, pressed && styles.primaryHoroscopePressed]} onPress={() => setSelectedHoroscope(data.primary)}>
         <View style={styles.signOrb}>
           <Text style={styles.signSymbol}>{data.primary.symbol}</Text>
         </View>
         <View style={styles.primaryCopy}>
           <Text style={styles.primarySign}>{data.primary.displayName}</Text>
-          <Text style={styles.primaryHoroscopeText} numberOfLines={4}>{data.primary.horoscope}</Text>
-        </View>
-      </View>
-
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horoscopeRow}>
-        {otherSigns.map((item) => (
-          <View key={item.sign} style={styles.smallHoroscope}>
-            <View style={styles.smallSignRow}>
-              <Text style={styles.smallSymbol}>{item.symbol}</Text>
-              <Text style={styles.smallSign}>{item.displayName}</Text>
-            </View>
-            <Text style={styles.smallText} numberOfLines={3}>{item.horoscope}</Text>
+          <Text style={styles.primaryHoroscopeText}>Know your horoscope for today</Text>
+          <View style={styles.horoscopeAction}>
+            <Text style={styles.horoscopeActionText}>Read full horoscope</Text>
+            <Ionicons name="chevron-forward" size={16} color="#1A1040" />
           </View>
-        ))}
-      </ScrollView>
+        </View>
+      </Pressable>
+
+      <Modal visible={!!selectedHoroscope} transparent animationType="fade" onRequestClose={() => setSelectedHoroscope(null)}>
+        <View style={styles.horoscopeModalOverlay}>
+          <View style={styles.horoscopeModal}>
+            <View style={styles.modalHeader}>
+              <View style={styles.modalSignOrb}>
+                <Text style={styles.modalSymbol}>{selectedHoroscope?.symbol}</Text>
+              </View>
+              <View style={styles.modalTitleCopy}>
+                <Text style={styles.modalKicker}>Daily Horoscope</Text>
+                <Text style={styles.modalTitle}>{selectedHoroscope?.displayName}</Text>
+              </View>
+              <Pressable style={styles.modalClose} onPress={() => setSelectedHoroscope(null)}>
+                <Ionicons name="close" size={18} color={colors.muted} />
+              </Pressable>
+            </View>
+            <Text style={styles.modalText}>{selectedHoroscope?.horoscope}</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -393,17 +402,32 @@ const styles = StyleSheet.create({
   horoscopeDatePill: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 7, backgroundColor: "#FFF3D8", borderWidth: 1, borderColor: "#EBC75F", flexDirection: "row", alignItems: "center", gap: 5 },
   horoscopeDateText: { fontFamily: fonts.extrabold, color: colors.orangeDark, fontSize: 11 },
   primaryHoroscope: { borderRadius: 22, padding: 15, backgroundColor: "#1A1040", borderWidth: 1, borderColor: "rgba(245,200,66,.28)", flexDirection: "row", gap: 13, alignItems: "flex-start" },
+  primaryHoroscopePressed: { opacity: 0.9, transform: [{ scale: 0.99 }] },
   signOrb: { width: 58, height: 58, borderRadius: 20, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" },
   signSymbol: { fontFamily: fonts.extrabold, color: "#1A1040", fontSize: 31 },
   primaryCopy: { flex: 1 },
   primarySign: { fontFamily: fonts.extrabold, color: "white", fontSize: 18 },
   primaryHoroscopeText: { fontFamily: fonts.regular, color: "rgba(255,255,255,.72)", fontSize: 12.2, lineHeight: 17.5, marginTop: 5 },
+  horoscopeAction: { alignSelf: "flex-start", marginTop: 12, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7, backgroundColor: colors.gold, flexDirection: "row", alignItems: "center", gap: 4 },
+  horoscopeActionText: { fontFamily: fonts.extrabold, color: "#1A1040", fontSize: 11.5 },
   horoscopeRow: { gap: 10, paddingRight: 8 },
   smallHoroscope: { width: 158, minHeight: 112, borderRadius: 18, padding: 12, backgroundColor: "#FFFEFC", borderWidth: 1, borderColor: "#EFE5D4" },
+  smallHoroscopePressed: { opacity: 0.88, transform: [{ scale: 0.98 }] },
   smallSignRow: { flexDirection: "row", alignItems: "center", gap: 7, marginBottom: 7 },
   smallSymbol: { fontFamily: fonts.extrabold, color: colors.orangeDark, fontSize: 18 },
   smallSign: { fontFamily: fonts.extrabold, color: colors.ink, fontSize: 13.5 },
   smallText: { fontFamily: fonts.regular, color: colors.muted, fontSize: 11, lineHeight: 15.5 },
+  readFull: { fontFamily: fonts.extrabold, color: colors.orangeDark, fontSize: 11, marginTop: 8 },
+  horoscopeModalOverlay: { flex: 1, backgroundColor: "rgba(17,24,39,.46)", justifyContent: "center", padding: 18 },
+  horoscopeModal: { borderRadius: 24, backgroundColor: "#FFFEFC", padding: 18, borderWidth: 1, borderColor: "#EFE5D4" },
+  modalHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 14 },
+  modalSignOrb: { width: 50, height: 50, borderRadius: 18, backgroundColor: colors.gold, alignItems: "center", justifyContent: "center" },
+  modalSymbol: { fontFamily: fonts.extrabold, color: "#1A1040", fontSize: 27 },
+  modalTitleCopy: { flex: 1 },
+  modalKicker: { fontFamily: fonts.extrabold, color: colors.orangeDark, fontSize: 10, letterSpacing: 1.1, textTransform: "uppercase" },
+  modalTitle: { fontFamily: fonts.extrabold, color: colors.ink, fontSize: 22, marginTop: 1 },
+  modalClose: { width: 34, height: 34, borderRadius: 17, backgroundColor: "#F4F1EC", alignItems: "center", justifyContent: "center" },
+  modalText: { fontFamily: fonts.regular, color: colors.muted, fontSize: 15, lineHeight: 22 },
   horoscopeEmpty: { borderRadius: 18, padding: 13, backgroundColor: "#FFF3D8", borderWidth: 1, borderColor: "#EBC75F", flexDirection: "row", alignItems: "center", gap: 9 },
   horoscopeEmptyText: { flex: 1, fontFamily: fonts.bold, color: "#6B4A12", fontSize: 12, lineHeight: 17 },
   sectionTitle: { fontFamily: fonts.extrabold, color: colors.ink, fontSize: 16, marginTop: 2, marginHorizontal: 14 },

@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type PropsWithChildren } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import { io, Socket } from "socket.io-client";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { api } from "@/src/api";
@@ -24,6 +24,7 @@ const PendingChatContext = createContext<PendingChatContextValue | null>(null);
 
 export function PendingChatProvider({ children }: PropsWithChildren) {
   const insets = useSafeAreaInsets();
+  const pathname = usePathname();
   const [pendingChat, setPendingChat] = useState<PendingChat | null>(null);
   const [connected, setConnected] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(600);
@@ -53,13 +54,19 @@ export function PendingChatProvider({ children }: PropsWithChildren) {
     });
   }, []);
 
-  const openChat = useCallback((sessionId: string) => {
+  const showWaitingScreen = useCallback((sessionId: string) => {
+    router.push(`/chat/${sessionId}`);
+  }, []);
+
+  const completeAndOpenChat = useCallback((sessionId: string) => {
     if (openingRef.current) return;
     openingRef.current = true;
     disconnect();
     setPendingChat(null);
-    router.push(`/chat/${sessionId}`);
-  }, [disconnect]);
+    if (pathname !== `/chat/${sessionId}`) {
+      router.push(`/chat/${sessionId}`);
+    }
+  }, [disconnect, pathname]);
 
   useEffect(() => {
     if (!pendingChat) return;
@@ -83,8 +90,8 @@ export function PendingChatProvider({ children }: PropsWithChildren) {
           client.emit("join_session", { sessionId: pendingChat.sessionId });
         });
         client.on("disconnect", () => setConnected(false));
-        client.on("astrologer_joined", () => openChat(pendingChat.sessionId));
-        client.on("billing_started", () => openChat(pendingChat.sessionId));
+        client.on("astrologer_joined", () => completeAndOpenChat(pendingChat.sessionId));
+        client.on("billing_started", () => completeAndOpenChat(pendingChat.sessionId));
         client.on("session_cancelled", () => clearPendingChat(pendingChat.sessionId));
         client.on("session_ended", () => clearPendingChat(pendingChat.sessionId));
       } catch {
@@ -96,7 +103,7 @@ export function PendingChatProvider({ children }: PropsWithChildren) {
       active = false;
       disconnect();
     };
-  }, [clearPendingChat, disconnect, openChat, pendingChat]);
+  }, [clearPendingChat, completeAndOpenChat, disconnect, pendingChat]);
 
   useEffect(() => {
     if (!pendingChat) return;
@@ -127,13 +134,14 @@ export function PendingChatProvider({ children }: PropsWithChildren) {
 
   const value = { pendingChat, beginPendingChat, clearPendingChat };
   const bottom = Math.max(insets.bottom, 10) + 66;
+  const isOnPendingChatScreen = Boolean(pendingChat && pathname === `/chat/${pendingChat.sessionId}`);
 
   return (
     <PendingChatContext.Provider value={value}>
       {children}
-      {pendingChat ? (
+      {pendingChat && !isOnPendingChatScreen ? (
         <View pointerEvents="box-none" style={[styles.overlay, { bottom }]}>
-          <Pressable style={({ pressed }) => [styles.bar, pressed && styles.barPressed]} onPress={() => openChat(pendingChat.sessionId)}>
+          <Pressable style={({ pressed }) => [styles.bar, pressed && styles.barPressed]} onPress={() => showWaitingScreen(pendingChat.sessionId)}>
             <View style={styles.iconWrap}>
               {connected ? <Ionicons name="radio-button-on" size={18} color={colors.green} /> : <ActivityIndicator size="small" color={colors.orange} />}
             </View>
