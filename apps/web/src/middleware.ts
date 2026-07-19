@@ -5,12 +5,18 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!req.auth;
   const role = req.auth?.user?.role;
+  const redirectTo = (path: string) => {
+    const url = req.nextUrl.clone();
+    url.pathname = path;
+    url.search = "";
+    return NextResponse.redirect(url);
+  };
 
   // If logged-in user hits the landing page or login page, redirect to their dashboard
   if (isLoggedIn && (pathname === "/" || pathname === "/login")) {
-    if (role === "ASTROLOGER") return NextResponse.redirect(new URL("/astrologer", req.url));
-    if (role === "ADMIN") return NextResponse.redirect(new URL("/admin", req.url));
-    return NextResponse.redirect(new URL("/home", req.url));
+    if (role === "ASTROLOGER") return redirectTo("/astrologer");
+    if (role === "ADMIN") return redirectTo("/admin");
+    return redirectTo("/home");
   }
 
   // Public paths — always accessible (exact match)
@@ -34,12 +40,12 @@ export default auth((req) => {
 
   // Not logged in — redirect to login
   if (!isLoggedIn) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return redirectTo("/login");
   }
 
   // Astrologer trying to access user dashboard, home, or onboarding
   if ((pathname.startsWith("/dashboard") || pathname === "/home" || pathname === "/onboarding") && role === "ASTROLOGER") {
-    return NextResponse.redirect(new URL("/astrologer", req.url));
+    return redirectTo("/astrologer");
   }
 
   // User trying to access the astrologer-only dashboard
@@ -53,7 +59,7 @@ export default auth((req) => {
     const isBlockedExact = blockedSubPaths.includes(subPath) || 
                            blockedSubPaths.some(bp => bp !== "" && subPath.startsWith(bp + "/"));
     if (isBlockedExact) {
-      return NextResponse.redirect(new URL("/home", req.url));
+      return redirectTo("/home");
     }
   }
 
