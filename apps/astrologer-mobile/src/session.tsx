@@ -1,6 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import { createContext, useCallback, useContext, useEffect, useState, type PropsWithChildren } from "react";
 import { api, TOKEN_KEY } from "@/src/api";
+import { registerPushToken, unregisterPushToken } from "@/src/push";
 import type { AstrologerProfile } from "@/src/types";
 
 type SessionContextValue = {
@@ -37,6 +38,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     refresh();
   }, [refresh]);
+  useEffect(() => {
+    if (profile) void registerPushToken("ASTROLOGER").catch(() => undefined);
+  }, [profile?.id]);
 
   const setToken = async (token: string) => {
     await SecureStore.setItemAsync(TOKEN_KEY, token);
@@ -44,6 +48,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   const logout = async () => {
+    await unregisterPushToken();
     await SecureStore.deleteItemAsync(TOKEN_KEY);
     setProfile(null);
   };

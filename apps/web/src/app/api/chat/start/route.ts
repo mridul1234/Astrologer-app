@@ -4,6 +4,7 @@ import { getRequestUser } from "@/lib/mobile-auth";
 import jwt from "jsonwebtoken";
 import { sendChatRequestNotification } from "@/lib/telegram";
 import { sendChatRequestCall } from "@/lib/vobiz";
+import { sendPushToUsers } from "@/lib/push-notifications";
 
 // POST /api/chat/start  — resumes or starts a chat session
 export async function POST(req: NextRequest) {
@@ -91,6 +92,16 @@ export async function POST(req: NextRequest) {
   // the chat page immediately without waiting for external alert APIs.
   after(async () => {
     console.log(`[chat/start] Astrologer ID: ${astrologer.id}, phoneNumber: ${astrologer.phoneNumber ?? "NOT SET"}, telegramChatId: ${astrologer.telegramChatId ?? "NOT SET"}`);
+    try {
+      await sendPushToUsers([astrologer.userId], {
+        title: "New chat request",
+        body: `${user.name} is waiting for your guidance.`,
+        data: { type: "chat_request", sessionId: chatSession.id },
+      });
+    } catch (err) {
+      console.error("[chat/start] Push notification error:", err);
+    }
+
     if (astrologer.phoneNumber) {
       console.log(`[chat/start] Sending Vobiz call alert to ${astrologer.phoneNumber} for user ${user.name}`);
       try {

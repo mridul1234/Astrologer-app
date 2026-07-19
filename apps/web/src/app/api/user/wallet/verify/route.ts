@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
 import { getRequestUser } from "@/lib/mobile-auth";
+import { sendPushToUsers } from "@/lib/push-notifications";
 import crypto from "crypto";
 import Razorpay from "razorpay";
 
@@ -84,6 +85,14 @@ export async function POST(req: NextRequest) {
       });
       return updatedUser;
     });
+
+    await sendPushToUsers([session.id], {
+      title: isIntroChatPass ? "Intro chat pass unlocked" : "Wallet recharge successful",
+      body: isIntroChatPass
+        ? "Your Rs 1 intro pass is ready. You can start your 3-minute chat now."
+        : `Rs ${amountNum} has been added to your AstroWalla wallet.`,
+      data: { type: isIntroChatPass ? "intro_pass_success" : "wallet_recharge_success" },
+    }).catch((error) => console.error("[wallet/verify] Push notification error:", error));
 
     return NextResponse.json({
       success: true,

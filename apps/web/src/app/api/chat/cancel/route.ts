@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@astrology/db";
-import { auth } from "@/auth";
 import { getRequestUser } from "@/lib/mobile-auth";
+import { sendPushToUsers } from "@/lib/push-notifications";
 
 /**
  * POST /api/chat/cancel
@@ -71,6 +71,13 @@ export async function POST(req: NextRequest) {
         : "Chat cancelled by astrologer (no charge)",
     },
   });
+
+  const recipientId = isUser ? chatSession.astrologer.userId : chatSession.userId;
+  await sendPushToUsers([recipientId], {
+    title: "Chat cancelled",
+    body: isUser ? "The user cancelled before the session started." : "The astrologer could not join this session.",
+    data: { type: "chat_cancelled", sessionId },
+  }).catch((error) => console.error("[chat/cancel] Push notification error:", error));
 
   return NextResponse.json({ success: true, message: "Session cancelled" });
 }

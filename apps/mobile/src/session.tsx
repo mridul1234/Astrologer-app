@@ -1,6 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import { createContext, useCallback, useContext, useEffect, useState, type PropsWithChildren } from "react";
 import { api } from "@/src/api";
+import { registerPushToken, unregisterPushToken } from "@/src/push";
 
 type User = {
   id: string; name: string; walletBalance: number; freeMinutesLeft: number; introOfferUsed: boolean;
@@ -29,8 +30,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    if (user) void registerPushToken("USER").catch(() => undefined);
+  }, [user?.id]);
   const setToken = async (token: string) => { await SecureStore.setItemAsync("astrowalla_access_token", token); await refresh(); };
-  const logout = async () => { await SecureStore.deleteItemAsync("astrowalla_access_token"); setUser(null); };
+  const logout = async () => { await unregisterPushToken(); await SecureStore.deleteItemAsync("astrowalla_access_token"); setUser(null); };
   return <SessionContext.Provider value={{ user, loading, refresh, setToken, logout }}>{children}</SessionContext.Provider>;
 }
 

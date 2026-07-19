@@ -80,6 +80,37 @@ interface SessionMeta {
 const billingTimers = new Map<string, NodeJS.Timeout>();
 const activeSessions = new Map<string, SessionMeta>();
 
+async function sendPushToUsers(userIds: string[], payload: { title: string; body: string; data?: Record<string, unknown> }) {
+  const uniqueUserIds = [...new Set(userIds)].filter(Boolean);
+  if (uniqueUserIds.length === 0) return;
+  const tokens = await prisma.pushToken.findMany({
+    where: { userId: { in: uniqueUserIds }, enabled: true },
+    select: { token: true },
+  });
+  const messages = tokens
+    .filter((item) => /^ExponentPushToken\[[^\]]+\]$/.test(item.token) || /^ExpoPushToken\[[^\]]+\]$/.test(item.token))
+    .map((item) => ({
+      to: item.token,
+      title: payload.title,
+      body: payload.body,
+      data: payload.data || {},
+      sound: "default",
+      priority: "high",
+    }));
+  if (messages.length === 0) return;
+  for (let index = 0; index < messages.length; index += 100) {
+    await fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Accept-Encoding": "gzip, deflate",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(messages.slice(index, index + 100)),
+    }).catch((error) => console.error("[Push] Send error:", error));
+  }
+}
+
 // ─── Socket.io Auth Middleware ────────────────────────────────────────────────
 io.use((socket, next) => {
   try {
@@ -123,6 +154,13 @@ io.on("connection", (socket) => {
 
       if (isAstrologer) {
         io.to(sessionId).emit("astrologer_joined");
+        if (!userInRoom) {
+          void sendPushToUsers([session.userId], {
+            title: "Astrologer joined",
+            body: "Your astrologer is ready. Tap to continue your chat.",
+            data: { type: "astrologer_joined", sessionId },
+          });
+        }
       }
       
       // If user is joining and astrologer is already there, tell the user immediately
@@ -277,7 +315,7 @@ io.on("connection", (socket) => {
   // Send a message
   socket.on(
     "send_message",
-    ({ sessionId, content }: { sessionId: string; content: string }) => {
+    async ({ sessionId, content }: { sessionId: string; content: string }) => {
       if (!content?.trim()) return;
       const message: QueuedMessage = {
         sessionId,
@@ -291,6 +329,27 @@ io.on("connection", (socket) => {
         ...message,
         id: `tmp_${Date.now()}`,
       });
+      try {
+        const session = await prisma.chatSession.findUnique({
+          where: { id: sessionId },
+          include: { astrologer: { include: { user: { select: { name: true } } } }, user: { select: { name: true } } },
+        });
+        if (!session) return;
+        const recipientId = userId === session.userId ? session.astrologer.userId : session.userId;
+        const socketsInRoom = await io.in(sessionId).fetchSockets();
+        const recipientInRoom = socketsInRoom.some(s => s.data.userId === recipientId);
+        if (!recipientInRoom) {
+          const senderName = userId === session.userId ? session.user.name : session.astrologer.user.name;
+          const isImage = content.trim().startsWith("{\"type\":\"image\"");
+          void sendPushToUsers([recipientId], {
+            title: `New message from ${senderName}`,
+            body: isImage ? "Sent you an image." : content.trim().slice(0, 120),
+            data: { type: "chat_message", sessionId },
+          });
+        }
+      } catch (error) {
+        console.error("[send_message] Push lookup error:", error);
+      }
     }
   );
 

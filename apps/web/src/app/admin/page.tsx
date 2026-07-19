@@ -45,11 +45,17 @@ interface WithdrawalRequest {
   };
 }
 
+interface NotificationCounts {
+  users: number;
+  astrologers: number;
+  all: number;
+}
+
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<"ANALYTICS" | "USERS" | "ASTROLOGERS" | "CREATE" | "WITHDRAWALS" | "SETTINGS">("ANALYTICS");
+  const [activeTab, setActiveTab] = useState<"ANALYTICS" | "USERS" | "ASTROLOGERS" | "CREATE" | "WITHDRAWALS" | "SETTINGS" | "NOTIFICATIONS">("ANALYTICS");
   
   // Data States
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -57,6 +63,12 @@ export default function AdminDashboard() {
   const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
   const [commissionRate, setCommissionRate] = useState("20");
+  const [notificationCounts, setNotificationCounts] = useState<NotificationCounts | null>(null);
+  const [notificationAudience, setNotificationAudience] = useState<"USERS" | "ASTROLOGERS" | "ALL">("USERS");
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationBody, setNotificationBody] = useState("");
+  const [sendingNotification, setSendingNotification] = useState(false);
+  const [notificationResult, setNotificationResult] = useState<string | null>(null);
 
   // Create Astrologer Form States
   const [name, setName] = useState("");
@@ -107,6 +119,8 @@ export default function AdminDashboard() {
           const comm = d.settings?.find((s: any) => s.key === "PLATFORM_COMMISSION");
           if (comm) setCommissionRate(comm.value);
         }).catch(console.error);
+      } else if (activeTab === "NOTIFICATIONS") {
+        fetch("/api/admin/notifications").then(r => r.json()).then(d => setNotificationCounts(d.counts || null)).catch(console.error);
       }
     }
   }, [activeTab, status, session]);
@@ -289,6 +303,34 @@ export default function AdminDashboard() {
     }
   }
 
+  async function handleSendNotification(e: React.FormEvent) {
+    e.preventDefault();
+    if (!notificationTitle.trim() || !notificationBody.trim()) return;
+    setSendingNotification(true);
+    setNotificationResult(null);
+    try {
+      const res = await fetch("/api/admin/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          audience: notificationAudience,
+          title: notificationTitle,
+          body: notificationBody,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send notification");
+      setNotificationResult(`Sent ${data.sent || 0} notifications${data.failed ? `, ${data.failed} failed` : ""}.`);
+      setNotificationTitle("");
+      setNotificationBody("");
+      fetch("/api/admin/notifications").then(r => r.json()).then(d => setNotificationCounts(d.counts || null)).catch(console.error);
+    } catch (error) {
+      setNotificationResult(error instanceof Error ? error.message : "Failed to send notification");
+    } finally {
+      setSendingNotification(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#fdfaf5] font-sans text-stone-800 p-6 md:p-10">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -313,6 +355,7 @@ export default function AdminDashboard() {
           { id: "ASTROLOGERS", label: "✨ Astrologers" },
           { id: "USERS", label: "👥 Users" },
           { id: "WITHDRAWALS", label: "💸 Withdrawals" },
+          { id: "NOTIFICATIONS", label: "Notifications" },
           { id: "SETTINGS", label: "⚙️ Settings" },
           { id: "CREATE", label: "➕ Add Astrologer" }
         ].map((tab) => (
@@ -532,6 +575,57 @@ export default function AdminDashboard() {
                    </tbody>
                  </table>
                </div>
+            </div>
+          </div>
+        )}
+
+        {/* NOTIFICATIONS TAB */}
+        {activeTab === "NOTIFICATIONS" && (
+          <div className="animate-in fade-in duration-300 max-w-3xl">
+            <h2 className="text-xl font-extrabold text-stone-900 mb-6">Push Notifications</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+              <div className="bg-white border border-stone-100 shadow-sm rounded-2xl p-4">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400">User devices</div>
+                <div className="text-2xl font-extrabold text-stone-900 mt-1">{notificationCounts?.users ?? "—"}</div>
+              </div>
+              <div className="bg-white border border-stone-100 shadow-sm rounded-2xl p-4">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Astrologer devices</div>
+                <div className="text-2xl font-extrabold text-stone-900 mt-1">{notificationCounts?.astrologers ?? "—"}</div>
+              </div>
+              <div className="bg-white border border-stone-100 shadow-sm rounded-2xl p-4">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Total devices</div>
+                <div className="text-2xl font-extrabold text-[#d97706] mt-1">{notificationCounts?.all ?? "—"}</div>
+              </div>
+            </div>
+
+            <div className="bg-white border border-stone-100 shadow-sm rounded-3xl p-6 relative overflow-hidden">
+              <form onSubmit={handleSendNotification} className="relative z-10 space-y-5">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Audience</label>
+                  <select value={notificationAudience} onChange={e => setNotificationAudience(e.target.value as any)} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-bold text-stone-800 outline-none focus:border-[#f5c842]">
+                    <option value="USERS">Users only</option>
+                    <option value="ASTROLOGERS">Astrologers only</option>
+                    <option value="ALL">Everyone</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Notification Title</label>
+                  <input required value={notificationTitle} onChange={e => setNotificationTitle(e.target.value)} maxLength={80} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400" placeholder="Your daily horoscope is ready" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-500 mb-2 mt-1">Message</label>
+                  <textarea required value={notificationBody} onChange={e => setNotificationBody(e.target.value)} maxLength={180} className="w-full bg-[#fdfaf5] border border-stone-200 rounded-xl px-4 py-3 text-sm font-medium text-stone-800 outline-none focus:border-[#f5c842] focus:ring-2 focus:ring-[#f5c842]/20 transition-all placeholder:text-stone-400 min-h-[110px]" placeholder="Open AstroWalla and see what the stars say today." />
+                  <p className="text-xs text-stone-400 mt-2">{notificationBody.length}/180 characters</p>
+                </div>
+                {notificationResult && (
+                  <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm font-bold text-amber-800">
+                    {notificationResult}
+                  </div>
+                )}
+                <button disabled={sendingNotification} type="submit" className="w-full bg-gradient-to-r from-[#f5c842] to-[#ffb347] text-stone-900 font-extrabold py-3.5 rounded-xl hover:shadow-lg hover:shadow-amber-200/60 active:scale-[0.98] transition-all duration-200 disabled:opacity-50">
+                  {sendingNotification ? "Sending..." : "Send Notification"}
+                </button>
+              </form>
             </div>
           </div>
         )}
