@@ -168,10 +168,12 @@ export default function ChatScreen() {
   const cancelBeforeJoin = async () => {
     try {
       await api("/api/chat/cancel", { method: "POST", body: JSON.stringify({ sessionId }) });
-    } catch {
-      // If it already started, the server will reject cancellation. We still return to list.
-    } finally {
       router.replace("/(tabs)/chats");
+    } catch (error: any) {
+      if (error?.status !== 409) {
+        router.replace("/(tabs)/chats");
+      }
+      // If it already started, stay here and let the live chat state/socket event take over.
     }
   };
 

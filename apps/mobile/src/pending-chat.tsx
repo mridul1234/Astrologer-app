@@ -121,13 +121,16 @@ export function PendingChatProvider({ children }: PropsWithChildren) {
 
   const cancel = async () => {
     if (!pendingChat || cancelling) return;
+    const sessionId = pendingChat.sessionId;
     setCancelling(true);
     try {
-      await api("/api/chat/cancel", { method: "POST", body: JSON.stringify({ sessionId: pendingChat.sessionId }) });
-    } catch {
-      // If billing already started, the route to chat will win via socket event.
+      await api("/api/chat/cancel", { method: "POST", body: JSON.stringify({ sessionId }) });
+      clearPendingChat(sessionId);
+    } catch (error: any) {
+      if (error?.status === 409) {
+        completeAndOpenChat(sessionId);
+      }
     } finally {
-      clearPendingChat(pendingChat.sessionId);
       setCancelling(false);
     }
   };
