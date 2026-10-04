@@ -24,6 +24,8 @@ type ChatSession = {
 };
 type KundliProfile = { fullName: string; dateOfBirth: string; timeOfBirth: string | null; placeOfBirth: string };
 
+const rechargePacks = [50, 100, 200, 500];
+
 export default function ChatScreen() {
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
   const { user, refresh } = useSession();
@@ -49,6 +51,8 @@ export default function ChatScreen() {
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [recharging, setRecharging] = useState(false);
+  const [selectedRechargeAmount, setSelectedRechargeAmount] = useState(100);
+  const [customRechargeAmount, setCustomRechargeAmount] = useState("100");
   const socket = useRef<Socket | null>(null);
   const list = useRef<FlatList<Message>>(null);
   const freeMinutesLeftRef = useRef(0);
@@ -187,12 +191,6 @@ export default function ChatScreen() {
   const sendImage = async () => {
     if (!astrologerJoined || ended) return;
     try {
-      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!permission.granted) {
-        Alert.alert("Photo access needed", "Please allow photo access to share an image in chat.");
-        return;
-      }
-
       const picked = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         quality: 0.45,
@@ -222,11 +220,16 @@ export default function ChatScreen() {
 
   const rechargeInChat = async (amount = 50) => {
     if (recharging) return;
+    const rechargeAmount = Math.floor(amount);
+    if (!rechargeAmount || rechargeAmount < 10) {
+      Alert.alert("Minimum recharge", "Please add at least ₹10 to continue.");
+      return;
+    }
     try {
       setRecharging(true);
       const order = await api<any>("/api/user/wallet/create-order", {
         method: "POST",
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ amount: rechargeAmount }),
       });
       const payment: any = await RazorpayCheckout.open({
         key: order.keyId,
@@ -298,7 +301,6 @@ export default function ChatScreen() {
     <SafeAreaView style={styles.screen}>
       <View style={[styles.header, { paddingTop: safeTop + 8 }]}>
         <View style={styles.headerMain}>
-          <Pressable onPress={() => router.back()} style={styles.back}><Text style={styles.backText}>‹</Text></Pressable>
           {chat.astrologer.profileImage ? (
             <Image source={{ uri: chat.astrologer.profileImage }} style={styles.avatarPhoto} />
           ) : (
@@ -375,13 +377,23 @@ export default function ChatScreen() {
           <View style={styles.ended}>
             <Text style={styles.endedTitle}>Session ended</Text>
             <Text style={styles.endedText}>{endReason === "insufficient_balance" ? "Your balance ran out during the session." : "Your consultation has ended."}</Text>
-            {endReason === "insufficient_balance" ? (
-              <Pressable disabled={recharging} style={styles.continue} onPress={() => void rechargeInChat(50)}>
-                <Text style={styles.continueText}>{recharging ? "Opening payment..." : "Add ₹50 now"}</Text>
-              </Pressable>
-            ) : (
-              <Pressable style={styles.continue} onPress={() => router.push("/(tabs)/chats")}><Text style={styles.continueText}>Back to astrologers</Text></Pressable>
-            )}
+            <PostChatRecharge
+              selectedAmount={selectedRechargeAmount}
+              customAmount={customRechargeAmount}
+              recharging={recharging}
+              onSelectAmount={(amount) => {
+                setSelectedRechargeAmount(amount);
+                setCustomRechargeAmount(String(amount));
+              }}
+              onChangeCustom={(value) => {
+                const numeric = value.replace(/[^0-9]/g, "");
+                setCustomRechargeAmount(numeric);
+                const parsed = Number(numeric);
+                if (Number.isFinite(parsed)) setSelectedRechargeAmount(parsed);
+              }}
+              onRecharge={() => void rechargeInChat(Number(customRechargeAmount || selectedRechargeAmount))}
+              onBackToAstrologers={() => router.push("/(tabs)/chats")}
+            />
           </View>
         ) : (
           <View style={[styles.composer, { paddingBottom: composerBottom }]}>
@@ -440,8 +452,70 @@ export default function ChatScreen() {
   );
 }
 
+function PostChatRecharge({
+  selectedAmount,
+  customAmount,
+  recharging,
+  onSelectAmount,
+  onChangeCustom,
+  onRecharge,
+  onBackToAstrologers,
+}: {
+  selectedAmount: number;
+  customAmount: string;
+  recharging: boolean;
+  onSelectAmount: (amount: number) => void;
+  onChangeCustom: (value: string) => void;
+  onRecharge: () => void;
+  onBackToAstrologers: () => void;
+}) {
+  return (
+    <View style={styles.postRecharge}>
+      <View style={styles.postRechargeHeader}>
+        <View style={styles.postRechargeIcon}>
+          <Ionicons name="wallet-outline" size={20} color="#7A4300" />
+        </View>
+        <View style={styles.postRechargeCopy}>
+          <Text style={styles.postRechargeTitle}>Recharge and continue anytime</Text>
+          <Text style={styles.postRechargeText}>Add balance now if you want to start another consultation quickly.</Text>
+        </View>
+      </View>
+
+      <View style={styles.rechargePackRow}>
+        {rechargePacks.map((amount) => {
+          const active = selectedAmount === amount;
+          return (
+            <Pressable key={amount} style={[styles.rechargePack, active && styles.rechargePackActive]} onPress={() => onSelectAmount(amount)}>
+              <Text style={[styles.rechargePackText, active && styles.rechargePackTextActive]}>₹{amount}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <View style={styles.customAmountRow}>
+        <Text style={styles.customPrefix}>₹</Text>
+        <TextInput
+          value={customAmount}
+          onChangeText={onChangeCustom}
+          keyboardType="number-pad"
+          placeholder="Custom amount"
+          placeholderTextColor="#9CA3AF"
+          style={styles.customAmountInput}
+        />
+      </View>
+
+      <Pressable disabled={recharging} style={[styles.continue, recharging && styles.continueDisabled]} onPress={onRecharge}>
+        <Text style={styles.continueText}>{recharging ? "Opening payment..." : `Add ₹${Number(customAmount || selectedAmount) || 0}`}</Text>
+      </Pressable>
+      <Pressable style={styles.secondaryAction} onPress={onBackToAstrologers}>
+        <Text style={styles.secondaryActionText}>Back to astrologers</Text>
+      </Pressable>
+    </View>
+  );
+}
+
 function ZodiacPattern() {
-  const symbols = ["♈", "☽", "✦", "♌", "♓", "♎", "☉", "♐", "✧", "♋", "♒", "♉"];
+  const symbols = ["\u2648", "\u263d", "\u2726", "\u264c", "\u2653", "\u264e", "\u2609", "\u2650", "\u2727", "\u264b", "\u2652", "\u2649"];
   return (
     <View pointerEvents="none" style={styles.pattern}>
       {symbols.map((symbol, index) => (
@@ -627,11 +701,28 @@ const styles = StyleSheet.create({
   send: { width: 50, height: 50, borderRadius: 25, alignItems: "center", justifyContent: "center", backgroundColor: "#FFB21C" },
   sendDisabled: { backgroundColor: "#D9DDE1" },
   sendText: { color: "white", fontSize: 25, fontFamily: fonts.extrabold },
-  ended: { margin: 16, backgroundColor: "white", borderRadius: 18, padding: 20, alignItems: "center", gap: 8 },
+  ended: { margin: 16, backgroundColor: "white", borderRadius: 18, padding: 18, alignItems: "center", gap: 8 },
   endedTitle: { fontFamily: fonts.extrabold, fontSize: 18, color: colors.ink },
   endedText: { color: colors.muted, textAlign: "center", fontFamily: fonts.regular },
-  continue: { backgroundColor: colors.orange, borderRadius: 12, paddingHorizontal: 18, paddingVertical: 12, marginTop: 6 },
+  postRecharge: { alignSelf: "stretch", marginTop: 8, borderRadius: 18, borderWidth: 1, borderColor: "#F1D9A4", backgroundColor: "#FFF9EA", padding: 13 },
+  postRechargeHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
+  postRechargeIcon: { width: 40, height: 40, borderRadius: 14, backgroundColor: "#FFE8A6", alignItems: "center", justifyContent: "center" },
+  postRechargeCopy: { flex: 1 },
+  postRechargeTitle: { fontFamily: fonts.extrabold, color: colors.ink, fontSize: 13.5 },
+  postRechargeText: { fontFamily: fonts.regular, color: colors.muted, fontSize: 11.5, lineHeight: 16, marginTop: 2 },
+  rechargePackRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 13 },
+  rechargePack: { flexGrow: 1, minWidth: 64, borderRadius: 13, borderWidth: 1, borderColor: "#E6D8B7", backgroundColor: "#FFFEFC", paddingVertical: 10, alignItems: "center" },
+  rechargePackActive: { borderColor: colors.gold, backgroundColor: "#FFF0BE" },
+  rechargePackText: { fontFamily: fonts.extrabold, color: colors.ink, fontSize: 13 },
+  rechargePackTextActive: { color: "#7A4300" },
+  customAmountRow: { marginTop: 10, minHeight: 45, borderRadius: 14, borderWidth: 1, borderColor: "#E6D8B7", backgroundColor: "#FFFEFC", flexDirection: "row", alignItems: "center", paddingHorizontal: 12 },
+  customPrefix: { fontFamily: fonts.extrabold, color: colors.orangeDark, fontSize: 17, marginRight: 5 },
+  customAmountInput: { flex: 1, fontFamily: fonts.bold, color: colors.ink, fontSize: 15, paddingVertical: 9 },
+  continue: { backgroundColor: colors.orange, borderRadius: 12, paddingHorizontal: 18, paddingVertical: 12, marginTop: 12, alignItems: "center" },
+  continueDisabled: { opacity: 0.65 },
   continueText: { color: "white", fontFamily: fonts.extrabold },
+  secondaryAction: { alignItems: "center", paddingTop: 12, paddingBottom: 2 },
+  secondaryActionText: { fontFamily: fonts.bold, color: colors.muted, fontSize: 12.5 },
   reviewOverlay: { flex: 1, backgroundColor: "rgba(30,41,59,.42)", justifyContent: "flex-end", padding: 14 },
   reviewCard: { backgroundColor: "#FFFEFC", borderRadius: 25, padding: 22, alignItems: "center" },
   reviewIcon: { width: 56, height: 56, borderRadius: 19, backgroundColor: "#FFF2D6", alignItems: "center", justifyContent: "center" },

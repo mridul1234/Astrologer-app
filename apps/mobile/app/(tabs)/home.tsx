@@ -180,10 +180,10 @@ export default function HomeScreen() {
           <Pressable onPress={() => router.push("/(tabs)/chats")}><Text style={styles.viewAll}>View all</Text></Pressable>
         </View>
         {loading || focusSkeleton ? (
-          <View style={styles.astroSkeletons}>{[0, 1].map((item) => <AstrologerCardSkeleton key={item} />)}</View>
+          <View style={styles.astroSkeletons}>{[0, 1, 2].map((item) => <AstrologerCardSkeleton key={item} />)}</View>
         ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.astroRow}>
-            {topAstrologers.map((item) => (
+          <View style={styles.astroList}>
+            {topAstrologers.slice(0, 4).map((item) => (
               <HomeAstrologer
                 key={item.id}
                 astrologer={item}
@@ -193,7 +193,7 @@ export default function HomeScreen() {
                 onChat={() => void start(item)}
               />
             ))}
-          </ScrollView>
+          </View>
         )}
 
         <SectionTitle title="AstroWalla services" />
@@ -356,6 +356,9 @@ function HomeAstrologer({
   onChat: () => void;
 }) {
   const available = astrologer.isOnline && !astrologer.isBusy;
+  const speciality = astrologer.speciality || astrologer.categories?.slice(0, 2).join(", ") || "Vedic Astrology";
+  const rating = astrologer.reviewCount > 0 && astrologer.averageRating > 0 ? astrologer.averageRating.toFixed(1) : "New";
+  const orders = astrologer.orderCount && astrologer.orderCount > 0 ? `${astrologer.orderCount.toLocaleString("en-IN")} orders` : "New";
   const cta = loading
     ? "Starting..."
     : !available
@@ -367,17 +370,36 @@ function HomeAstrologer({
           : "Chat";
   return (
     <View style={styles.astroCard}>
-      {astrologer.profileImage ? (
-        <Image source={{ uri: astrologer.profileImage }} style={styles.astroPhoto} />
-      ) : (
-        <View style={styles.astroAvatar}><Text style={styles.astroInitial}>{astrologer.user.name[0]}</Text></View>
-      )}
-      <Text style={styles.astroName} numberOfLines={1}>{astrologer.user.name}</Text>
-      <Text style={styles.astroSpec} numberOfLines={1}>{astrologer.speciality || "Vedic Astrology"}</Text>
-      <Text style={styles.astroMeta}>{astrologer.experienceYears || 1} yrs • ₹{astrologer.ratePerMin}/min</Text>
-      <Pressable disabled={!available || loading} style={({ pressed }) => [styles.astroChat, pressed && styles.astroChatPressed, (!available || loading) && styles.astroChatDisabled]} onPress={onChat}>
-        <Text style={[styles.astroChatText, (!available || loading) && styles.astroChatTextDisabled]}>{cta}</Text>
-      </Pressable>
+      {available ? (
+        <View style={styles.topRibbon}>
+          <Text style={styles.topRibbonText}>TOP</Text>
+        </View>
+      ) : null}
+      <View style={styles.astroTop}>
+        <View style={styles.photoColumn}>
+          {astrologer.profileImage ? (
+            <Image source={{ uri: astrologer.profileImage }} style={styles.astroPhoto} />
+          ) : (
+            <View style={styles.astroAvatar}><Text style={styles.astroInitial}>{astrologer.user.name.charAt(0).toUpperCase()}</Text></View>
+          )}
+          {available ? <View style={styles.onlineDot} /> : null}
+          <Text style={styles.astroRating}>{rating === "New" ? "New" : `★ ${rating}`}</Text>
+          <Text style={styles.astroOrders} numberOfLines={1}>{orders}</Text>
+        </View>
+        <View style={styles.astroInfo}>
+          <Text style={styles.astroName} numberOfLines={1}>{astrologer.user.name}</Text>
+          <Text style={styles.astroSpec} numberOfLines={1}>{speciality}</Text>
+          <Text style={styles.astroLang} numberOfLines={1}>{astrologer.languages || "Hindi, English"}</Text>
+          <Text style={styles.astroMeta}>Exp - {astrologer.experienceYears || 1} Years</Text>
+          <Text style={styles.astroRate}>₹{astrologer.ratePerMin}<Text style={styles.perMin}>/min</Text></Text>
+        </View>
+        <View style={styles.astroAction}>
+          <View style={[styles.statusDot, available ? styles.statusDotOnline : styles.statusDotOffline]} />
+          <Pressable disabled={!available || loading} style={({ pressed }) => [styles.astroChat, pressed && styles.astroChatPressed, (!available || loading) && styles.astroChatDisabled]} onPress={onChat}>
+            <Text style={[styles.astroChatText, (!available || loading) && styles.astroChatTextDisabled]}>{cta}</Text>
+          </Pressable>
+        </View>
+      </View>
     </View>
   );
 }
@@ -434,16 +456,31 @@ const styles = StyleSheet.create({
   sectionCompact: { marginTop: 0 },
   sectionRow: { marginHorizontal: 14, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   viewAll: { fontFamily: fonts.bold, color: colors.orangeDark, fontSize: 12 },
-  astroSkeletons: { marginHorizontal: -18 },
-  astroRow: { gap: 10, paddingHorizontal: 14, paddingRight: 22 },
-  astroCard: { width: 145, borderRadius: 20, padding: 12, backgroundColor: "#FFFEFC", borderWidth: 1, borderColor: "#E9E2D7", alignItems: "center" },
-  astroPhoto: { width: 58, height: 58, borderRadius: 29, backgroundColor: "#EEE" },
-  astroAvatar: { width: 58, height: 58, borderRadius: 29, backgroundColor: "#FFF0D2", borderWidth: 1, borderColor: "#EAD393", alignItems: "center", justifyContent: "center" },
+  astroSkeletons: { marginHorizontal: -4 },
+  astroList: { gap: 12 },
+  astroCard: { backgroundColor: "#FFFEFC", marginHorizontal: 14, borderRadius: 22, overflow: "hidden", borderWidth: 1, borderColor: "#E9E2D7", shadowColor: "#64748B", shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
+  topRibbon: { position: "absolute", left: -28, top: 14, width: 94, height: 24, backgroundColor: "#FF9D1C", alignItems: "center", justifyContent: "center", transform: [{ rotate: "-45deg" }], zIndex: 3 },
+  topRibbonText: { fontFamily: fonts.extrabold, color: "white", fontSize: 10, letterSpacing: 0.6 },
+  astroTop: { paddingHorizontal: 15, paddingVertical: 14, flexDirection: "row", alignItems: "center", gap: 12 },
+  photoColumn: { width: 76, alignItems: "center", position: "relative" },
+  astroPhoto: { width: 64, height: 64, borderRadius: 32, backgroundColor: "#EEE", borderWidth: 2, borderColor: "#F6D36E" },
+  astroAvatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: "#FFF0D2", borderWidth: 2, borderColor: "#F6D36E", alignItems: "center", justifyContent: "center" },
   astroInitial: { fontFamily: fonts.extrabold, color: colors.orangeDark, fontSize: 23 },
-  astroName: { fontFamily: fonts.extrabold, color: colors.ink, fontSize: 14.5, marginTop: 8, maxWidth: "100%" },
-  astroSpec: { fontFamily: fonts.medium, color: colors.muted, fontSize: 11.2, marginTop: 2, maxWidth: "100%" },
-  astroMeta: { fontFamily: fonts.regular, color: colors.muted, fontSize: 10.5, marginTop: 5 },
-  astroChat: { marginTop: 10, borderRadius: 12, paddingHorizontal: 20, paddingVertical: 8, borderWidth: 1, borderColor: colors.green, backgroundColor: "#FFFEFC" },
+  onlineDot: { position: "absolute", right: 5, top: 48, width: 15, height: 15, borderRadius: 8, backgroundColor: "#10B981", borderWidth: 2, borderColor: "white" },
+  astroRating: { marginTop: 8, fontFamily: fonts.extrabold, fontSize: 13.5, color: "#111827" },
+  astroOrders: { fontFamily: fonts.semibold, fontSize: 10.5, color: "#8A8A8A", marginTop: 1, maxWidth: "100%" },
+  astroInfo: { flex: 1, minWidth: 0 },
+  astroName: { fontFamily: fonts.extrabold, color: colors.ink, fontSize: 18, lineHeight: 22, maxWidth: "100%" },
+  astroSpec: { fontFamily: fonts.medium, color: colors.muted, fontSize: 13, marginTop: 3, maxWidth: "100%" },
+  astroLang: { fontFamily: fonts.regular, color: colors.muted, fontSize: 12.5, marginTop: 3, maxWidth: "100%" },
+  astroMeta: { fontFamily: fonts.regular, color: colors.muted, fontSize: 12.5, marginTop: 3 },
+  astroRate: { fontFamily: fonts.extrabold, color: "#111827", fontSize: 15, marginTop: 4 },
+  perMin: { fontFamily: fonts.bold, color: "#111827", fontSize: 12 },
+  astroAction: { width: 76, alignSelf: "stretch", alignItems: "center", justifyContent: "space-between" },
+  statusDot: { width: 17, height: 17, borderRadius: 9, alignSelf: "flex-end", borderWidth: 2, borderColor: "#FFFFFF" },
+  statusDotOnline: { backgroundColor: "#4FC464" },
+  statusDotOffline: { backgroundColor: "#D1D5DB" },
+  astroChat: { borderRadius: 20, paddingHorizontal: 15, paddingVertical: 8, borderWidth: 1.5, borderColor: colors.green, backgroundColor: "#FFFEFC", minWidth: 70, alignItems: "center" },
   astroChatPressed: { backgroundColor: "#EAF8F0", transform: [{ scale: 0.96 }] },
   astroChatDisabled: { borderColor: "#D8D8D8", backgroundColor: "#F7F7F7" },
   astroChatText: { fontFamily: fonts.bold, color: "#16A060", fontSize: 12.5 },

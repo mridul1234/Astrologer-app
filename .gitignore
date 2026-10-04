@@ -19,6 +19,12 @@ yarn-debug.log*
 yarn-error.log*
 *.tsbuildinfo
 *.apk
+*.aab
+*.jks
+*.keystore
+!**/debug.keystore
+/release-private/
+/release-output/
 **/.kotlin/
 
 # local env files

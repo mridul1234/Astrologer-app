@@ -10,7 +10,9 @@ const sections = [
       "Device information including IP address, browser type, and operating system",
       "Usage data such as pages visited, features used, and session duration",
       "Payment information processed securely via Razorpay (we do not store card details)",
-      "Chat session metadata (duration, astrologer, timestamps) — not conversation content",
+      "Birth profile information you provide: name, date and time of birth, and birthplace",
+      "Chat session metadata and conversation content, including messages and images you choose to send; conversations are stored to provide chat history",
+      "Notification tokens and device platform when push notifications are enabled",
     ],
   },
   {
@@ -19,7 +21,7 @@ const sections = [
       "To provide, maintain, and improve our astrology consultation platform",
       "To process wallet transactions and maintain your account balance",
       "To match you with available astrologers based on your selected filters",
-      "To send you important account notifications via SMS",
+      "To send account notifications via SMS and, when configured and permitted, push notifications via Expo and Google Firebase",
       "To detect and prevent fraudulent activity on our platform",
       "To comply with applicable Indian laws and regulations",
     ],
@@ -28,7 +30,7 @@ const sections = [
     title: "3. Data Sharing",
     content: [
       "We do not sell, rent, or trade your personal information to third parties",
-      "Astrologers only see your session details — they do not have access to your phone number",
+      "Your selected astrologer receives the profile information, messages and images needed for your consultation",
       "Payment processing is handled by Razorpay under their privacy policy",
       "We may share anonymized aggregate data for analytics purposes",
       "Data may be disclosed if required by Indian law, court order, or government authority",
@@ -37,11 +39,10 @@ const sections = [
   {
     title: "4. Data Security",
     content: [
-      "All data is encrypted in transit using TLS 1.3 industry-standard encryption",
-      "Your wallet and payment data are stored using AES-256 encryption at rest",
-      "We conduct regular security audits and penetration testing",
+      "The deployed app communicates with our API and chat service over HTTPS and secure WebSockets",
+      "Payment card information is handled by Razorpay; it is not stored by AstroWalla",
       "Access to your personal data is restricted to authorized personnel only",
-      "We maintain an incident response plan for data breach scenarios",
+      "Contact help.astrowalla@gmail.com to report a security or privacy concern",
     ],
   },
   {
@@ -58,9 +59,10 @@ const sections = [
     title: "6. Data Retention",
     content: [
       "Account data is retained for the duration of your active account",
-      "Transaction records are retained for 7 years as required by Indian tax law",
-      "Chat session logs are retained for 90 days then permanently deleted",
-      "Upon account deletion, personal data is removed within 30 days",
+      "Chat content, birth details and wallet history are retained while your account is active; no automatic 90-day chat deletion is currently implemented",
+      "Deleting your account in the app removes its data from the active application database; backup copies may remain until backups expire",
+      "You can also request account deletion at /delete-account without installing or signing into the app; support verifies ownership before acting",
+      "Where records must be retained to comply with applicable law, support will explain the required retention",
     ],
   },
   {
@@ -98,7 +100,7 @@ export default function PrivacyPolicyPage() {
             ✦ Legal
           </div>
           <h1 className="text-4xl font-extrabold text-stone-900 mb-2">Privacy Policy</h1>
-          <p className="text-stone-500 text-sm font-medium">Last updated: 1 January 2026 &nbsp;·&nbsp; Effective: 1 January 2026</p>
+          <p className="text-stone-500 text-sm font-medium">Last updated: 4 October 2026</p>
         </div>
       </div>
 
@@ -129,7 +131,7 @@ export default function PrivacyPolicyPage() {
             For any privacy-related queries, write to us at{" "}
             <a href="mailto:help.astrowalla@gmail.com" className="text-[#d97706] font-bold hover:underline">help.astrowalla@gmail.com</a>
             {" "}or reach out through our{" "}
-            <Link href="/contact-us" className="text-[#d97706] font-bold hover:underline">Contact page</Link>.
+            <Link href="/contact-us" className="text-[#d97706] font-bold hover:underline">Contact page</Link>. To remove your account, visit our <Link href="/delete-account" className="text-[#d97706] font-bold hover:underline">account deletion page</Link>.
           </p>
         </div>
       </main>

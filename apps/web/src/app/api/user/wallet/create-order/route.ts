@@ -11,6 +11,9 @@ export async function POST(req: NextRequest) {
 
   const { amount, purpose } = await req.json();
   const amountNum = Number(amount);
+  if (!Number.isFinite(amountNum) || !Number.isSafeInteger(Math.round(amountNum * 100)) || amountNum > 100000 || Math.abs(amountNum * 100 - Math.round(amountNum * 100)) > 0.000001) {
+    return NextResponse.json({ error: "Enter a valid recharge amount up to Rs 100000 with at most two decimal places." }, { status: 400 });
+  }
   const isIntroChatPass = purpose === "INTRO_CHAT_PASS";
   if (isIntroChatPass && amountNum !== 1) {
     return NextResponse.json({ error: "The intro chat pass costs Rs 1" }, { status: 400 });
@@ -39,7 +42,7 @@ export async function POST(req: NextRequest) {
     const receipt = `wp_${session.id.slice(-10)}_${Date.now().toString().slice(-8)}`;
 
     const order = await (razorpay.orders as any).create({
-      amount: amountNum * 100, // paise
+      amount: Math.round(amountNum * 100), // paise
       currency: "INR",
       receipt,
       notes: {

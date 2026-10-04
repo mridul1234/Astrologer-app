@@ -10,6 +10,7 @@ type User = {
 type SessionContextValue = {
   user: User | null;
   loading: boolean;
+  error: string | null;
   refresh: () => Promise<void>;
   setToken: (token: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -20,12 +21,22 @@ const SessionContext = createContext<SessionContextValue | null>(null);
 export function SessionProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
+    setError(null);
     const token = await SecureStore.getItemAsync("astrowalla_access_token");
     if (!token) { setUser(null); setLoading(false); return; }
     try { setUser(await api<User>("/api/mobile/me")); }
-    catch { await SecureStore.deleteItemAsync("astrowalla_access_token"); setUser(null); }
+    catch (failure) {
+      const status = (failure as { status?: number }).status;
+      if (status === 401 || status === 404) {
+        await SecureStore.deleteItemAsync("astrowalla_access_token");
+        setUser(null);
+      } else {
+        setError("Could not connect to AstroWalla. Check your connection and try again.");
+      }
+    }
     finally { setLoading(false); }
   }, []);
 
@@ -34,8 +45,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
     if (user) void registerPushToken("USER").catch(() => undefined);
   }, [user?.id]);
   const setToken = async (token: string) => { await SecureStore.setItemAsync("astrowalla_access_token", token); await refresh(); };
-  const logout = async () => { await unregisterPushToken(); await SecureStore.deleteItemAsync("astrowalla_access_token"); setUser(null); };
-  return <SessionContext.Provider value={{ user, loading, refresh, setToken, logout }}>{children}</SessionContext.Provider>;
+  const logout = async () => { await unregisterPushToken(); await SecureStore.deleteItemAsync("astrowalla_access_token"); setError(null); setUser(null); };
+  return <SessionContext.Provider value={{ user, loading, error, refresh, setToken, logout }}>{children}</SessionContext.Provider>;
 }
 
 export function useSession() {

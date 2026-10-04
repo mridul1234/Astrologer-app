@@ -21,8 +21,6 @@ export default function ProfileScreen() {
   const focusSkeleton = useFocusSkeleton();
   const [kundli, setKundli] = useState<KundliProfile | null>(null);
   const [name, setName] = useState("");
-  const [gender, setGender] = useState<"Male" | "Female" | "">("");
-  const [address, setAddress] = useState("");
   const [saving, setSaving] = useState(false);
   const pageLoading = loading || focusSkeleton;
 
@@ -85,33 +83,15 @@ export default function ProfileScreen() {
             <View style={styles.profileTop}>
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>{(name || user?.name || "U").charAt(0).toUpperCase()}</Text>
-                <Pressable style={styles.uploadBadge} onPress={() => Alert.alert("Profile photo", "Photo upload can be added once image storage is enabled.")}>
-                  <Ionicons name="cloud-upload-outline" size={17} color={colors.orangeDark} />
-                </Pressable>
               </View>
               <Text style={styles.phone}>AstroWalla member</Text>
             </View>
 
             <ProfileField label="Name*" value={name} onChangeText={setName} placeholder="Enter your name" />
 
-            <View style={styles.fieldBlock}>
-              <Text style={styles.label}>Gender</Text>
-              <View style={styles.genderRow}>
-                {(["Male", "Female"] as const).map((item) => (
-                  <Pressable key={item} style={styles.genderOption} onPress={() => setGender(item)}>
-                    <View style={[styles.radio, gender === item && styles.radioActive]}>
-                      {gender === item && <View style={styles.radioDot} />}
-                    </View>
-                    <Text style={styles.genderText}>{item}</Text>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
-
-            <DisplayField label="Date of Birth" value={kundli?.dateOfBirth ? formatDate(kundli.dateOfBirth) : "Add your birth date"} onPress={() => router.push("/onboarding")} />
-            <DisplayField label="Time of Birth" value={kundli?.timeOfBirth ? formatTime(kundli.timeOfBirth) : "Add your birth time"} onPress={() => router.push("/onboarding")} />
-            <DisplayField label="Place of Birth" value={kundli?.placeOfBirth || "Add your birth place"} onPress={() => router.push("/onboarding")} />
-            <ProfileField label="Current Address" value={address} onChangeText={setAddress} placeholder="Enter flat, house no, building, apartment" />
+            <DisplayField label="Date of Birth" value={kundli?.dateOfBirth ? formatDate(kundli.dateOfBirth) : "Add your birth date"} onPress={() => router.push("/onboarding?edit=1")} />
+            <DisplayField label="Time of Birth" value={kundli?.timeOfBirth ? formatTime(kundli.timeOfBirth) : "Add your birth time"} onPress={() => router.push("/onboarding?edit=1")} />
+            <DisplayField label="Place of Birth" value={kundli?.placeOfBirth || "Add your birth place"} onPress={() => router.push("/onboarding?edit=1")} />
 
             <Pressable style={[styles.submit, (!name.trim() || saving) && styles.submitDisabled]} disabled={!name.trim() || saving} onPress={submit}>
               <Text style={[styles.submitText, (!name.trim() || saving) && styles.submitTextDisabled]}>{saving ? "Saving..." : "Submit"}</Text>

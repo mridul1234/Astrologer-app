@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Alert, Image, KeyboardAvoidingView, PermissionsAndroid, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import DateTimePicker, { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { api } from "@/src/api";
 import { useSession } from "@/src/session";
 import { colors } from "@/src/ui";
@@ -16,6 +16,7 @@ const dateForPicker = (value: string) => value ? new Date(`${value}T12:00:00`) :
 const timeForPicker = (value: string) => { const [hour = "12", minute = "00"] = value.split(":"); const date = new Date(); date.setHours(Number(hour), Number(minute), 0, 0); return date; };
 
 export default function Onboarding() {
+  const { edit } = useLocalSearchParams<{ edit?: string }>();
   const { user, refresh } = useSession();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -24,7 +25,15 @@ export default function Onboarding() {
   // A new OTP user is initially named after their phone number on the server. Never
   // prefill that fallback value: the user must deliberately choose their display name.
   const [details, setDetails] = useState<Details>({ fullName: "", dateOfBirth: "", timeOfBirth: "", placeOfBirth: "" });
-  useEffect(() => { if (user?.kundliProfile) router.replace("/(tabs)/chats"); }, [user?.kundliProfile]);
+  useEffect(() => { if (user?.kundliProfile && edit !== "1") router.replace("/(tabs)/chats"); }, [user?.kundliProfile, edit]);
+  useEffect(() => {
+    if (edit !== "1") return;
+    let active = true;
+    void api<Details | null>("/api/user/kundli").then((profile) => {
+      if (active && profile) setDetails({ fullName: profile.fullName, dateOfBirth: profile.dateOfBirth, timeOfBirth: profile.timeOfBirth || "", placeOfBirth: profile.placeOfBirth });
+    }).catch(() => Alert.alert("Could not load your birth details", "Please try again."));
+    return () => { active = false; };
+  }, [edit]);
   const valid = useMemo(() => (step === 0 ? details.fullName.trim().length >= 2 : step === 1 ? Boolean(details.dateOfBirth) : step === 3 ? details.placeOfBirth.trim().length >= 2 : true), [details, step]);
   const update = (key: keyof Details, value: string) => setDetails((old) => ({ ...old, [key]: value }));
   const selectDate = (_event: DateTimePickerEvent, date?: Date) => { setShowDatePicker(false); if (date) update("dateOfBirth", dateToApi(date)); };

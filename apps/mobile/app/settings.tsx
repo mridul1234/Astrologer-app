@@ -1,50 +1,14 @@
-import { useEffect, useState } from "react";
-import { Alert, Linking, Pressable, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Switch, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, Linking, Pressable, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useSession } from "@/src/session";
 import { colors, fonts } from "@/src/ui";
 import { api } from "@/src/api";
 
-type SettingKey = "chatAlerts" | "offers" | "profilePrivacy";
-
-const preferenceKeys: Record<SettingKey, string> = {
-  chatAlerts: "astrowalla_setting_chat_alerts",
-  offers: "astrowalla_setting_offers",
-  profilePrivacy: "astrowalla_setting_profile_privacy",
-};
-
 export default function SettingsScreen() {
   const { logout } = useSession();
   const [deleting, setDeleting] = useState(false);
-  const [prefs, setPrefs] = useState<Record<SettingKey, boolean>>({
-    chatAlerts: true,
-    offers: true,
-    profilePrivacy: true,
-  });
-
-  useEffect(() => {
-    let alive = true;
-    Promise.all(
-      (Object.keys(preferenceKeys) as SettingKey[]).map(async (key) => {
-        const saved = await SecureStore.getItemAsync(preferenceKeys[key]);
-        return [key, saved === null ? true : saved === "true"] as const;
-      }),
-    ).then((entries) => {
-      if (alive) setPrefs(Object.fromEntries(entries) as Record<SettingKey, boolean>);
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  const toggle = async (key: SettingKey) => {
-    const next = !prefs[key];
-    setPrefs((current) => ({ ...current, [key]: next }));
-    await SecureStore.setItemAsync(preferenceKeys[key], String(next));
-  };
-
   const openWeb = (path: string) => {
     void Linking.openURL(`https://www.astrowalla.com${path}`);
   };
@@ -92,28 +56,16 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Section title="Notifications">
-          <SettingSwitch icon="chatbubble-outline" title="Chat alerts" subtitle="Replies, chat starts and session updates." value={prefs.chatAlerts} onValueChange={() => void toggle("chatAlerts")} />
-          <Divider />
-          <SettingSwitch icon="sparkles-outline" title="Offers and reminders" subtitle="Recharge offers and useful AstroWalla updates." value={prefs.offers} onValueChange={() => void toggle("offers")} />
-        </Section>
-
         <Section title="Privacy">
-          <SettingSwitch icon="lock-closed-outline" title="Profile privacy" subtitle="Show your name only where it is needed for sessions and reviews." value={prefs.profilePrivacy} onValueChange={() => void toggle("profilePrivacy")} />
-          <Divider />
           <SettingRow icon="shield-checkmark-outline" title="Manage privacy" subtitle="Read how your chats and details are protected." onPress={() => openWeb("/privacy-policy")} />
         </Section>
 
         <Section title="Preferences">
-          <SettingRow icon="language-outline" title="App language" right="English" onPress={() => Alert.alert("Language", "English is currently available. More languages can be added later.")} />
-          <Divider />
           <SettingRow icon="notifications-outline" title="Phone notification settings" subtitle="Open Android settings to manage system permissions." onPress={() => Linking.openSettings()} />
         </Section>
 
         <Section title="Account">
           <SettingRow icon="receipt-outline" title="Wallet transactions" onPress={() => router.push("/transactions")} />
-          <Divider />
-          <SettingRow icon="card-outline" title="Manage billing address" subtitle="Used for invoices and payment records." onPress={() => Alert.alert("Billing address", "Billing address management will be added once invoices are enabled.")} />
         </Section>
 
         <Section title="Legal">
@@ -125,7 +77,7 @@ export default function SettingsScreen() {
         <Pressable style={styles.logoutButton} onPress={doLogout}>
           <Text style={styles.logoutText}>Logout</Text>
         </Pressable>
-        <Pressable style={styles.deleteButton} onPress={deleteAccount}>
+        <Pressable style={styles.deleteButton} onPress={deleteAccount} disabled={deleting}>
           <Text style={styles.deleteText}>{deleting ? "Deleting account..." : "Delete my account"}</Text>
         </Pressable>
 
@@ -143,33 +95,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <View>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.sectionCard}>{children}</View>
-    </View>
-  );
-}
-
-function SettingSwitch({
-  icon,
-  title,
-  subtitle,
-  value,
-  onValueChange,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  subtitle?: string;
-  value: boolean;
-  onValueChange: () => void;
-}) {
-  return (
-    <View style={styles.settingRow}>
-      <View style={styles.settingIcon}>
-        <Ionicons name={icon} size={20} color={colors.orangeDark} />
-      </View>
-      <View style={styles.settingCopy}>
-        <Text style={styles.settingTitle}>{title}</Text>
-        {!!subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
-      </View>
-      <Switch value={value} onValueChange={onValueChange} trackColor={{ false: "#DDD6CC", true: "#F5C842" }} thumbColor="#FFFFFF" />
     </View>
   );
 }

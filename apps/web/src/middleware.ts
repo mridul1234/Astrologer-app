@@ -24,6 +24,7 @@ export default auth((req) => {
   // Public path prefixes — legal/info pages accessible without login
   const publicPrefixes = [
     "/privacy-policy",
+    "/delete-account",
     "/terms-and-conditions",
     "/refund-and-cancellation",
     "/user-guidelines",

@@ -77,6 +77,11 @@ def releaseStorePassword = findProperty('ASTROWALLA_RELEASE_STORE_PASSWORD') ?: 
 def releaseKeyAlias = findProperty('ASTROWALLA_RELEASE_KEY_ALIAS') ?: System.getenv('ASTROWALLA_RELEASE_KEY_ALIAS')
 def releaseKeyPassword = findProperty('ASTROWALLA_RELEASE_KEY_PASSWORD') ?: System.getenv('ASTROWALLA_RELEASE_KEY_PASSWORD')
 def hasReleaseKeystore = releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword
+def releaseVersionCode = (project.findProperty('astrowallaVersionCode') ?: '1').toInteger()
+
+if (gradle.startParameter.taskNames.any { it.toLowerCase().contains('release') } && !hasReleaseKeystore) {
+    throw new GradleException('Release signing is required. Run scripts/build-user-release.ps1.')
+}
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -102,7 +107,7 @@ android {
         applicationId 'com.astrowalla.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode releaseVersionCode
         versionName "1.0.0"
     }
     signingConfigs {
@@ -126,7 +131,7 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            signingConfig hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            signingConfig signingConfigs.release
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"

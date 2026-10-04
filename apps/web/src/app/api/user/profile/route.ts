@@ -93,6 +93,14 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Only seeker accounts can be deleted from the app." }, { status: 403 });
   }
 
+  const activeSession = await prisma.chatSession.findFirst({
+    where: { userId: user.id, status: "ACTIVE" },
+    select: { id: true },
+  });
+  if (activeSession) {
+    return NextResponse.json({ error: "Finish or cancel your active consultation before deleting your account." }, { status: 409 });
+  }
+
   await prisma.$transaction([
     prisma.message.deleteMany({ where: { senderId: user.id } }),
     prisma.review.deleteMany({ where: { userId: user.id } }),
