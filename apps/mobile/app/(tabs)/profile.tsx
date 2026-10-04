@@ -35,7 +35,7 @@ export default function ProfileScreen() {
         if (data?.fullName) setName(data.fullName);
       })
       .catch(() => undefined);
-  }, []);
+  }, [user?.kundliProfile]);
 
   const submit = async () => {
     if (!name.trim()) {
@@ -103,7 +103,7 @@ export default function ProfileScreen() {
                 <Text style={styles.actionText}>Settings</Text>
                 <Ionicons name="chevron-forward" size={16} color={colors.muted} />
               </Pressable>
-              <Pressable style={styles.actionRow} onPress={logout}>
+              <Pressable style={styles.actionRow} onPress={() => void logout().then(() => router.replace("/login"))}>
                 <Ionicons name="log-out-outline" size={18} color={colors.red} />
                 <Text style={[styles.actionText, styles.logoutText]}>Log out</Text>
               </Pressable>

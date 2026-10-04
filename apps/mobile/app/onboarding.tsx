@@ -43,7 +43,7 @@ export default function Onboarding() {
     try {
       await api("/api/user/kundli", { method: "POST", body: JSON.stringify({ ...details, timeOfBirth: details.timeOfBirth || "12:00" }) });
       if (Platform.OS === "android" && Number(Platform.Version) >= 33) await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
-      await refresh(); router.replace("/(tabs)/chats");
+      await refresh(); router.replace(edit === "1" ? "/(tabs)/profile" : "/(tabs)/chats");
     } catch (error) { Alert.alert("We couldn't save your details", error instanceof Error ? error.message : "Please try again."); }
     finally { setSaving(false); }
   };
@@ -51,7 +51,7 @@ export default function Onboarding() {
   const skipTime = () => { update("timeOfBirth", ""); setStep(3); };
 
   return <SafeAreaView style={styles.screen}><KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : undefined}><ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-    <View style={styles.header}><Pressable style={styles.back} onPress={() => step ? setStep((current) => current - 1) : router.replace("/login")} hitSlop={10}><Ionicons name="chevron-back" size={22} color={colors.ink}/></Pressable><View style={styles.brand}><Image source={require("../assets/astrowalla-logo.jpeg")} style={styles.headerLogo}/><Text style={styles.brandName}>AstroWalla</Text></View><Text style={styles.stepCount}>{step + 1}/{steps.length}</Text></View>
+    <View style={styles.header}><Pressable style={styles.back} onPress={() => step ? setStep((current) => current - 1) : edit === "1" ? router.back() : router.replace("/login")} hitSlop={10}><Ionicons name="chevron-back" size={22} color={colors.ink}/></Pressable><View style={styles.brand}><Image source={require("../assets/astrowalla-logo.jpeg")} style={styles.headerLogo}/><Text style={styles.brandName}>AstroWalla</Text></View><Text style={styles.stepCount}>{step + 1}/{steps.length}</Text></View>
     <View style={styles.progressTrack}>{steps.map((item, index) => <View key={item} style={[styles.progressSegment, index <= step && styles.progressActive]}/>)}</View>
     <View style={styles.card}><View style={styles.stepLabel}><View style={styles.stepBadge}><Text style={styles.stepBadgeText}>{step + 1}</Text></View><Text style={styles.stepLabelText}>{steps[step]}</Text></View>
       {step === 0 && <Question icon="person-outline" eyebrow="LET'S BEGIN" title="What should we call you?" subtitle="This is how your astrologer will greet you."><TextInput autoFocus value={details.fullName} onChangeText={(value) => update("fullName", value)} placeholder="Enter your full name" placeholderTextColor="#94A3B8" style={styles.input} autoCapitalize="words" returnKeyType="next" onSubmitEditing={next}/></Question>}
