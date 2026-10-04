@@ -45,6 +45,7 @@ if ($LASTEXITCODE -ne 0) { throw 'APK manifest read failed.' }
 if (!($badging -match "package: name='com.astrowalla.app'.*versionCode='$VersionCode'")) { throw 'Wrong application ID or version code.' }
 if (!($badging -match "targetSdkVersion:'36'")) { throw 'Wrong Android target SDK.' }
 if ($badging -match 'application-debuggable') { throw 'Release APK is debuggable.' }
+if ($badging -match "uses-permission: name='android.permission.(CAMERA|READ_PHONE_STATE|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|READ_MEDIA_IMAGES|READ_MEDIA_VIDEO)'") { throw 'Unexpected broad device or photo permissions.' }
 $badging | Select-String 'package:|sdkVersion:|targetSdkVersion:|uses-permission:'
 & "$env:JAVA_HOME\bin\jarsigner.exe" -verify $aab
 if ($LASTEXITCODE -ne 0) { throw 'AAB signature verification failed.' }
