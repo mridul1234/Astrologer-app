@@ -28,7 +28,7 @@ the Android bundle. See the private `release-private/play-review-access.json`.
 - Review verification can issue only USER mobile tokens, not website, ADMIN or
   ASTROLOGER access. The stored role is checked before a token is returned.
 - Challenges expire after ten minutes; start again with Continue when needed.
-- Ten verification attempts per clock hour are allowed across all challenges and
+- Ten failed verification attempts per clock hour are allowed across all challenges and
   server instances. Changing phone/challenge does not reset this shared budget.
 - Credentials themselves remain reusable until intentionally rotated. Keep them
   current in Play Console for future reviews; do not disable access after approval.

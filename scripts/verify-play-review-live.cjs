@@ -49,4 +49,4 @@ async function main() {
   assert.equal((await request("/api/user/profile")).status, 401);
   console.log(`PASS: production reviewer login/re-login, wrong code and astrologer client rejected, sample onboarding saved, wallet INR ${initialBalance}, horoscope accessible, normal unauthenticated profile blocked. No live consultation or card payment was initiated.`);
 }
-main().catch(error => { console.error(error.message); process.exitCode = 1; });
+main().catch(error => { console.error(error.stack); process.exitCode = 1; });
