@@ -28,6 +28,7 @@ async function main() {
   assert.equal(profile.status, 200);
   assert.equal(profile.data.email, `${phone}@astrowalla.com`);
   const initialBalance = profile.data.walletBalance;
+  assert.equal(profile.data.introOfferUsed, true, "Complimentary intro pass must unlock the first-chat paywall");
   assert.equal(profile.data.transactions.filter(tx => tx.reason === "Google Play review promotional credit").length, 1);
   if (!profile.data.kundliProfile) {
     const saved = await request("/api/user/kundli", {

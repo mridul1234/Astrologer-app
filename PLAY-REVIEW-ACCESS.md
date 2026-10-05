@@ -11,7 +11,8 @@ the Android bundle. See the private `release-private/play-review-access.json`.
 - Tap Continue, then enter the reusable four-digit PIN. No SMS is sent.
 - Complete onboarding if the review profile was deleted.
 - All normal USER APIs, astrologer availability, billing and chat are unchanged.
-- Initial access receives a one-time INR 1,000 promotional wallet credit with a
+- Initial access receives a complimentary three-minute intro pass and a one-time
+  INR 1,000 promotional wallet credit with a
   transaction entry. It is not automatically replenished, including after account
   deletion. Monitor the review balance and use normal admin credit tools if needed.
 - Paid consultations still generate normal astrologer earnings. This is not a

@@ -27,6 +27,8 @@ const db = {
     async update({ where, data }) {
       const row = [...users.values()].find(user => user.id === where.id);
       row.walletBalance += data.walletBalance.increment;
+      row.introOfferUsed = data.introOfferUsed;
+      row.freeMinutesLeft = data.freeMinutesLeft;
       return { ...row };
     },
     async findUniqueOrThrow({ where }) { return { ...[...users.values()].find(user => user.id === where.id) }; },
@@ -61,6 +63,8 @@ async function main() {
   const expired = "play-review:" + require("jsonwebtoken").sign({ phone: "0000000001", purpose: "play-review-login" }, process.env.MOBILE_AUTH_SECRET, { expiresIn: -1 });
   assert.equal(await verify("5826", "mobile", expired), false);
   assert.equal((await api.getPlayReviewUser("0000000001")).walletBalance, 1000);
+  assert.equal((await api.getPlayReviewUser("0000000001")).introOfferUsed, true);
+  assert.equal((await api.getPlayReviewUser("0000000001")).freeMinutesLeft, 3);
   assert.equal((await api.getPlayReviewUser("0000000001")).walletBalance, 1000);
   assert.equal(transactions.length, 1);
   users.clear();

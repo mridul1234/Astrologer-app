@@ -69,7 +69,9 @@ export async function getPlayReviewUser(phone: string) {
     if (grant.value === "pending") {
       const claimed = await tx.systemSetting.updateMany({ where: { key: grantKey, value: "pending" }, data: { value: "granted" } });
       if (claimed.count === 1) {
-        await tx.user.update({ where: { id: user.id }, data: { walletBalance: { increment: 1000 } } });
+        await tx.user.update({ where: { id: user.id }, data: {
+          walletBalance: { increment: 1000 }, introOfferUsed: true, freeMinutesLeft: 3,
+        } });
         await tx.transaction.create({ data: { userId: user.id, amount: 1000, type: "CREDIT", reason: "Google Play review promotional credit", referenceId: grantKey } });
       }
     }
