@@ -3,6 +3,7 @@ import { prisma } from "@astrology/db";
 import bcrypt from "bcryptjs";
 import { createMobileAccessToken } from "@/lib/mobile-auth";
 import { normalizeIndianPhoneNumber } from "@/lib/vobiz";
+import { getPlayReviewUser, isPlayReviewPhone, verifyPlayReviewChallenge } from "@/lib/play-review-access";
 
 const BASE_URL = "https://cpaas.messagecentral.com";
 const CUSTOMER_ID = process.env.MC_CUSTOMER_ID!;
@@ -40,6 +41,18 @@ export async function POST(req: NextRequest) {
         { error: "phone, verificationId, and otp are required." },
         { status: 400 }
       );
+    }
+
+    if (isPlayReviewPhone(phone)) {
+      if (!await verifyPlayReviewChallenge(phone, verificationId, otp, client)) {
+        return NextResponse.json({ error: "Invalid login code or too many attempts. Try again later." }, { status: 401 });
+      }
+      const user = await getPlayReviewUser(phone);
+      return NextResponse.json({
+        success: true, phone,
+        accessToken: createMobileAccessToken({ id: user.id, role: user.role }),
+        user: { id: user.id, name: user.name, role: user.role },
+      });
     }
 
     const authToken = await getMCAuthToken();

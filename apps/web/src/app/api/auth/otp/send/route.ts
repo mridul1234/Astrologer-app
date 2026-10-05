@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createPlayReviewChallenge, isPlayReviewPhone } from "@/lib/play-review-access";
 
 const BASE_URL = "https://cpaas.messagecentral.com";
 const CUSTOMER_ID = process.env.MC_CUSTOMER_ID!;
@@ -43,6 +44,10 @@ export async function POST(req: NextRequest) {
         { error: "Invalid phone number. Must be 10 digits." },
         { status: 400 }
       );
+    }
+
+    if (isPlayReviewPhone(phone)) {
+      return NextResponse.json({ success: true, verificationId: createPlayReviewChallenge(phone) });
     }
 
     const authToken = await getMCAuthToken();
