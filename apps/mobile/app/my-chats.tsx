@@ -41,7 +41,7 @@ export default function MyChatsScreen() {
 }
 
 function ChatCard({ item }: { item: ChatSession }) {
-  const canOpen = item.status === "ACTIVE" || item.status === "PENDING";
+  const canOpen = true;
   return (
     <Pressable style={styles.card} onPress={() => canOpen && router.push(`/chat/${item.id}`)}>
       {item.astrologer.profileImage ? <Image source={{ uri: item.astrologer.profileImage }} style={styles.photo} /> : <View style={styles.avatar}><Text style={styles.initial}>{item.astrologer.name[0]}</Text></View>}

@@ -25,7 +25,7 @@ const clauses = [
   },
   {
     title: "6. User Conduct",
-    content: "Users must not engage in abusive, harassing, or inappropriate behavior toward astrologers. Sharing contact information including phone numbers or social media handles with astrologers violates our policy and may result in account suspension. The platform must not be used for any unlawful purpose.",
+    content: "All users and astrologers must not share sexually explicit material, child sexual abuse material, threats, graphic violence, hate speech, harassment, scams, or other unlawful content. Sharing contact information including phone numbers or social media handles with astrologers violates our policy. Use the chat Safety control to report a conversation or block the other participant, and the flag control to report a message. Blocking ends the active consultation and prevents further interaction; already billed time is not automatically refunded. Our support team reviews reports and may take appropriate action, including restricting access or removing prohibited content. Unblock users in Settings. Urgent safety concerns can also be sent to help.astrowalla@gmail.com.",
   },
   {
     title: "7. Astrologer Relationship",

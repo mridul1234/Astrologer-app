@@ -57,6 +57,7 @@ export default function SettingsScreen() {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Section title="Privacy">
+          <SettingRow icon="ban-outline" title="Blocked users" onPress={() => router.push("/blocked-users")} />
           <SettingRow icon="shield-checkmark-outline" title="Manage privacy" subtitle="Read how your chats and details are protected." onPress={() => openWeb("/privacy-policy")} />
         </Section>
 

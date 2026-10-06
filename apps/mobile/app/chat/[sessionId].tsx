@@ -6,10 +6,13 @@ import { Ionicons } from "@expo/vector-icons";
 import RazorpayCheckout from "react-native-razorpay";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
+import * as SecureStore from "expo-secure-store";
 import { api } from "@/src/api";
 import { Skeleton, SkeletonLine } from "@/src/Skeleton";
 import { useSession } from "@/src/session";
 import { colors, fonts } from "@/src/ui";
+import { ChatSafety } from "@/src/ChatSafety";
+import { usePendingChat } from "@/src/pending-chat";
 
 type Message = { id: string; senderId: string; content: string; createdAt: string };
 type ParsedMessage = { type: "text"; text: string } | { type: "image"; uri: string };
@@ -29,10 +32,13 @@ const rechargePacks = [50, 100, 200, 500];
 export default function ChatScreen() {
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
   const { user, refresh } = useSession();
+  const { clearPendingChat } = usePendingChat();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [chat, setChat] = useState<ChatSession | null>(null);
   const [text, setText] = useState("");
+  const [rulesAccepted, setRulesAccepted] = useState(false);
+  useEffect(() => { void SecureStore.getItemAsync("chat-safety-20261007").then(value => setRulesAccepted(value === "accepted")).catch(() => undefined); }, []);
   const [typing, setTyping] = useState(false);
   const [ended, setEnded] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -181,8 +187,16 @@ export default function ChatScreen() {
     }
   };
 
-  const send = () => {
+  const ensureChatRules = async () => {
+    if (rulesAccepted) return true;
+    return new Promise<boolean>(resolve => Alert.alert("Chat safety rules", "By sharing messages or images, you agree to our Terms and Conditions. Harassment, sexual content, threats, hate speech, scams and unlawful content are prohibited. Use Safety to report or block participants.", [
+      { text: "Cancel", style: "cancel", onPress: () => resolve(false) },
+      { text: "I agree", onPress: () => { setRulesAccepted(true); void SecureStore.setItemAsync("chat-safety-20261007", "accepted"); resolve(true); } },
+    ], { cancelable: true, onDismiss: () => resolve(false) }));
+  };
+  const send = async () => {
     if (!text.trim() || !astrologerJoined || ended) return;
+    if (!await ensureChatRules()) return;
     socket.current?.emit("send_message", { sessionId, content: text.trim() });
     socket.current?.emit("typing", { sessionId, isTyping: false });
     setText("");
@@ -190,6 +204,7 @@ export default function ChatScreen() {
 
   const sendImage = async () => {
     if (!astrologerJoined || ended) return;
+    if (!await ensureChatRules()) return;
     try {
       const picked = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
@@ -273,6 +288,7 @@ export default function ChatScreen() {
   const sessionStartedAt = new Date(chat.startedAt).getTime();
   const hasHistory = chat.messages.some((message) => new Date(message.createdAt).getTime() < sessionStartedAt);
   const compactHeader = width < 380;
+  const safetyBlocked = () => { clearPendingChat(sessionId); setEnded(true); setBillingStarted(false); setReviewSubmitted(true); setEndReason("blocked_or_ended"); void refresh(); };
   const safeTop = Math.max(insets.top, Platform.OS === "android" ? StatusBar.currentHeight || 0 : 0);
   const composerBottom = Math.max(insets.bottom, Platform.OS === "android" ? 16 : 12);
   const headerControls = (
@@ -286,6 +302,7 @@ export default function ChatScreen() {
         <Text style={styles.plus}>+</Text>
       </Pressable>
       {!ended && <Pressable onPress={end} style={styles.end}><Text style={styles.endText}>End</Text></Pressable>}
+      <ChatSafety sessionId={sessionId} name={name} onBlocked={safetyBlocked}/>
     </View>
   );
 
@@ -294,7 +311,7 @@ export default function ChatScreen() {
   }
 
   if (!astrologerJoined && !ended) {
-    return <WaitingRoom name={name} connected={connected} waitLeft={waitLeft} kundli={kundli} onCancel={cancelBeforeJoin} />;
+    return <WaitingRoom name={name} connected={connected} waitLeft={waitLeft} kundli={kundli} onCancel={cancelBeforeJoin} safety={<ChatSafety sessionId={sessionId} name={name} onBlocked={safetyBlocked} label/>} />;
   }
 
   return (
@@ -367,6 +384,7 @@ export default function ChatScreen() {
                   )}
                 </View>
                 <Text style={styles.time}>{new Date(item.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+                {!mine && !item.id.startsWith("tmp_") && <ChatSafety sessionId={sessionId} name={name} messageId={item.id} onBlocked={safetyBlocked} label/>}
               </View>
               </>
             );
@@ -549,7 +567,7 @@ function parseMessageContent(content: string): ParsedMessage {
   return { type: "text", text: content };
 }
 
-function WaitingRoom({ name, connected, waitLeft, kundli, onCancel }: { name: string; connected: boolean; waitLeft: number; kundli: KundliProfile | null; onCancel: () => void }) {
+function WaitingRoom({ name, connected, waitLeft, kundli, onCancel, safety }: { name: string; connected: boolean; waitLeft: number; kundli: KundliProfile | null; onCancel: () => void; safety: React.ReactNode }) {
   return (
     <SafeAreaView style={styles.waitingScreen}>
       <View style={styles.waitingCard}>
@@ -577,6 +595,7 @@ function WaitingRoom({ name, connected, waitLeft, kundli, onCancel }: { name: st
         <Pressable style={({ pressed }) => [styles.cancelButton, pressed && styles.cancelPressed]} onPress={onCancel}>
           <Text style={styles.cancelText}>Cancel session</Text>
         </Pressable>
+        {safety}
       </View>
     </SafeAreaView>
   );

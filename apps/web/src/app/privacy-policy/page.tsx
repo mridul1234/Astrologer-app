@@ -13,6 +13,7 @@ const sections = [
       "Birth profile information you provide: name, date and time of birth, and birthplace",
       "Chat session metadata and conversation content, including messages and images you choose to send; conversations are stored to provide chat history",
       "Notification tokens and device platform when push notifications are enabled",
+      "Safety reports, reported message copies, review notes, and the accounts you block",
     ],
   },
   {
@@ -23,6 +24,7 @@ const sections = [
       "To match you with available astrologers based on your selected filters",
       "To send account notifications via SMS and, when configured and permitted, push notifications via Expo and Google Firebase",
       "To detect and prevent fraudulent activity on our platform",
+      "To investigate safety reports, enforce our conduct rules, and prevent blocked accounts from contacting each other",
       "To comply with applicable Indian laws and regulations",
     ],
   },
@@ -31,6 +33,7 @@ const sections = [
     content: [
       "We do not sell, rent, or trade your personal information to third parties",
       "Your selected astrologer receives the profile information, messages and images needed for your consultation",
+      "Authorized support staff can access reports and reported messages to investigate abuse; reports are not public",
       "Payment processing is handled by Razorpay under their privacy policy",
       "We may share anonymized aggregate data for analytics purposes",
       "Data may be disclosed if required by Indian law, court order, or government authority",
@@ -100,13 +103,13 @@ export default function PrivacyPolicyPage() {
             ✦ Legal
           </div>
           <h1 className="text-4xl font-extrabold text-stone-900 mb-2">Privacy Policy</h1>
-          <p className="text-stone-500 text-sm font-medium">Last updated: 4 October 2026</p>
+          <p className="text-stone-500 text-sm font-medium">Last updated: 7 October 2026</p>
         </div>
       </div>
 
       <main className="max-w-5xl mx-auto px-6 py-12">
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-10 text-sm text-amber-800 font-medium">
-          <strong>Summary:</strong> We collect only what is necessary to run the platform. We do not sell your data. Your conversations with astrologers are private. You can delete your account at any time.
+          <strong>Summary:</strong> We collect information to run the platform and investigate safety reports. We do not sell your data. Conversations are not public; authorized support staff can review reported messages. You can delete your account at any time.
         </div>
 
         <div className="bg-white rounded-3xl border border-stone-100 shadow-sm divide-y divide-stone-50">

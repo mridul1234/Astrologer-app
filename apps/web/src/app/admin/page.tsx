@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import SafetyReports from "./SafetyReports";
 
 interface Analytics {
   totalUsers: number;
@@ -55,7 +56,7 @@ export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<"ANALYTICS" | "USERS" | "ASTROLOGERS" | "CREATE" | "WITHDRAWALS" | "SETTINGS" | "NOTIFICATIONS">("ANALYTICS");
+  const [activeTab, setActiveTab] = useState<"ANALYTICS" | "USERS" | "ASTROLOGERS" | "CREATE" | "WITHDRAWALS" | "SETTINGS" | "NOTIFICATIONS" | "SAFETY">("ANALYTICS");
   
   // Data States
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
@@ -356,6 +357,7 @@ export default function AdminDashboard() {
           { id: "USERS", label: "👥 Users" },
           { id: "WITHDRAWALS", label: "💸 Withdrawals" },
           { id: "NOTIFICATIONS", label: "Notifications" },
+          { id: "SAFETY", label: "Safety Reports" },
           { id: "SETTINGS", label: "⚙️ Settings" },
           { id: "CREATE", label: "➕ Add Astrologer" }
         ].map((tab) => (
@@ -376,6 +378,7 @@ export default function AdminDashboard() {
       <main className="max-w-6xl">
         
         {/* ANALYTICS TAB */}
+        {activeTab === "SAFETY" && <SafetyReports/>}
         {activeTab === "ANALYTICS" && (
           <div className="space-y-6 animate-in fade-in duration-300">
             <h2 className="text-xl font-extrabold text-stone-900 mb-4">Platform Health</h2>

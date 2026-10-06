@@ -40,6 +40,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const blocked = await prisma.userBlock.findFirst({ where: { OR: [
+    { blockerId: user.id, blockedId: astrologer.userId },
+    { blockerId: astrologer.userId, blockedId: user.id },
+  ] } });
+  if (blocked) return NextResponse.json({ error: "This conversation is blocked. Manage your blocked users in Settings." }, { status: 403 });
+
   // After the intro pass is bought/used, allow entry when the user has intro-pass
   // minutes or enough wallet balance for the selected astrologer's per-minute rate.
   if (user.freeMinutesLeft <= 0 && user.walletBalance < astrologer.ratePerMin) {
