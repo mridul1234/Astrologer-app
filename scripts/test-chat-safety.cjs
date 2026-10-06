@@ -52,7 +52,10 @@ function event(socket, name, action) {
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => { socket.off(name, handler); reject(new Error(`Missing event ${name}`)); }, 15000);
     const handler = value => { clearTimeout(timeout); resolve(value); };
-    socket.once(name, handler); action?.();
+    socket.once(name, handler);
+    Promise.resolve().then(() => action?.()).catch(error => {
+      clearTimeout(timeout); socket.off(name, handler); reject(error);
+    });
   });
 }
 async function connect(user) {
